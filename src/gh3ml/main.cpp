@@ -27,9 +27,14 @@ void __stdcall detourDebugLog(char* fmt, ...)
     va_list args;
     va_start(args, fmt);
 
-    std::cout << "GH3 : " << fmt << std::endl;
+    std::cout << "GH3  | ";
+
+    vprintf(fmt, args);
+    
+    std::cout << std::endl;
 
     Debug_Log(fmt, args);
+
     va_end(args);
 }
 
@@ -51,18 +56,18 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         {
             // TODO: this
         }
+        gh3ml::Log::Info("MinHook Initialized!");
 
         if (MH_CreateHook(reinterpret_cast<void**>(Debug_Log_Target), &detourDebugLog, reinterpret_cast<void**>(&Debug_Log)) != MH_OK)
         {
             std::cout << "Unable to get Hook!" << std::endl;
         }
-        std::cout << "Hooked!" << std::endl;
 
         MH_EnableHook(reinterpret_cast<void**>(Debug_Log_Target));
 
         _gh3Handle = GetCurrentProcess();
 
-
+        gh3ml::Log::Info("Finished Initializing!");
         break;
 
     case DLL_THREAD_ATTACH:

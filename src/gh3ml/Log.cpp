@@ -1,5 +1,5 @@
 #include <cstdint>
-
+#include <cstdarg>
 
 #include <Log.hpp>
 
@@ -67,6 +67,11 @@ namespace gh3ml
         return result;
     }
 
+    void Log::WriteToOutput(LogLevel level, const char* fmt, va_list argList)
+    {
+
+    }
+
 	LogLevel Log::GetLogLevel()
 	{
 		return s_currentLogLevel;
@@ -125,5 +130,27 @@ namespace gh3ml
 
         return result;
 	}
+
+    void Log::Write(LogLevel level, const char* fmt, ...)
+    {
+        va_list args;
+        va_start(fmt, args);
+        vprintf(fmt, args);
+        va_end(args);
+    }
+
+    void Log::Info(const char* fmt, ...)
+    {
+        va_list args;
+        va_start(args, fmt);
+
+        std::cout << "INFO | ";
+
+        vprintf(fmt, args);
+
+        std::cout << std::endl;
+
+        va_end(args);
+    }
 
 }
