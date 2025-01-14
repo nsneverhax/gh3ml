@@ -12,6 +12,8 @@
 
 // "Borrowed" from https://stackoverflow.com/questions/191842/how-do-i-get-console-output-in-c-with-a-windows-program
 
+#undef ERROR
+
 namespace gh3ml
 {
 	LogLevel Log::s_currentLogLevel = LogLevel::INFO;
@@ -133,18 +135,44 @@ namespace gh3ml
 
     void Log::Write(LogLevel level, const char* fmt, ...)
     {
+        if (level <= s_currentLogLevel)
+            return;
+
         va_list args;
         va_start(fmt, args);
+        switch (level)
+        {
+        case gh3ml::LogLevel::TRACE:
+            std::cout << "TRACE | ";
+            break;
+        case gh3ml::LogLevel::DEBUG:
+            std::cout << "DEBUG | ";
+            break;
+        case gh3ml::LogLevel::INFO:
+            std::cout << "INFO  | ";
+            break;
+        case gh3ml::LogLevel::WARN:
+            std::cout << "WARN  | ";
+            break;
+        case gh3ml::LogLevel::ERROR:
+        default:
+            std::cout << "ERROR | ";
+            break;
+        }
         vprintf(fmt, args);
+        std::cout << std::endl;
         va_end(args);
     }
 
-    void Log::Info(const char* fmt, ...)
+    void Log::Trace(const char* fmt, ...)
     {
+        if (LogLevel::TRACE <= s_currentLogLevel)
+            return;
+
         va_list args;
         va_start(args, fmt);
 
-        std::cout << "INFO | ";
+        std::cout << "TRACE | ";
 
         vprintf(fmt, args);
 
@@ -152,5 +180,68 @@ namespace gh3ml
 
         va_end(args);
     }
+    void Log::Debug(const char* fmt, ...)
+    {
+        if (LogLevel::DEBUG <= s_currentLogLevel)
+            return;
 
+        va_list args;
+        va_start(args, fmt);
+
+        std::cout << "DEBUG | ";
+
+        vprintf(fmt, args);
+
+        std::cout << std::endl;
+
+        va_end(args);
+    }
+    void Log::Info(const char* fmt, ...)
+    {
+        if (LogLevel::INFO <= s_currentLogLevel)
+            return;
+
+        va_list args;
+        va_start(args, fmt);
+
+        std::cout << "INFO  | ";
+
+        vprintf(fmt, args);
+
+        std::cout << std::endl;
+
+        va_end(args);
+    }
+    void Log::Warn(const char* fmt, ...)
+    {
+        if (LogLevel::WARN <= s_currentLogLevel)
+            return;
+
+        va_list args;
+        va_start(args, fmt);
+
+        std::cout << "WARN  | ";
+
+        vprintf(fmt, args);
+
+        std::cout << std::endl;
+
+        va_end(args);
+    }
+    void Log::Error(const char* fmt, ...)
+    {
+        if (LogLevel::ERROR <= s_currentLogLevel)
+            return;
+
+        va_list args;
+        va_start(args, fmt);
+
+        std::cout << "ERROR | ";
+
+        vprintf(fmt, args);
+
+        std::cout << std::endl;
+
+        va_end(args);
+    }
 }

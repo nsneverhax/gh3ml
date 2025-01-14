@@ -35,7 +35,12 @@ namespace gh3ml
 
 
 		static void Write(LogLevel level, const char* fmt, ...);
+
+		static void Trace(const char* fmt, ...);
+		static void Debug(const char* fmt, ...);
 		static void Info(const char* fmt, ...);
+		static void Warn(const char* fmt, ...);
+		static void Error(const char* fmt, ...);
 
 		Log() = delete;
 		~Log() = delete;
