@@ -13,6 +13,7 @@ add_library(${PROJECT_NAME} SHARED
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     include/
+    "libGH3/include/"
 )
 
 # this is so stupid
@@ -38,6 +39,20 @@ set_target_properties(ProxyLoader PROPERTIES
   PREFIX ""
   OUTPUT_NAME "XInput1_3"
 )
+
+# -- libGH3
+
+add_library(libGH3 SHARED "libGH3/src/main.cpp")
+
+set_target_properties(libGH3 PROPERTIES
+  PREFIX ""
+  OUTPUT_NAME "libGH3"
+)
+
+target_include_directories(libGH3 PUBLIC
+    "libGH3/include/"
+)
+
 
 if (MSVC)
   include(CheckLinkerFlag)

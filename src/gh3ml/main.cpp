@@ -15,12 +15,10 @@ const HANDLE gh3ml::GetGH3Handle()
 }
 
 
-
-typedef void(__stdcall* func_Debug_Log)(char* fmt, ...);
+typedef void(__stdcall* func_Debug_Log)(void* fmt, ...);
 
 func_Debug_Log Debug_Log = nullptr;
 func_Debug_Log Debug_Log_Target = reinterpret_cast<func_Debug_Log>(0x00472b50);
-
 
 void __stdcall detourDebugLog(char* fmt, ...)
 {
@@ -62,6 +60,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         {
             std::cout << "Unable to get Hook!" << std::endl;
         }
+
 
         MH_EnableHook(reinterpret_cast<void**>(Debug_Log_Target));
 
