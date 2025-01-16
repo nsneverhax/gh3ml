@@ -6,6 +6,7 @@
 
 namespace GH3
 {
+
 	/// <summary>
 	/// This type has NOT been verified to work in a direct cast to GH3 use with caution!
 	/// </summary>
@@ -19,5 +20,7 @@ namespace GH3
 		std::int32_t Value;
 
 		QbStructItem* Next;
+
+
 	};
 }
