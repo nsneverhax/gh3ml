@@ -23,8 +23,6 @@ namespace gh3ml
 		static void AdjustConsoleBuffer(int16_t minLength);
 		static bool RedirectConsoleIO();
 
-		static void WriteToOutput(LogLevel level, const char* fmt, va_list argList);
-
 	public:
 
 		static LogLevel GetLogLevel();
@@ -33,14 +31,7 @@ namespace gh3ml
 		static bool CreateConsole();
 		static bool ReleaseConsole();
 
-
-		static void Write(LogLevel level, const char* fmt, ...);
-
-		static void Trace(const char* fmt, ...);
-		static void Debug(const char* fmt, ...);
-		static void Info(const char* fmt, ...);
-		static void Warn(const char* fmt, ...);
-		static void Error(const char* fmt, ...);
+		static void WriteToOutput(LogLevel level, const char* sourceName, const char* fmt, va_list argList);
 
 		Log() = delete;
 		~Log() = delete;

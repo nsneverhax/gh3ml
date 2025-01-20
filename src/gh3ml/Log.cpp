@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <cstdarg>
 
-#include <Log.hpp>
+#include <GH3ML/Log.hpp>
 
 #include <Windows.h>
 #include <stdio.h>
@@ -9,7 +9,7 @@
 #include <io.h>
 #include <iostream>
 #include <fstream>
-
+#include <chrono>
 // "Borrowed" from https://stackoverflow.com/questions/191842/how-do-i-get-console-output-in-c-with-a-windows-program
 
 #undef ERROR
@@ -69,9 +69,51 @@ namespace gh3ml
         return result;
     }
 
-    void Log::WriteToOutput(LogLevel level, const char* fmt, va_list argList)
+    void Log::WriteToOutput(LogLevel level, const char* sourceName, const char* fmt, va_list args)
     {
+        if (level < s_currentLogLevel)
+            return;
 
+        time_t now = time(0);
+        tm* localtm = localtime(&now);
+
+        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        int consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+
+        char levelStr[6];
+        switch (level)
+        {
+        case gh3ml::LogLevel::TRACE:
+            consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
+            strncpy(levelStr, "TRACE", sizeof(levelStr) - 1);
+            break;
+        case gh3ml::LogLevel::DEBUG:
+            consoleColorAttribute =  FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+            strncpy(levelStr, "DEBUG", sizeof(levelStr) - 1);
+            break;
+        case gh3ml::LogLevel::INFO:
+            strncpy(levelStr, "INFO ", sizeof(levelStr) - 1);
+            break;
+        case gh3ml::LogLevel::WARN:
+            consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+            strncpy(levelStr, "WARN ", sizeof(levelStr) - 1);
+            break;
+        case gh3ml::LogLevel::ERROR:
+        default:
+            consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_RED;
+            strncpy(levelStr, "ERROR", sizeof(levelStr) - 1);
+            break;
+        }
+        levelStr[5] = '\0';
+
+        SetConsoleTextAttribute(hConsole, consoleColorAttribute);
+
+        printf("%02i:%02i:%02i %s [%s]: ", localtm->tm_hour, localtm->tm_min, localtm->tm_sec, levelStr, sourceName);
+
+        SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+
+        vprintf(fmt,args);
+        std::cout << std::endl;
     }
 
 	LogLevel Log::GetLogLevel()
@@ -132,116 +174,4 @@ namespace gh3ml
 
         return result;
 	}
-
-    void Log::Write(LogLevel level, const char* fmt, ...)
-    {
-        if (level <= s_currentLogLevel)
-            return;
-
-        va_list args;
-        va_start(fmt, args);
-        switch (level)
-        {
-        case gh3ml::LogLevel::TRACE:
-            std::cout << "TRACE | ";
-            break;
-        case gh3ml::LogLevel::DEBUG:
-            std::cout << "DEBUG | ";
-            break;
-        case gh3ml::LogLevel::INFO:
-            std::cout << "INFO  | ";
-            break;
-        case gh3ml::LogLevel::WARN:
-            std::cout << "WARN  | ";
-            break;
-        case gh3ml::LogLevel::ERROR:
-        default:
-            std::cout << "ERROR | ";
-            break;
-        }
-        vprintf(fmt, args);
-        std::cout << std::endl;
-        va_end(args);
-    }
-
-    void Log::Trace(const char* fmt, ...)
-    {
-        if (LogLevel::TRACE <= s_currentLogLevel)
-            return;
-
-        va_list args;
-        va_start(args, fmt);
-
-        std::cout << "TRACE | ";
-
-        vprintf(fmt, args);
-
-        std::cout << std::endl;
-
-        va_end(args);
-    }
-    void Log::Debug(const char* fmt, ...)
-    {
-        if (LogLevel::DEBUG <= s_currentLogLevel)
-            return;
-
-        va_list args;
-        va_start(args, fmt);
-
-        std::cout << "DEBUG | ";
-
-        vprintf(fmt, args);
-
-        std::cout << std::endl;
-
-        va_end(args);
-    }
-    void Log::Info(const char* fmt, ...)
-    {
-        if (LogLevel::INFO <= s_currentLogLevel)
-            return;
-
-        va_list args;
-        va_start(args, fmt);
-
-        std::cout << "INFO  | ";
-
-        vprintf(fmt, args);
-
-        std::cout << std::endl;
-
-        va_end(args);
-    }
-    void Log::Warn(const char* fmt, ...)
-    {
-        if (LogLevel::WARN <= s_currentLogLevel)
-            return;
-
-        va_list args;
-        va_start(args, fmt);
-
-        std::cout << "WARN  | ";
-
-        vprintf(fmt, args);
-
-        std::cout << std::endl;
-
-        va_end(args);
-    }
-    void Log::Error(const char* fmt, ...)
-    {
-        if (LogLevel::ERROR <= s_currentLogLevel)
-            return;
-
-        va_list args;
-        va_start(args, fmt);
-
-        std::cout << "ERROR | ";
-
-        vprintf(fmt, args);
-
-        std::cout << std::endl;
-
-        va_end(args);
-    }
 }

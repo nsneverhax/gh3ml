@@ -1,10 +1,10 @@
 #include <Core.hpp>
 
-bool gh3ml::ReadMemory(const std::uint32_t* baseAddress, std::uint8_t* buffer, size_t size)
+bool gh3ml::ReadMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size)
 {
-	return ReadProcessMemory(GetGH3Handle(), baseAddress, buffer, size, NULL);
+	return ReadProcessMemory(GetGH3Handle(), reinterpret_cast<void*>(baseAddress), buffer, size, NULL);
 }
-bool gh3ml::WriteMemory(const std::uint32_t* baseAddress, std::uint8_t* buffer, size_t size)
+bool gh3ml::WriteMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size)
 {
-	return false;
+	return WriteProcessMemory(GetGH3Handle(), reinterpret_cast<void*>(baseAddress), buffer, size, NULL);
 }
