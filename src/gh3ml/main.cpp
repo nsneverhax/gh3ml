@@ -38,11 +38,13 @@ const HANDLE gh3ml::GetGH3Handle()
     return _gh3Handle;
 }
 
+using DebugLog = gh3ml::hook::Binding<0x00472b50, gh3ml::hook::cconv::CDecl, void, char*, va_list>;
+
 void detourDebugLog(char* fmt, va_list args)
 {
     gh3ml::internal::LogGH3.Info(fmt, args);
 
-    gh3ml::hook::Orig<0x00472b50, gh3ml::hook::cconv::CDecl, void>(fmt, args);
+    DebugLog::Orig(fmt, args);
 }
 
 HWND detourCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
@@ -59,37 +61,34 @@ struct QbStruct
     uint8_t member1;
     uint8_t member2;
     void* first;
+
+    using InsertCStringItem = gh3ml::hook::Binding<0x00479ac0, gh3ml::hook::cconv::ThisCall, void, QbStruct*, uint32_t, const char*>;
+    using InsertQbKeyItem = gh3ml::hook::Binding<0x00479c80, gh3ml::hook::cconv::ThisCall, void, QbStruct*, uint32_t, uint32_t>;
 };
 
-typedef void(__thiscall* func__QbStruct_InsertCStringItem)(QbStruct* self, uint32_t key, const char* string);
-typedef void(__thiscall* func__QbStruct_InsertQbKeyItem)(QbStruct* self, uint32_t key, uint32_t value);
-
-func__QbStruct_InsertCStringItem QbStruct_InsertCStringItem = reinterpret_cast<func__QbStruct_InsertCStringItem>(0x00479ac0);
-func__QbStruct_InsertQbKeyItem QbStruct_InsertQbKeyItem = reinterpret_cast<func__QbStruct_InsertQbKeyItem>(0x00479c80);
+using LoadPak = gh3ml::hook::Binding<0x004a1780, gh3ml::hook::cconv::CDecl, bool, QbStruct*>;
 
 int loadPakCount = 0;
 
 bool detourLoadPak(QbStruct* qbStruct)
 {
-    auto ret = gh3ml::hook::Orig<0x004a1780, gh3ml::hook::cconv::CDecl, bool>(qbStruct);
+    auto ret = LoadPak::Orig(qbStruct);
     if (loadPakCount++ == 1)
     {
         if (std::filesystem::exists("../gh3ml/Mods/GH3Deluxe/pak/gh3dx.pak"))
         {
             QbStruct deluxeStruct = QbStruct();
 
-            QbStruct_InsertCStringItem(&deluxeStruct, 0, "../gh3ml/Mods/GH3Deluxe/pak/gh3dx.pak");
+            QbStruct::InsertCStringItem(&deluxeStruct, 0, "../gh3ml/Mods/GH3Deluxe/pak/gh3dx.pak");
 
-            gh3ml::hook::Orig<0x004a1780, gh3ml::hook::cconv::CDecl, bool>(&deluxeStruct);
+            LoadPak::Orig(&deluxeStruct);
         }
 
     }
     return ret;
 }
 
-
-
-
+using CFuncPrintF = gh3ml::hook::Binding<0x00530940, gh3ml::hook::cconv::CDecl, bool, void*>;
 bool detourCFuncPrintF(void* param1)
 {
 
@@ -115,8 +114,6 @@ bool detourCFuncPrintF(void* param1)
     return true;
 }
 
-
-
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
     _gh3Handle = GetCurrentProcess();
@@ -136,15 +133,15 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         else
             gh3ml::internal::Log.Info("Minhook initialized!");
 
-        gh3ml::hook::CreateHook<0x00472b50, gh3ml::hook::cconv::CDecl>(detourDebugLog);
+        gh3ml::hook::CreateHook<DebugLog>(detourDebugLog);
 
         gh3ml::hook::CreateHook<1, gh3ml::hook::cconv::STDCall>(
             reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "CreateWindowExA")),
             detourCreateWindowExA
         );
 
-        gh3ml::hook::CreateHook<0x004a1780, gh3ml::hook::cconv::CDecl>(detourLoadPak);
-        gh3ml::hook::CreateHook<0x00530940, gh3ml::hook::cconv::CDecl>(detourCFuncPrintF);
+        gh3ml::hook::CreateHook<LoadPak>(detourLoadPak);
+        gh3ml::hook::CreateHook<CFuncPrintF>(detourCFuncPrintF);
 
         gh3ml::internal::Log.Info("Finished Core Initialization!");
         break;

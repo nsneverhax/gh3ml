@@ -20,7 +20,7 @@ namespace gh3ml::hook
 
     std::unordered_map<uintptr_t, HookData> Hooks;
 
-    template<uintptr_t id, typename CConv, typename Ret, typename... Args>
+    template<uintptr_t id, typename Cconv, typename Ret, typename... Args>
     Ret Orig(Args... args)
     {
         auto& data = Hooks[id];
@@ -32,14 +32,14 @@ namespace gh3ml::hook
         if constexpr (std::is_same_v<Ret, void>)
         {
             if (index == 0)
-                CConv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
+                Cconv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
             else
                 reinterpret_cast<Ret(*)(Args...)>(data.Hooks[index])(args...);
         }
         else
         {
             if (index == 0)
-                return CConv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
+                return Cconv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
             else
                 return reinterpret_cast<Ret(*)(Args...)>(data.Hooks[index])(args...);
         }
@@ -149,5 +149,39 @@ namespace gh3ml::hook
     void CreateHook(Ret(&detour)(Args...))
     {
         CreateHook<address, Cconv, Ret, Args...>(address, detour);
+    }
+
+    template<uintptr_t Address, typename Cconv, typename Ret, typename... Args>
+    struct Binding {
+        static constexpr uintptr_t address = Address;
+        using cconv = Cconv;
+        using func = Ret(&)(Args...);
+        Ret value;
+        explicit Binding(Args... args) {
+            value = Cconv::template Trampoline<Ret, Args...>(Address, args...);
+        }
+        operator Ret() const { return value; } // NOLINT(*-explicit-constructor)
+        static Ret Orig(Args... args) {
+            return gh3ml::hook::Orig<Address, Cconv, Ret, Args...>(args...);
+        }
+    };
+
+    template<uintptr_t Address, typename Cconv, typename... Args>
+    struct Binding<Address, Cconv, void, Args...> {
+        static constexpr uintptr_t address = Address;
+        using cconv = Cconv;
+        using func = void(&)(Args...);
+        explicit Binding(Args... args) {
+            Cconv::template Trampoline<void, Args...>(Address, args...);
+        }
+        static void Orig(Args... args) {
+            gh3ml::hook::Orig<Address, Cconv, void, Args...>(args...);
+        }
+    };
+
+    template<typename Binding>
+    void CreateHook(typename Binding::func detour)
+    {
+        CreateHook<Binding::address, typename Binding::cconv>(Binding::address, detour);
     }
 }
