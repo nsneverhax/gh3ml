@@ -9,17 +9,53 @@
 
 namespace gh3ml::hook
 {
+    struct HookData
+    {
+    public:
+
+        uintptr_t Address;
+        std::vector<uintptr_t> Hooks = std::vector<uintptr_t>();
+        size_t OrigIndex = 0;
+    };
+
+    std::unordered_map<uintptr_t, HookData> Hooks;
+
+    template<uintptr_t id, typename CConv, typename Ret, typename... Args>
+    Ret Orig(Args... args)
+    {
+        auto& data = Hooks[id];
+        size_t index = data.Hooks.size() - ++data.OrigIndex;
+
+        if (index == 0)
+            data.OrigIndex = 0;
+
+        if constexpr (std::is_same_v<Ret, void>)
+        {
+            if (index == 0)
+                CConv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
+            else
+                reinterpret_cast<Ret(*)(Args...)>(data.Hooks[index])(args...);
+        }
+        else
+        {
+            if (index == 0)
+                return CConv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
+            else
+                return reinterpret_cast<Ret(*)(Args...)>(data.Hooks[index])(args...);
+        }
+    }
+
 	namespace cconv
 	{
 		struct CDecl
 		{
-			template<uintptr_t offset, typename Ret, typename... Args>
+			template<uintptr_t id, typename Ret, typename... Args>
 			static Ret __cdecl Handler(Args... args)
 			{
 				if constexpr (std::is_same_v<Ret, void>)
-					Orig<offset, CDecl, Ret, Args...>(args...);
+					Orig<id, CDecl, Ret, Args...>(args...);
 				else
-					return Orig<offset, CDecl, Ret, Args...>(args...);
+					return Orig<id, CDecl, Ret, Args...>(args...);
 			}
 
 			template<typename Ret, typename... Args>
@@ -35,13 +71,13 @@ namespace gh3ml::hook
 
 		struct STDCall
 		{
-			template<uintptr_t offset, typename Ret, typename... Args>
+			template<uintptr_t id, typename Ret, typename... Args>
 			static Ret __stdcall Handler(Args... args)
 			{
 				if constexpr (std::is_same_v<Ret, void>)
-					Orig<offset, STDCall, Ret, Args...>(args...);
+					Orig<id, STDCall, Ret, Args...>(args...);
 				else
-					return Orig<offset, STDCall, Ret, Args...>(args...);
+					return Orig<id, STDCall, Ret, Args...>(args...);
 			}
 
 			template<typename Ret, typename... Args>
@@ -56,42 +92,32 @@ namespace gh3ml::hook
 		};
 	}
 
-	uintptr_t ModuleBase = 0;
-
-	struct HookData
+	template<uintptr_t id, typename Cconv, typename Ret, typename... Args>
+	void CreateHook(uintptr_t address, Ret(&detour)(Args...))
 	{
-	public:
-
-		std::vector<uintptr_t> Hooks = std::vector<uintptr_t>();
-		size_t OrigIndex = 0;
-
-		// uintptr_t GetAddress() const;
-	};
-
-
-	std::unordered_map<uintptr_t, HookData> Hooks;
-
-	template<uintptr_t offset, typename Cconv, typename Ret, typename... Args>
-	void CreateHook(Ret(__cdecl &detour)(Args...))
-	{
-		auto address = offset;
-		bool isNew = !Hooks.contains(address);
+		bool isNew = !Hooks.contains(id);
 
 		if (isNew)
-			Hooks[address] = HookData();
+			Hooks[id] = HookData();
 
-		auto& data = Hooks[address];
+		auto& data = Hooks[id];
 
 		if (isNew)
 		{
-			uintptr_t orig = 0;
-			if (MH_CreateHook(reinterpret_cast<void*>(address), &cconv::CDecl::Handler<offset, Ret, Args...>, reinterpret_cast<void**>(&orig)) != MH_OK)
-			{
-				std::cout << "failed to hook" << std::endl;
+            data.Address = address;
 
+			uintptr_t orig = 0;
+			if (MH_CreateHook(reinterpret_cast<void*>(address), reinterpret_cast<void*>(&Cconv::template Handler<id, Ret, Args...>), reinterpret_cast<void**>(&orig)) != MH_OK)
+			{
+				std::cout << "failed to hook: MH_CreateHook" << std::endl;
+                return;
 			}
-			else
-				std::cout << "hook" << std::endl;
+			if (MH_EnableHook(reinterpret_cast<void*>(address)) != MH_OK)
+            {
+                std::cout << "failed to hook: MH_EnableHook" << std::endl;
+                return;
+            }
+            std::cout << "hook" << std::endl;
 
 			data.Hooks.push_back(orig);
 		}
@@ -99,57 +125,9 @@ namespace gh3ml::hook
 		data.Hooks.push_back(reinterpret_cast<uintptr_t>(&detour));
 	}
 
-	template<uintptr_t offset, typename Cconv, typename Ret, typename... Args>
-	void CreateHook(Ret(__stdcall& detour)(Args...))
-	{
-		auto address = offset;
-		bool isNew = !Hooks.contains(address);
-
-		if (isNew)
-			Hooks[address] = HookData();
-
-		auto& data = Hooks[address];
-
-		if (isNew)
-		{
-			uintptr_t orig = 0;
-			if (MH_CreateHook(reinterpret_cast<void*>(address), &Cconv::template Handler<offset, Ret, Args...>, reinterpret_cast<void**>(&orig)) != MH_OK)
-			{
-				std::cout << "failed to hook" << std::endl;
-
-			}
-			else
-				std::cout << "hook" << std::endl;
-
-			data.Hooks.push_back(orig);
-		}
-
-		data.Hooks.push_back(reinterpret_cast<uintptr_t>(detour));
-	}
-
-	template<uintptr_t offset, typename CConv, typename Ret, typename... Args>
-	Ret Orig(Args... args) 
-	{
-		auto addr = offset;
-		auto& data = Hooks[addr];
-		size_t index = data.Hooks.size() - ++data.OrigIndex;
-
-		if (index == 0)
-			data.OrigIndex = 0;
-
-		if constexpr (std::is_same_v<Ret, void>) 
-		{
-			if (index == 0) 
-				CConv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
-			else 
-				reinterpret_cast<Ret(*)(Args...)>(data.Hooks[index])(args...);
-		}
-		else 
-		{
-			if (index == 0)
-				return CConv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
-			else
-				return reinterpret_cast<Ret(*)(Args...)>(data.Hooks[index])(args...);
-		}
-	}
+    template<uintptr_t address, typename Cconv, typename Ret, typename... Args>
+    void CreateHook(Ret(&detour)(Args...))
+    {
+        CreateHook<address, Cconv, Ret, Args...>(address, detour);
+    }
 }
