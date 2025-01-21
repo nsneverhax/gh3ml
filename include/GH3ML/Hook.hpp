@@ -66,7 +66,6 @@ namespace gh3ml::hook
 				else
 					return reinterpret_cast<Ret(__cdecl*)(Args...)>(address)(args...);
 			}
-
 		};
 
 		struct STDCall
@@ -88,7 +87,28 @@ namespace gh3ml::hook
 				else
 					return reinterpret_cast<Ret(__stdcall*)(Args...)>(address)(args...);
 			}
+		};
 
+
+		struct ThisCall
+		{
+			template<uintptr_t id, typename Ret, typename... Args>
+			static Ret __thiscall Handler(Args... args)
+			{
+				if constexpr (std::is_same_v<Ret, void>)
+					Orig<id, ThisCall, Ret, Args...>(args...);
+				else
+					return Orig<id, ThisCall, Ret, Args...>(args...);
+			}
+
+			template<typename Ret, typename... Args>
+			static Ret Trampoline(uintptr_t address, Args... args)
+			{
+				if constexpr (std::is_same_v<Ret, void>)
+					reinterpret_cast<Ret(__thiscall*)(Args...)>(address)(args...);
+				else
+					return reinterpret_cast<Ret(__thiscall*)(Args...)>(address)(args...);
+			}
 		};
 	}
 

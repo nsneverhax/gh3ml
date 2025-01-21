@@ -70,7 +70,7 @@ int loadPakCount = 0;
 bool detourLoadPak(QbStruct* qbStruct)
 {
     auto ret = gh3ml::hook::Orig<0x004a1780, gh3ml::hook::cconv::CDecl, bool>(qbStruct);
-    if (loadPakCount == 1)
+    if (loadPakCount++ == 1)
     {
         QbStruct deluxeStruct = QbStruct();
 
@@ -79,11 +79,38 @@ bool detourLoadPak(QbStruct* qbStruct)
         gh3ml::hook::Orig<0x004a1780, gh3ml::hook::cconv::CDecl, bool>(&deluxeStruct);
 
     }
-    loadPakCount++;
     return ret;
 }
 
-typedef uint32_t(* func__GetCFunCount)(void);
+
+
+
+bool detourCFuncPrintF(void* param1)
+{
+
+    char buffer[1024];
+    memset(buffer, 0, sizeof(buffer));
+
+    reinterpret_cast<void(*)(char*, size_t, void*)>(0x00532a80)(buffer, 1023, param1);
+
+
+    // Replace linebreaks becuase we take care of them ourself
+    for (auto i = 0; i < 1024; i++)
+    {
+        if (buffer[i] == '\n')
+        {
+            buffer[i] = ' ';
+        }
+        if (buffer[i] == '\0')
+            break;
+    }
+
+    gh3ml::internal::LogGH3.Info(buffer);
+    //return gh3ml::hook::Orig<0x00530940, gh3ml::hook::cconv::CDecl, bool, char*>(param1);
+    return true;
+}
+
+
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
@@ -100,10 +127,9 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         gh3ml::Log::CreateConsole();
 
         if (MH_Initialize() != MH_OK)
-        {
-            // TODO: this
-        }
-        gh3ml::internal::Log.Info("Minhook Initialized!");
+            gh3ml::internal::Log.Error("Minhook failed to initialize!");
+        else
+            gh3ml::internal::Log.Info("Minhook initialized!");
 
         gh3ml::hook::CreateHook<0x00472b50, gh3ml::hook::cconv::CDecl>(detourDebugLog);
 
@@ -113,6 +139,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         );
 
         gh3ml::hook::CreateHook<0x004a1780, gh3ml::hook::cconv::CDecl>(detourLoadPak);
+        gh3ml::hook::CreateHook<0x00530940, gh3ml::hook::cconv::CDecl>(detourCFuncPrintF);
 
         gh3ml::internal::Log.Info("Finished Core Initialization!");
         break;
