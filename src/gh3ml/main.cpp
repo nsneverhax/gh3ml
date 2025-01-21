@@ -11,6 +11,8 @@
 #include <GH3ML/Hook.hpp>
 #include <GH3ML/Log.hpp>
 
+#include <filesystem>
+
 
 extern gh3ml::LogSource gh3ml::internal::Log = gh3ml::LogSource("GH3ML");
 extern gh3ml::LogSource gh3ml::internal::LogGH3 = gh3ml::LogSource("GH3");
@@ -72,11 +74,14 @@ bool detourLoadPak(QbStruct* qbStruct)
     auto ret = gh3ml::hook::Orig<0x004a1780, gh3ml::hook::cconv::CDecl, bool>(qbStruct);
     if (loadPakCount++ == 1)
     {
-        QbStruct deluxeStruct = QbStruct();
+        if (std::filesystem::exists("../gh3ml/Mods/GH3Deluxe/pak/gh3dx.pak"))
+        {
+            QbStruct deluxeStruct = QbStruct();
 
-        QbStruct_InsertCStringItem(&deluxeStruct, 0, "../gh3ml/Mods/GH3Deluxe/pak/gh3dx.pak");
+            QbStruct_InsertCStringItem(&deluxeStruct, 0, "../gh3ml/Mods/GH3Deluxe/pak/gh3dx.pak");
 
-        gh3ml::hook::Orig<0x004a1780, gh3ml::hook::cconv::CDecl, bool>(&deluxeStruct);
+            gh3ml::hook::Orig<0x004a1780, gh3ml::hook::cconv::CDecl, bool>(&deluxeStruct);
+        }
 
     }
     return ret;
