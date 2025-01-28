@@ -8,5 +8,8 @@ namespace gh3ml::internal
 	extern LogSource LogGH3;
 
 	static void SetupCFuncRedirection();
-
+	
+	
+	void ReadConfig();
+	
 }

@@ -4,7 +4,7 @@
 #undef ERROR
 #endif // ERROR
 
-namespace gh3ml
+namespace gh3ml::Log
 {
 	enum class LogLevel
 	{
@@ -15,25 +15,17 @@ namespace gh3ml
 		ERROR
 	};
 
-	class Log
-	{
-	private:
-		static LogLevel s_currentLogLevel;
+	void AdjustConsoleBuffer(int16_t minLength);
+	bool RedirectConsoleIO();
+	
+	
+	
+	LogLevel GetLogLevel();
+	void SetLogLevel(LogLevel level);
+	
+	bool CreateConsole();
+	bool ReleaseConsole();
+	
+	void WriteToOutput(LogLevel level, const char* sourceName, const char* fmt, va_list argList);
 
-		static void AdjustConsoleBuffer(int16_t minLength);
-		static bool RedirectConsoleIO();
-
-	public:
-
-		static LogLevel GetLogLevel();
-		static void SetLogLevel(LogLevel level);
-
-		static bool CreateConsole();
-		static bool ReleaseConsole();
-
-		static void WriteToOutput(LogLevel level, const char* sourceName, const char* fmt, va_list argList);
-
-		Log() = delete;
-		~Log() = delete;
-	};
 }

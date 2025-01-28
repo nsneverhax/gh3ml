@@ -7,7 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project(gh3ml VERSION 1.0.0)
 
 add_library(${PROJECT_NAME} SHARED
-  src/gh3ml/main.cpp src/gh3ml/Core.cpp "src/gh3ml/Log.cpp" "src/gh3ml/LogSource.cpp"
+  src/gh3ml/main.cpp src/gh3ml/Core.cpp "src/gh3ml/Log.cpp" "src/gh3ml/LogSource.cpp" "src/gh3ml/Config.cpp"
   # source files here
 )
 
@@ -28,8 +28,10 @@ endif()
 include(cmake/get_cpm.cmake)
 
 CPMAddPackage("gh:TsudaKageyu/minhook#master")
+CPMAddPackage("gh:geode-sdk/json#main")
 
 target_link_libraries(${PROJECT_NAME} minhook)
+target_link_libraries(${PROJECT_NAME} mat-json)
 
 # -- PORXY LAODER
 

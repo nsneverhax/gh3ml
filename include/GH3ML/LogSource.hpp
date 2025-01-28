@@ -10,13 +10,13 @@ namespace gh3ml
 	class LogSource
 	{
 	private:
-		std::string _name = { "NO NAME" };
+		std::string_view _name = { "NO NAME" };
 
 	public:
 		LogSource(const char* name);
 		LogSource(const std::string& name);
 
-		void Write(LogLevel level, const char* fmt, ...) const;
+		void Write(Log::LogLevel level, const char* fmt, ...) const;
 
 		void Trace(const char* fmt, ...) const;
 		void Debug(const char* fmt, ...) const;
@@ -25,7 +25,7 @@ namespace gh3ml
 		void Error(const char* fmt, ...) const;
 
 
-		void Write(LogLevel level, const char* fmt, va_list args) const;
+		void Write(Log::LogLevel level, const char* fmt, va_list args) const;
 
 		void Trace(const char* fmt, va_list args) const;
 		void Debug(const char* fmt, va_list args) const;

@@ -1,4 +1,4 @@
-#include <Core.hpp>
+#include <GH3ML/Core.hpp>
 
 bool gh3ml::ReadMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size)
 {

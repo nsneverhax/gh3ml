@@ -24,11 +24,19 @@ static HMODULE getXInput()
     static auto xinput = []() -> HMODULE
         {
             std::wstring path(MAX_PATH_CHARS, L'\0');
+
+            // Vultu: Some people have special xinput1_3.dll for their guitars.. apparently
+            // We are already modding the game might as well give them support for it.
+            if (std::filesystem::exists("gh3ml\\xinput1_3.dll"))
+            {
+                return LoadLibraryW(L"gh3ml\\xinput1_3.dll");
+            }
+
             auto size = GetSystemDirectoryW(path.data(), path.size());
             if (size)
             {
                 path.resize(size);
-                return LoadLibraryW((path + L"\\XInput1_3.dll").c_str());
+                return LoadLibraryW((path + L"\\xinput1_3.dll").c_str());
             }
             return NULL;
         }();

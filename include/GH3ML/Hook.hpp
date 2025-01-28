@@ -7,6 +7,9 @@
 
 #include <MinHook.h>
 
+// TODO: this is dumb!
+#include "../src/gh3ml/Main.hpp"
+
 namespace gh3ml::hook
 {
     struct HookData
@@ -129,15 +132,15 @@ namespace gh3ml::hook
 			uintptr_t orig = 0;
 			if (MH_CreateHook(reinterpret_cast<void*>(address), reinterpret_cast<void*>(&Cconv::template Handler<id, Ret, Args...>), reinterpret_cast<void**>(&orig)) != MH_OK)
 			{
-				std::cout << "failed to hook: MH_CreateHook" << std::endl;
+				gh3ml::internal::Log.Error("Failed to hook function at address: 0x%X", address);
                 return;
 			}
 			if (MH_EnableHook(reinterpret_cast<void*>(address)) != MH_OK)
             {
-                std::cout << "failed to hook: MH_EnableHook" << std::endl;
+				gh3ml::internal::Log.Error("Failed to enable function hook with address: 0x%X", address);
                 return;
             }
-            std::cout << "hook" << std::endl;
+			gh3ml::internal::Log.Info("Hooked function at address: 0x%X", address);
 
 			data.Hooks.push_back(orig);
 		}
