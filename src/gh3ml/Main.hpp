@@ -7,7 +7,8 @@ namespace gh3ml::internal
 	extern LogSource Log;
 	extern LogSource LogGH3;
 
-	static void SetupCFuncRedirection();
+	extern void SetupDefaultHooks();
+	void SetupCFuncRedirection();
 	
 	
 	void ReadConfig();

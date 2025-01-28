@@ -7,7 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project(gh3ml VERSION 1.0.0)
 
 add_library(${PROJECT_NAME} SHARED
-  src/gh3ml/main.cpp src/gh3ml/Core.cpp "src/gh3ml/Log.cpp" "src/gh3ml/LogSource.cpp" "src/gh3ml/Config.cpp"
+  src/gh3ml/main.cpp src/gh3ml/Core.cpp "src/gh3ml/Log.cpp" "src/gh3ml/LogSource.cpp" "src/gh3ml/Config.cpp" "src/gh3ml/DefaultHooks.cpp" "src/gh3ml/Hook.cpp"
   # source files here
 )
 

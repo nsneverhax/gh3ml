@@ -16,12 +16,12 @@ namespace gh3ml::hook
     {
     public:
 
-        uintptr_t Address;
+        uintptr_t Address = NULL;
         std::vector<uintptr_t> Hooks = std::vector<uintptr_t>();
         size_t OrigIndex = 0;
     };
 
-    std::unordered_map<uintptr_t, HookData> Hooks;
+    extern std::unordered_map<uintptr_t, HookData> Hooks;
 
     template<uintptr_t id, typename Cconv, typename Ret, typename... Args>
     Ret Orig(Args... args)
