@@ -2,6 +2,7 @@
 #include <GH3ML/Hook.hpp>
 #include <d3d9.h>
 #include <GH3ML/Core.hpp>
+#include <filesystem>
 
 constexpr int INST_NOP = 0x90;
 
@@ -74,6 +75,7 @@ struct QbStruct
 
     using InsertCStringItem = gh3ml::hook::Binding<0x00479ac0, gh3ml::hook::cconv::ThisCall, void, QbStruct*, uint32_t, const char*>;
     using InsertQbKeyItem = gh3ml::hook::Binding<0x00479c80, gh3ml::hook::cconv::ThisCall, void, QbStruct*, uint32_t, uint32_t>;
+    using FUN_004788b0 = gh3ml::hook::Binding<0x004788b0, gh3ml::hook::cconv::ThisCall, bool, QbStruct*, uint32_t, void*, uint32_t>;
 };
 
 using LoadPak = gh3ml::hook::Binding<0x004a1780, gh3ml::hook::cconv::CDecl, bool, QbStruct*>;
@@ -82,23 +84,49 @@ int loadPakCount = 0;
 
 std::unordered_map<uint32_t, std::string> keyMap = { };
 
+
 bool detourLoadPak(QbStruct* qbStruct)
 {
+    static bool _doPakCheck = true;
+
     auto ret = LoadPak::Orig(qbStruct);
-    if (loadPakCount == 1)
+
+    if (!_doPakCheck)
+        return ret;
+
+    char* pakNameBuffer[128];
+    memset(pakNameBuffer, 0, 128);
+
+    QbStruct::FUN_004788b0(qbStruct, 0, pakNameBuffer, 0);
+
+    if (strcmp("pak/qb.pak", pakNameBuffer[0]) == 0)
     {
 
-        loadPakCount++;
+        for (const auto pair : gh3ml::internal::LoadedMods)
+        {
 
-        // if (std::filesystem::exists("./gh3ml/Mods/GH3Deluxe/pak/gh3dx.pak"))
-         //{
-        QbStruct deluxeStruct = QbStruct();
-        QbStruct::InsertCStringItem(&deluxeStruct, 0, "../gh3ml/Mods/GH3Deluxe/pak/gh3dx.pak");
-        //LoadPak::Orig(&deluxeStruct);
-    //}
+            auto expectedPakPath = pair.second.GetDirectory() + "\\pak\\" + pair.first + ".pak";
+
+            gh3ml::internal::LogGH3.Info("Expecting: \"%s\"", expectedPakPath.c_str());
+
+            if (!std::filesystem::exists(gh3ml::GetModsDirectory() + expectedPakPath + ".xen"))
+            {
+                gh3ml::internal::LogGH3.Info("Unable to find pak file.");
+                continue;
+            }
+
+            expectedPakPath.insert(0, "..\\gh3ml\\Mods\\");
+
+            gh3ml::internal::LogGH3.Info("Found it! Loading...");
+            QbStruct modPakStruct = QbStruct();
+            QbStruct::InsertCStringItem(&modPakStruct, 0, expectedPakPath.c_str());
+            LoadPak::Orig(&modPakStruct);
+            gh3ml::internal::LogGH3.Info("Done!");
+        }
+
+        _doPakCheck = false;
     }
-    else
-        loadPakCount++;
+
     return ret;
 }
 
@@ -153,7 +181,7 @@ void gh3ml::internal::SetupDefaultHooks()
 
     gh3ml::hook::CreateHook<WindowProc>(detourWindowProc);
 
-    // gh3ml::hook::CreateHook<LoadPak>(detourLoadPak);
+    gh3ml::hook::CreateHook<LoadPak>(detourLoadPak);
     gh3ml::hook::CreateHook<CFuncPrintF>(detourCFuncPrintF);
 
 

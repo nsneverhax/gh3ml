@@ -23,9 +23,10 @@ namespace gh3ml
 
 	constexpr const char* VersionString = "0.1.0-alpha";
 
-
 	const HANDLE GetGH3Handle();
 
-	bool ReadMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size);
-	bool WriteMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size);
+	extern const std::string& GetModsDirectory();
+
+	extern bool ReadMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size);
+	extern bool WriteMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size);
 }

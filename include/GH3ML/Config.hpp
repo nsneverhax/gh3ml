@@ -5,6 +5,14 @@
 
 namespace gh3ml::Config
 {
+	enum class WindowStyle
+	{
+		Fullscreen,
+		Windowed,
+		BorderlessWindowed,
+		BorderlessFullscreen
+	};
+
 	constexpr const char* ConfigFilepath = "gh3ml/config.json";
 
 	uint32_t GetVersionMajor();
