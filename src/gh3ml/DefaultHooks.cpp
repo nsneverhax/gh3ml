@@ -158,6 +158,68 @@ bool detourCFuncPrintF(void* param1)
 
 #pragma endregion
 
+using HashTableGetInt = gh3ml::hook::Binding<0x004a5960, gh3ml::hook::cconv::CDecl, uint32_t, uint32_t>;
+
+uint32_t detourHashTableGetInt(UINT32 key)
+{
+    uint32_t ret = HashTableGetInt::Orig(key);
+
+    if (key == 0x41FC685A) // KEY_WHAMMY_WIBBLE_SPEED
+    {
+        //float aspyrFrameTime = 0.01666666f;
+
+        // 0.033333332
+
+        gh3ml::internal::LogGH3.Info("Whammy Speed: %f", ret);
+
+        //union
+        //{
+        //    uint8_t bytes[sizeof(float)];
+        //    float value;
+        //} float_u;
+
+        //float_u.value = 0;
+
+        //gh3ml::ReadMemory(0x009596bc, float_u.bytes, sizeof(float));
+
+        //ret = (uint32_t) (0.033333332f * float_u.value);
+
+        //if (ret < 1)
+        //    ret = 1.4013e-45f;
+
+        return 1;
+    }
+    return ret
+;
+}
+
+using  Wait_GameFrames = gh3ml::hook::Binding<0x00493020, gh3ml::hook::cconv::ThisCall, void, void*, float>;
+void detourWaitGameFrames(void* self, float wait)
+{
+    // Vultu: Waittime is hardcoded to "wait * (1/60)" so we need to remove that
+    float newWait = wait / (16.666666f);
+
+    // Vultu: Use a union to get the Deltatime var from memory
+    union
+    {
+        uint8_t bytes[sizeof(float)];
+        float value;
+    } float_u;
+
+    float_u.value = 0;
+
+    gh3ml::ReadMemory(0x009596bc, float_u.bytes, sizeof(float));
+
+    if (float_u.value != 0)
+        newWait *= (float_u.value * 1000);
+    else
+        newWait = wait;
+
+    //if (wait != 0)
+    //    gh3ml::internal::LogGH3.Info("WaitFrames: D: %f - %f - %X", float_u.value, newWait, wait);
+
+    Wait_GameFrames::Orig(self, wait);
+}
 
 void gh3ml::internal::SetupDefaultHooks()
 {
@@ -183,7 +245,8 @@ void gh3ml::internal::SetupDefaultHooks()
 
     gh3ml::hook::CreateHook<LoadPak>(detourLoadPak);
     gh3ml::hook::CreateHook<CFuncPrintF>(detourCFuncPrintF);
-
+    //gh3ml::hook::CreateHook<Wait_GameFrames>(detourWaitGameFrames);
+    gh3ml::hook::CreateHook<HashTableGetInt>(detourHashTableGetInt);
 
     Log.Info("Finished setting up default hooks.");
 }
