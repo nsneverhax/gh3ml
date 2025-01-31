@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GH3/Qb/Qb.hpp>
+#include <GH3/Qb.hpp>
 
 namespace GH3
 {

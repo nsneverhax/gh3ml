@@ -1,5 +1,6 @@
 #include <GH3/Keys.hpp>
-#include <GH3/Qb/Qb.hpp>
+#include "../include/GH3/Qb.hpp"
 
 #include <GH3/Misc.hpp>
 
+#include "../include/GH3/CFunc.hpp"

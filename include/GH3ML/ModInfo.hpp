@@ -22,7 +22,7 @@ namespace gh3ml
 	class ModInfo
 	{
 	private:
-		std::string m_name = "axelsteel.newmod";
+		std::string m_name = "axelsteelsawesomemod";
 		std::string m_author = "Axel Steel";
 		std::string m_displayName = "My Mod";
 		std::string m_description = "GH3 Modding in 2025??";

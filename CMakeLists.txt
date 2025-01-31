@@ -45,7 +45,7 @@ set_target_properties(ProxyLoader PROPERTIES
 
 # -- libGH3
 
-add_library(libGH3 SHARED "libGH3/src/main.cpp")
+add_library(libGH3 SHARED "libGH3/src/main.cpp" "libGH3/src/GH3/Qb/QbStruct.cpp" "libGH3/src/GH3/CFunc.cpp")
 
 set_target_properties(libGH3 PROPERTIES
   PREFIX ""
