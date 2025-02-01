@@ -46,10 +46,10 @@ void gh3ml::internal::ReadConfig()
 	_versionType = object["versionInfo"]["type"].asString().unwrap();
 
 	if (object.contains("unlockfps"))
-
 		_unlockFPS = object["unlockfps"].asBool().unwrap();
-	if (object.contains("overrindWindProc"))
-		_overrideWindProc = object["overrindWindProc"].asBool().unwrap();
+
+	if (object.contains("overrideWindProc"))
+		_overrideWindProc = object["overrideWindProc"].asBool().unwrap();
 }
 
 uint32_t gh3ml::Config::VersionMajor()

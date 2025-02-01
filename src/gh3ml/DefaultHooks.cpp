@@ -72,25 +72,12 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             ShowCursor(TRUE);
             
         }
-        
-        //ShowCursor(TRUE);
+      
         return 1;
     }
 
     return result;
 }
-
-/*struct QbStruct
-{
-    uint16_t member0;
-    uint8_t member1;
-    uint8_t member2;
-    void* first;
-
-    using InsertCStringItem = gh3ml::hook::Binding<0x00479ac0, gh3ml::hook::cconv::ThisCall, void, QbStruct*, uint32_t, const char*>;
-    using InsertQbKeyItem = gh3ml::hook::Binding<0x00479c80, gh3ml::hook::cconv::ThisCall, void, QbStruct*, uint32_t, uint32_t>;
-    using FUN_004788b0 = gh3ml::hook::Binding<0x004788b0, gh3ml::hook::cconv::ThisCall, bool, QbStruct*, uint32_t, void*, uint32_t>;
-}; */
 
 using LoadPak = gh3ml::hook::Binding<0x004a1780, gh3ml::hook::cconv::CDecl, bool, QbStruct*>;
 
@@ -235,7 +222,7 @@ int deoutCreateHighwayDrawRect(double * array, float param_2, float param_3, flo
     //    
     float delta = (*DeltaTime * 60);
 
-    return CreateHighwayDrawRect::Orig(array, param_2, param_3, whammyTopWidth, param_5, whammyWidthOffset * delta, param_7 * (1080.0f / 720.0f) * 1.25f, param_8, param_9, param_10, param_11);
+    return CreateHighwayDrawRect::Orig(array, param_2, param_3, whammyTopWidth, param_5, whammyWidthOffset, param_7 * (1080.0f / 720.0f) * 1.25f, param_8, param_9, param_10, param_11);
 }
 
 
@@ -272,7 +259,7 @@ void gh3ml::internal::SetupDefaultHooks()
     //gh3ml::hook::CreateHook<Wait_GameFrames>(detourWaitGameFrames);
 
     // gh3ml::hook::CreateHook<func_SetNewWhammyValue>(detourSetNewWhammyValue);
-    // gh3ml::hook::CreateHook<CreateHighwayDrawRect>(deoutCreateHighwayDrawRect);
+    gh3ml::hook::CreateHook<CreateHighwayDrawRect>(deoutCreateHighwayDrawRect);
 
     // Log.Info("Finished setting up default hooks.");
 }
