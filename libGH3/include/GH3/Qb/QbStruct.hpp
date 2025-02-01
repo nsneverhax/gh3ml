@@ -4,14 +4,16 @@
 
 
 
-struct QbStruct
+struct alignas(4) QbStruct
 {
 private:
 	uint16_t m_itemChainPosition = 0;
 	uint8_t m_unk1 = 0;
-	uint8_t m_unk2;
+	uint8_t m_unk2 = 0;
 
 public:
+	void* first; 
+
 	bool GetKey(uint32_t key, uint32_t& outKey, int param_3 = 1);
 	bool GetFloat(uint32_t key, float& out, int param_3 = 1);
 	bool GetQbArrayItem(uint32_t key, void* out, int param_3 = 1);
@@ -24,14 +26,15 @@ public:
 	bool GetPair(uint32_t key, float& out, int param_3 = 1);
 	bool GetVector(uint32_t key, float& out, int param_3 = 1);
 	bool GetStruct(uint32_t key, float& out, int param_3 = 1);
+
 };
 
 namespace Functions
 {
-	typedef bool(__thiscall* func__QbStruct_GetTypedValue)(QbStruct* _this, uint32_t key, QbValueType valueType, void* value);
+	typedef bool(__thiscall* func__QbStruct_GetTypedValue)(QbStruct* self, uint32_t key, QbValueType valueType, void* value);
 
-	typedef void(__cdecl *func_InsertCStringItem)(QbStruct* _this, uint32_t key, char* string);
-	typedef void(__cdecl* func_InsertQbKeyItem)(QbStruct* _this, uint32_t key, uint32_t item);
+	typedef void(__thiscall* func_InsertCStringItem)(QbStruct* self, uint32_t key, char* string);
+	typedef void(__thiscall* func_InsertQbKeyItem)(QbStruct* self, uint32_t key, uint32_t item);
 
 	static func__QbStruct_GetTypedValue GetTypedValue = reinterpret_cast<func__QbStruct_GetTypedValue>(0x004786a0);
 

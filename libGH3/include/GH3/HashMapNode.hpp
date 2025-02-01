@@ -3,8 +3,9 @@
 #include <cstdint>
 #include <GH3/Qb/QbValueType.hpp>
 
-struct __declspec(align(4)) HashMapNode
+struct HashMapNode
 {
+
 	uint8_t Byte0 = 0;
 	uint8_t Byte1 = 0;
 	QbValueType ItemType;

@@ -4,6 +4,12 @@
 #include <GH3ML/Core.hpp>
 #include <filesystem>
 
+
+#include <dinput.h>
+
+#include <GH3/CFunc.hpp>
+
+
 constexpr int INST_NOP = 0x90;
 
 constexpr int FUNC_INITIALIZEDEVICE = 0x0057B940;
@@ -52,13 +58,16 @@ using WindowProc = gh3ml::hook::Binding<0x00578880, gh3ml::hook::cconv::STDCall,
 LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     LRESULT result = WindowProc::Orig(hWnd, uMsg, wParam, lParam);
+
     if ((uMsg == WM_SETCURSOR) && ((short)lParam == HTCLIENT))
     {
         if (GetCursor() == nullptr)
         {
             SetCursor(LoadCursor(NULL, IDC_ARROW));
             ShowCursor(TRUE);
+            
         }
+        
         //ShowCursor(TRUE);
         return 1;
     }
@@ -66,7 +75,7 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return result;
 }
 
-struct QbStruct
+/*struct QbStruct
 {
     uint16_t member0;
     uint8_t member1;
@@ -76,7 +85,7 @@ struct QbStruct
     using InsertCStringItem = gh3ml::hook::Binding<0x00479ac0, gh3ml::hook::cconv::ThisCall, void, QbStruct*, uint32_t, const char*>;
     using InsertQbKeyItem = gh3ml::hook::Binding<0x00479c80, gh3ml::hook::cconv::ThisCall, void, QbStruct*, uint32_t, uint32_t>;
     using FUN_004788b0 = gh3ml::hook::Binding<0x004788b0, gh3ml::hook::cconv::ThisCall, bool, QbStruct*, uint32_t, void*, uint32_t>;
-};
+}; */
 
 using LoadPak = gh3ml::hook::Binding<0x004a1780, gh3ml::hook::cconv::CDecl, bool, QbStruct*>;
 
@@ -84,6 +93,8 @@ int loadPakCount = 0;
 
 std::unordered_map<uint32_t, std::string> keyMap = { };
 
+
+using FUN_004788b0 = gh3ml::hook::Binding<0x004788b0, gh3ml::hook::cconv::ThisCall, bool, QbStruct*, uint32_t, void*, uint32_t>;
 
 bool detourLoadPak(QbStruct* qbStruct)
 {
@@ -97,7 +108,7 @@ bool detourLoadPak(QbStruct* qbStruct)
     char* pakNameBuffer[128];
     memset(pakNameBuffer, 0, 128);
 
-    QbStruct::FUN_004788b0(qbStruct, 0, pakNameBuffer, 0);
+    FUN_004788b0(qbStruct, 0, pakNameBuffer, 0);
 
     if (strcmp("pak/qb.pak", pakNameBuffer[0]) == 0)
     {
@@ -119,7 +130,9 @@ bool detourLoadPak(QbStruct* qbStruct)
 
             gh3ml::internal::LogGH3.Info("Found it! Loading...");
             QbStruct modPakStruct = QbStruct();
-            QbStruct::InsertCStringItem(&modPakStruct, 0, expectedPakPath.c_str());
+
+            Functions::InsertCStringItem(&modPakStruct, 0, expectedPakPath.data());
+
             LoadPak::Orig(&modPakStruct);
             gh3ml::internal::LogGH3.Info("Done!");
         }
@@ -160,42 +173,10 @@ bool detourCFuncPrintF(void* param1)
 
 using HashTableGetInt = gh3ml::hook::Binding<0x004a5960, gh3ml::hook::cconv::CDecl, uint32_t, uint32_t>;
 
-uint32_t detourHashTableGetInt(UINT32 key)
-{
-    uint32_t ret = HashTableGetInt::Orig(key);
-
-    if (key == 0x41FC685A) // KEY_WHAMMY_WIBBLE_SPEED
-    {
-        //float aspyrFrameTime = 0.01666666f;
-
-        // 0.033333332
-
-        gh3ml::internal::LogGH3.Info("Whammy Speed: %f", ret);
-
-        //union
-        //{
-        //    uint8_t bytes[sizeof(float)];
-        //    float value;
-        //} float_u;
-
-        //float_u.value = 0;
-
-        //gh3ml::ReadMemory(0x009596bc, float_u.bytes, sizeof(float));
-
-        //ret = (uint32_t) (0.033333332f * float_u.value);
-
-        //if (ret < 1)
-        //    ret = 1.4013e-45f;
-
-        return 1;
-    }
-    return ret
-;
-}
-
 using  Wait_GameFrames = gh3ml::hook::Binding<0x00493020, gh3ml::hook::cconv::ThisCall, void, void*, float>;
 void detourWaitGameFrames(void* self, float wait)
 {
+
     // Vultu: Waittime is hardcoded to "wait * (1/60)" so we need to remove that
     float newWait = wait / (16.666666f);
 
@@ -221,10 +202,19 @@ void detourWaitGameFrames(void* self, float wait)
     Wait_GameFrames::Orig(self, wait);
 }
 
+using func_SetNewWhammyValue = gh3ml::hook::Binding<0x0041de60, gh3ml::hook::cconv::CDecl, bool, QbStruct*>;
+bool detourSetNewWhammyValue(QbStruct* self)
+{
+    return SetNewWhammyValue(self);
+    //return func_SetNewWhammyValue::Orig(self);
+}
+
+
 void gh3ml::internal::SetupDefaultHooks()
 {
     Log.Info("Setting up default hooks...");
 
+    /*
     // Vultu: I really don't feel like rewriting the entire function for right now
     // so I'm going NOP where some global variables are setr
     uint8_t buffer[6];
@@ -232,7 +222,12 @@ void gh3ml::internal::SetupDefaultHooks()
 
     gh3ml::WriteMemory(FUNC_INITIALIZEDEVICE + 0x1C7, buffer, sizeof(buffer)); // 0x0057BB07 : dword ptr [D3DPresentParams.SwapEffect],EDI
     gh3ml::WriteMemory(FUNC_INITIALIZEDEVICE + 0x239, buffer, sizeof(buffer)); // 0x0057bb79 : dword ptr [D3DPresentParams.PresentationInterval],EDI
+    */
 
+    gh3ml::hook::CreateHook<1, gh3ml::hook::cconv::STDCall>(
+        reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "CreateWindowExA")),
+        detourCreateWindowExA
+    );
     gh3ml::hook::CreateHook<1, gh3ml::hook::cconv::STDCall>(
         reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "CreateWindowExA")),
         detourCreateWindowExA
@@ -245,8 +240,10 @@ void gh3ml::internal::SetupDefaultHooks()
 
     gh3ml::hook::CreateHook<LoadPak>(detourLoadPak);
     gh3ml::hook::CreateHook<CFuncPrintF>(detourCFuncPrintF);
+
     //gh3ml::hook::CreateHook<Wait_GameFrames>(detourWaitGameFrames);
-    gh3ml::hook::CreateHook<HashTableGetInt>(detourHashTableGetInt);
+
+    gh3ml::hook::CreateHook<func_SetNewWhammyValue>(detourSetNewWhammyValue);
 
     Log.Info("Finished setting up default hooks.");
 }

@@ -1,9 +1,11 @@
 #include <GH3/CFunc.hpp>
 #include <GH3/Keys.hpp>
 
-#include <GH3/Node.hpp>
-
 #include <GH3/HashMapNode.hpp>
+
+#include <GH3/Addresses.hpp>
+
+#include <iostream>
 
 bool SetNewWhammyValue(QbStruct* qbStruct)
 {
@@ -14,11 +16,6 @@ bool SetNewWhammyValue(QbStruct* qbStruct)
 	//Nx::Global::KeySymbolHashTable::sGetStructValue?()
 	QbStruct* playerStatus = reinterpret_cast<QbStruct* (__cdecl*)(uint32_t)>(0x004a5d70)(kPlayerStatus);
 
-	char cVar2 = -0x35;
-
-	if (cVar2 == '\0')
-		return false;
-
 	float value = 0;
 
 	if (!qbStruct->GetFloat(KEY_VALUE, value))
@@ -26,12 +23,16 @@ bool SetNewWhammyValue(QbStruct* qbStruct)
 
 	int player = 0;
 
+	//float delta = (*DeltaTime * 60.0f);
+
 	qbStruct->GetQbArrayItem(KEY_PLAYER, &player);
 
-	void* node = reinterpret_cast<void*(__cdecl*)(uint32_t)>(0x004a5e00)(player != 1 ? KEY_WHAMMYWIBBLE1 : KEY_WHAMMYWIBBLE0);
+	HashMapNode* whammyNode = reinterpret_cast<HashMapNode *(__cdecl*)(uint32_t)>(0x004a5e00)(player != 1 ? KEY_WHAMMYWIBBLE1 : KEY_WHAMMYWIBBLE0);
+	//
+	float whammyWibbleValue = *reinterpret_cast<float*>(&whammyNode->Value);
 
-	int32_t whammyWibbleValue = *(reinterpret_cast<int32_t*>(node) + 0x04);
-
+	//
+	//whammyWibbleValue *= delta;
 
 	float timeRemaining = 0;
 	float highwaySpeed = 0;
@@ -44,73 +45,76 @@ bool SetNewWhammyValue(QbStruct* qbStruct)
 	}
 
 	// BUG: Divide by zero!
-	float fVar1 = (*reinterpret_cast<float*>(0x00a12fb8)) / highwaySpeed;
+	float pvVar3 = (*reinterpret_cast<float*>(0x00a12fb8)) / highwaySpeed;
 
-	if (fVar1 < 0.0f)
-		fVar1 = fVar1 * -1.0f;
+	if (pvVar3 < 0.0f)
+		pvVar3 *= -1.0f;
 
-	float fVar2 = (((float)whammyWibbleValue / fVar1) * timeRemaining * 0.0001) + 2.0;
+	float fVar2 = ((whammyWibbleValue / pvVar3) * timeRemaining * 0.001) + 2;
+	highwaySpeed = fVar2;
 
-	int whammySpeed = reinterpret_cast<uint32_t(__cdecl*)(uint32_t)>(0x004a5960)(KEY_WHAMMY_WIBBLE_SPEED);
+	int whammySpeed = (float)reinterpret_cast<uint32_t(__cdecl*)(uint32_t)>(0x004a5960)(KEY_WHAMMY_WIBBLE_SPEED);
 
-	if (whammyWibbleValue < fVar1)
+
+	if (whammyWibbleValue < fVar2)
 	{
-		fVar1 = whammyWibbleValue;
+		fVar2 = whammyWibbleValue;
 		highwaySpeed = whammyWibbleValue;
 	}
 
 	float fVar3 = whammySpeed;
 
-	if (whammySpeed < 1)
-		fVar3 = 1;
+	if (whammySpeed < 1.0f)
+		fVar3 = 1.0f;
 
-	if (fVar1 - fVar3 < 0)
+	if (fVar2 - fVar3 < 0)
 	{
-		fVar1 = fVar3;
-		highwaySpeed = whammyWibbleValue;
+		fVar2 = fVar3;
+		highwaySpeed = fVar3;
 	}
 
-	int iVar1 = fVar1 + -1;
+	int iVar6 = (int)fVar2 + -1;
 
 
 	float(__thiscall * FUN_0055e2e0)(void*, int, float) = reinterpret_cast<float(__thiscall *)(void*, int, float)>(0x0055e2e0);
 
-	if (whammySpeed < iVar1)
+	if (whammySpeed <= iVar6)
 	{
-		int iVar2 = iVar1 - whammySpeed;
+		float iVar5 = iVar6 - whammySpeed;
 
 		do
 		{
-			float fVar4 = reinterpret_cast<float(__thiscall*)(void*, int)>(0x0055e450)(node, iVar2);
-			FUN_0055e2e0(node, iVar2, fVar4);
-			iVar1--;
-			iVar2--;
-			fVar1 = highwaySpeed;
-		} while (whammySpeed <= iVar1);
+			float fVar7 = reinterpret_cast<float(__thiscall*)(void*, int)>(0x0055e450)(whammyNode, iVar5);
+			FUN_0055e2e0(whammyNode, iVar6, fVar7);
+			iVar6--;
+			iVar5--;
+			fVar2 = highwaySpeed;
+		} while (whammySpeed <= iVar6);
 	}
 
-	iVar1 = 0;
 
-	auto fVar5 = whammyWibbleValue;
+	iVar6 = 0;
+
+	pvVar3 = whammyWibbleValue;
 
 	if (0 < whammySpeed)
 	{
+		
 		do
 		{
-			FUN_0055e2e0(node, iVar1, value);
-			iVar1 += 1;
-			fVar5 = whammyWibbleValue;
-		} while (iVar1 < whammySpeed);
+			FUN_0055e2e0(whammyNode, iVar6, value); // set whammy size
+			iVar6 += 1;
+			pvVar3 = whammyWibbleValue;
+		} while (iVar6 < whammySpeed);
 	}
 
 	float fVar6 = 0;
-
-	for (; fVar6 = whammyWibbleValue, fVar1 < whammyWibbleValue; fVar1++)
+	for (; fVar6 = whammyWibbleValue, fVar2 < whammyWibbleValue; fVar2++)
 	{
-		whammyWibbleValue = fVar5;
+		whammyWibbleValue = pvVar3;
 
-		FUN_0055e2e0(node, fVar1, 1);
-		fVar5 = whammyWibbleValue;
+		FUN_0055e2e0(whammyNode, fVar2, 1.0); // speed
+		pvVar3 = whammyWibbleValue;
 		whammyWibbleValue = fVar6;
 	}
 

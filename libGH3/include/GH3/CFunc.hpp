@@ -2,4 +2,4 @@
 
 #include "Qb.hpp"
 
-extern bool SetNewWhammyValue(QbStruct* qbStruct);
+bool SetNewWhammyValue(QbStruct* qbStruct);

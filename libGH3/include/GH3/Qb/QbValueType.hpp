@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-enum class QbValueType : uint32_t
+enum class QbValueType : uint8_t
 {
 	QTypeNull = 0,
 	QTypeInt = 1,
