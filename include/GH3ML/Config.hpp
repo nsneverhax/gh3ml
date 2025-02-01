@@ -15,9 +15,10 @@ namespace gh3ml::Config
 
 	constexpr const char* ConfigFilepath = "gh3ml/config.json";
 
-	uint32_t GetVersionMajor();
-	uint32_t GetVersionMinor();
-	uint32_t GetVersionPatch();
-	const std::string_view& GetVersionType();
-
+	uint32_t VersionMajor();
+	uint32_t VersionMinor();
+	uint32_t VersionPatch();
+	const std::string_view& VersionType();
+	bool UnlockFPS();
+	bool OverrideWindProc();
 }

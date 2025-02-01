@@ -10,6 +10,9 @@
 uint32_t _versionMajor = 0;
 uint32_t _versionMinor = 0;
 uint32_t _versionPatch = 0;
+bool _unlockFPS = false;
+bool _overrideWindProc = false;
+
 std::string_view _versionType = { };
 
 namespace fs = std::filesystem;
@@ -42,21 +45,34 @@ void gh3ml::internal::ReadConfig()
 	_versionPatch = object["versionInfo"]["patch"].asUInt().unwrap();
 	_versionType = object["versionInfo"]["type"].asString().unwrap();
 
+	if (object.contains("unlockfps"))
+
+		_unlockFPS = object["unlockfps"].asBool().unwrap();
+	if (object.contains("overrindWindProc"))
+		_overrideWindProc = object["overrindWindProc"].asBool().unwrap();
 }
 
-uint32_t gh3ml::Config::GetVersionMajor()
+uint32_t gh3ml::Config::VersionMajor()
 {
 	return _versionMajor;
 }
-uint32_t gh3ml::Config::GetVersionMinor()
+uint32_t gh3ml::Config::VersionMinor()
 {
 	return _versionMinor;
 }
-uint32_t gh3ml::Config::GetVersionPatch()
+uint32_t gh3ml::Config::VersionPatch()
 {
 	return _versionPatch;
 }
-const std::string_view& gh3ml::Config::GetVersionType()
+const std::string_view& gh3ml::Config::VersionType()
 {
 	return _versionType;
+}
+bool gh3ml::Config::UnlockFPS()
+{
+	return _unlockFPS;
+}
+bool gh3ml::Config::OverrideWindProc()
+{
+	return _overrideWindProc;
 }

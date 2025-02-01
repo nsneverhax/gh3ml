@@ -3,16 +3,21 @@
 #include <d3d9.h>
 #include <GH3ML/Core.hpp>
 #include <filesystem>
+#include <GH3ML/Config.hpp>
 
+#include <iostream>
 
 #include <dinput.h>
 
 #include <GH3/CFunc.hpp>
 
+#include <GH3/Addresses.hpp>
 
 constexpr int INST_NOP = 0x90;
 
 constexpr int FUNC_INITIALIZEDEVICE = 0x0057B940;
+
+extern float* DeltaTime = reinterpret_cast<float*>(0x009596bc);
 
 #pragma region Default Hooks
 using DebugLog = gh3ml::hook::Binding<0x00472b50, gh3ml::hook::cconv::CDecl, void, char*, va_list>;
@@ -210,40 +215,64 @@ bool detourSetNewWhammyValue(QbStruct* self)
 }
 
 
+using CreateHighwayDrawRect = gh3ml::hook::Binding<0x00601d30, gh3ml::hook::cconv::CDecl, int, double*, float, float, float, float, float, float, float, float, float, float>;
+
+int deoutCreateHighwayDrawRect(double * array, float param_2, float param_3, float whammyTopWidth, float param_5, float whammyWidthOffset , float param_7, float param_8, float param_9, float param_10, float param_11)
+{
+    //std::cout
+    //    << " param_2: " << param_2
+    //    << " param_3: " << param_3
+    //    << " whammyTopWidth: " << whammyTopWidth
+    //    << " param_5: " << param_3
+    //    << " whammyWidthOffset: " 
+    //    << whammyWidthOffset 
+    //    << " param_7: " << param_7
+    //    << " param_8: " << param_8
+    //    << " param_9: " << param_9
+    //    << " param_10: " << param_10
+    //    << " param_11: " << param_11
+    //    << std::endl;
+    //    
+    float delta = (*DeltaTime * 60);
+
+    return CreateHighwayDrawRect::Orig(array, param_2, param_3, whammyTopWidth, param_5, whammyWidthOffset * delta, param_7 * (1080.0f / 720.0f) * 1.25f, param_8, param_9, param_10, param_11);
+}
+
+
 void gh3ml::internal::SetupDefaultHooks()
 {
     Log.Info("Setting up default hooks...");
 
-    /*
-    // Vultu: I really don't feel like rewriting the entire function for right now
-    // so I'm going NOP where some global variables are setr
-    uint8_t buffer[6];
-    memset(buffer, INST_NOP, sizeof(buffer));
+    if (gh3ml::Config::UnlockFPS())
+    {
+        // Vultu: I really don't feel like rewriting the entire function for right now
+        // so I'm going NOP where some global variables are setr
+        uint8_t buffer[6];
+        memset(buffer, INST_NOP, sizeof(buffer));
 
-    gh3ml::WriteMemory(FUNC_INITIALIZEDEVICE + 0x1C7, buffer, sizeof(buffer)); // 0x0057BB07 : dword ptr [D3DPresentParams.SwapEffect],EDI
-    gh3ml::WriteMemory(FUNC_INITIALIZEDEVICE + 0x239, buffer, sizeof(buffer)); // 0x0057bb79 : dword ptr [D3DPresentParams.PresentationInterval],EDI
-    */
+        gh3ml::WriteMemory(FUNC_INITIALIZEDEVICE + 0x1C7, buffer, sizeof(buffer)); // 0x0057BB07 : dword ptr [D3DPresentParams.SwapEffect],EDI
+        gh3ml::WriteMemory(FUNC_INITIALIZEDEVICE + 0x239, buffer, sizeof(buffer)); // 0x0057bb79 : dword ptr [D3DPresentParams.PresentationInterval],EDI
+    }
 
     gh3ml::hook::CreateHook<1, gh3ml::hook::cconv::STDCall>(
         reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "CreateWindowExA")),
         detourCreateWindowExA
     );
-    gh3ml::hook::CreateHook<1, gh3ml::hook::cconv::STDCall>(
-        reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "CreateWindowExA")),
-        detourCreateWindowExA
-    );
+
 
     gh3ml::hook::CreateHook<DebugLog>(detourDebugLog);
     gh3ml::hook::CreateHook<Video_InitializeDevice>(detourVideo_InitializeDevice);
 
-    gh3ml::hook::CreateHook<WindowProc>(detourWindowProc);
+    if (gh3ml::Config::OverrideWindProc())
+        gh3ml::hook::CreateHook<WindowProc>(detourWindowProc);
 
     gh3ml::hook::CreateHook<LoadPak>(detourLoadPak);
     gh3ml::hook::CreateHook<CFuncPrintF>(detourCFuncPrintF);
 
     //gh3ml::hook::CreateHook<Wait_GameFrames>(detourWaitGameFrames);
 
-    gh3ml::hook::CreateHook<func_SetNewWhammyValue>(detourSetNewWhammyValue);
+    // gh3ml::hook::CreateHook<func_SetNewWhammyValue>(detourSetNewWhammyValue);
+    // gh3ml::hook::CreateHook<CreateHighwayDrawRect>(deoutCreateHighwayDrawRect);
 
-    Log.Info("Finished setting up default hooks.");
+    // Log.Info("Finished setting up default hooks.");
 }
