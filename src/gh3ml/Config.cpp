@@ -16,17 +16,17 @@ bool _overrideWindProc = false;
 std::string_view _versionType = { };
 
 namespace fs = std::filesystem;
-namespace ml = gh3ml::internal;
+namespace ml = nylon::internal;
 
-void gh3ml::internal::ReadConfig()
+void nylon::internal::ReadConfig()
 {
-	if (!fs::exists(gh3ml::Config::ConfigFilepath))
+	if (!fs::exists(nylon::Config::ConfigFilepath))
 	{
 		// TODO: this
 	}
 
 
-	std::ifstream t(gh3ml::Config::ConfigFilepath);
+	std::ifstream t(nylon::Config::ConfigFilepath);
 	std::stringstream buffer;
 	buffer << t.rdbuf();
 	t.close();
@@ -52,27 +52,27 @@ void gh3ml::internal::ReadConfig()
 		_overrideWindProc = object["overrideWindProc"].asBool().unwrap();
 }
 
-uint32_t gh3ml::Config::VersionMajor()
+uint32_t nylon::Config::VersionMajor()
 {
 	return _versionMajor;
 }
-uint32_t gh3ml::Config::VersionMinor()
+uint32_t nylon::Config::VersionMinor()
 {
 	return _versionMinor;
 }
-uint32_t gh3ml::Config::VersionPatch()
+uint32_t nylon::Config::VersionPatch()
 {
 	return _versionPatch;
 }
-const std::string_view& gh3ml::Config::VersionType()
+std::string_view nylon::Config::VersionType()
 {
 	return _versionType;
 }
-bool gh3ml::Config::UnlockFPS()
+bool nylon::Config::UnlockFPS()
 {
 	return _unlockFPS;
 }
-bool gh3ml::Config::OverrideWindProc()
+bool nylon::Config::OverrideWindProc()
 {
 	return _overrideWindProc;
 }

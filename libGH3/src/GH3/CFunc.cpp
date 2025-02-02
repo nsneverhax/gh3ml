@@ -9,6 +9,9 @@
 
 #include <algorithm>
 
+uint32_t gh3::CFuncArrayCount = 0x492;
+gh3::CFuncDescriptor* gh3::CFuncArray = reinterpret_cast<gh3::CFuncDescriptor*>(0x009551B8);
+
 bool SetNewWhammyValue(QbStruct* qbStruct)
 {
 	bool bVar2;

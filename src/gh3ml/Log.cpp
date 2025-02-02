@@ -14,10 +14,10 @@
 
 #undef ERROR
 
-gh3ml::Log::LogLevel _currentLogLevel = gh3ml::Log::LogLevel::INFO;
+nylon::Log::LogLevel _currentLogLevel = nylon::Log::LogLevel::INFO;
 
 
-void gh3ml::Log::AdjustConsoleBuffer(int16_t minLength)
+void nylon::Log::AdjustConsoleBuffer(int16_t minLength)
 {
     // Set the screen buffer to be big enough to scroll some text
     CONSOLE_SCREEN_BUFFER_INFO conInfo;
@@ -27,7 +27,7 @@ void gh3ml::Log::AdjustConsoleBuffer(int16_t minLength)
     SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), conInfo.dwSize);
 }
 
-bool gh3ml::Log::RedirectConsoleIO()
+bool nylon::Log::RedirectConsoleIO()
 {
     bool result = true;
     FILE* fp;
@@ -67,7 +67,7 @@ bool gh3ml::Log::RedirectConsoleIO()
     return result;
 }
 
-void gh3ml::Log::WriteToOutput(LogLevel level, const char* sourceName, const char* fmt, va_list args)
+void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const char* fmt, va_list args)
 {
     if (level < _currentLogLevel)
         return;
@@ -81,22 +81,22 @@ void gh3ml::Log::WriteToOutput(LogLevel level, const char* sourceName, const cha
     char levelStr[6];
     switch (level)
     {
-    case gh3ml::Log::LogLevel::TRACE:
+    case nylon::Log::LogLevel::TRACE:
         consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
         strncpy(levelStr, "TRACE", sizeof(levelStr) - 1);
         break;
-    case gh3ml::Log::LogLevel::DEBUG:
+    case nylon::Log::LogLevel::DEBUG:
         consoleColorAttribute =  FOREGROUND_BLUE | FOREGROUND_INTENSITY;
         strncpy(levelStr, "DEBUG", sizeof(levelStr) - 1);
         break;
-    case gh3ml::Log::LogLevel::INFO:
+    case nylon::Log::LogLevel::INFO:
         strncpy(levelStr, "INFO ", sizeof(levelStr) - 1);
         break;
-    case gh3ml::Log::LogLevel::WARN:
+    case nylon::Log::LogLevel::WARN:
         consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
         strncpy(levelStr, "WARN ", sizeof(levelStr) - 1);
         break;
-    case gh3ml::Log::LogLevel::ERROR:
+    case nylon::Log::LogLevel::ERROR:
     default:
         consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_RED;
         strncpy(levelStr, "ERROR", sizeof(levelStr) - 1);
@@ -114,17 +114,17 @@ void gh3ml::Log::WriteToOutput(LogLevel level, const char* sourceName, const cha
     std::cout << std::endl;
 }
 
-gh3ml::Log::LogLevel gh3ml::Log::GetLogLevel()
+nylon::Log::LogLevel nylon::Log::GetLogLevel()
 {
     return _currentLogLevel;
 }
 
-void gh3ml::Log::SetLogLevel(LogLevel level)
+void nylon::Log::SetLogLevel(LogLevel level)
 {
     _currentLogLevel = level;
 }
 	
-bool gh3ml::Log::CreateConsole()
+bool nylon::Log::CreateConsole()
 {
     bool result = false;
 
@@ -141,7 +141,7 @@ bool gh3ml::Log::CreateConsole()
     return result;
 }
 
-bool gh3ml::Log::ReleaseConsole()
+bool nylon::Log::ReleaseConsole()
 {
     bool result = true;
     FILE* fp;

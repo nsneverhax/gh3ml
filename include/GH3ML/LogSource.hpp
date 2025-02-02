@@ -5,7 +5,7 @@
 
 #include <GH3ML/Log.hpp>
 
-namespace gh3ml
+namespace nylon
 {
 	class LogSource
 	{

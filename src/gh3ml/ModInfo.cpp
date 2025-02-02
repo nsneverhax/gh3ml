@@ -5,7 +5,7 @@
 
 #include <filesystem>
 
-bool gh3ml::ModInfo::TryRead(const std::string& filepath, ModInfo& modInfo)
+bool nylon::ModInfo::TryRead(const std::string& filepath, ModInfo& modInfo)
 {
 	modInfo.m_directory = std::filesystem::path(filepath).parent_path().filename().string();
 
@@ -41,37 +41,37 @@ bool gh3ml::ModInfo::TryRead(const std::string& filepath, ModInfo& modInfo)
 	return true;
 }
 
-const std::string& gh3ml::ModInfo::GetName() const
+const std::string& nylon::ModInfo::GetName() const
 {
 	return m_name;
 }
 
-const std::string& gh3ml::ModInfo::GetAuthor() const
+const std::string& nylon::ModInfo::GetAuthor() const
 {
 	return m_author;
 }
 
-const std::string& gh3ml::ModInfo::GetDisplayName() const
+const std::string& nylon::ModInfo::GetDisplayName() const
 {
 	return m_displayName;
 }
 
-const std::string& gh3ml::ModInfo::GetDescription() const
+const std::string& nylon::ModInfo::GetDescription() const
 {
 	return m_description;
 }
 
-const std::string& gh3ml::ModInfo::GetVersion() const
+const std::string& nylon::ModInfo::GetVersion() const
 {
 	return m_version;
 }
 
-const gh3ml::ModTag& gh3ml::ModInfo::GetTags() const
+const nylon::ModTag& nylon::ModInfo::GetTags() const
 {
 	return m_tags;
 }
 
-const std::string& gh3ml::ModInfo::GetDirectory() const
+const std::string& nylon::ModInfo::GetDirectory() const
 {
 	return m_directory;
 }

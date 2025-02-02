@@ -18,11 +18,11 @@ add_library(${PROJECT_NAME} SHARED
   "src/gh3ml/Log.cpp"
   "src/gh3ml/LogSource.cpp" 
   "src/gh3ml/Config.cpp"
-  "src/gh3ml/DefaultHooks.cpp" 
-  "src/gh3ml/Hook.cpp" 
-  "src/gh3ml/Hook.cpp"
+  "src/gh3ml/Hooks/DefaultHooks.cpp" 
+  "src/gh3ml/Hooks/Hook.cpp" 
   "src/gh3ml/Hooks/DirectXHooks.cpp"
   "src/gh3ml/ModInfo.cpp"
+  "src/gh3ml/CFuncManager.cpp"
 
   "${imgui_SOURCE_DIR}/imgui.cpp"
   "${imgui_SOURCE_DIR}/imgui_demo.cpp"
@@ -32,7 +32,8 @@ add_library(${PROJECT_NAME} SHARED
   "${imgui_SOURCE_DIR}/backends/imgui_impl_dx9.cpp"
   "${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp"
 
-  "libGH3/src/main.cpp" "libGH3/src/GH3/Qb/QbStruct.cpp" "libGH3/src/GH3/CFunc.cpp"
+  # Vultu: these need to be moved to a seperate project!
+  "libGH3/src/main.cpp" "libGH3/src/GH3/Qb/QbStruct.cpp" "libGH3/src/GH3/CFunc.cpp" "libGH3/src/GH3/CRC32.cpp"
   # source files here
 )
 
@@ -59,7 +60,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "libGH3/include/"
     "${imgui_SOURCE_DIR}"
     "${imgui_SOURCE_DIR}/backends/"
+    "$ENV{DXSDK_DIR}Include/"
 )
+
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     copyfile(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pdb ${GH3_GAME_DIR}/${PROJECT_NAME}.pdb)
@@ -67,7 +70,7 @@ endif()
 
 copyfile(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.dll ${GH3_GAME_DIR}/${PROJECT_NAME}.dll)
 
-# this is so stupid
+# mat: this is so stupid -- vultu: Too bad!
 set(CMAKE_SIZEOF_VOID_P 4)
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
   # ensure 32 bit on clang
@@ -82,7 +85,7 @@ CPMAddPackage("gh:geode-sdk/json#main")
 
 target_link_libraries(${PROJECT_NAME} minhook)
 target_link_libraries(${PROJECT_NAME} mat-json)
-
+target_link_libraries(${PROJECT_NAME} "$ENV{DXSDK_DIR}Lib/x86/d3dx9.lib")
 
 # -- PORXY LAODER
 

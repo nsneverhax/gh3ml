@@ -3,7 +3,6 @@
 
 #include <iostream>
 
-#include <GH3ML.hpp>
 #include "Main.hpp"
 #include <MinHook.h>
 #include <GH3ML/Hook.hpp>
@@ -16,20 +15,16 @@
 #include <imgui_impl_dx9.h>
 #include <imgui_impl_win32.h>
 
+
 namespace fs = std::filesystem;
 
-extern gh3ml::LogSource gh3ml::internal::Log = gh3ml::LogSource("GH3ML");
-extern gh3ml::LogSource gh3ml::internal::LogGH3 = gh3ml::LogSource("GH3");
-extern std::string gh3ml::internal::ModsPath = { };
-extern std::map<std::string, gh3ml::ModInfo> gh3ml::internal::LoadedMods = { };
+nylon::LogSource nylon::internal::Log = nylon::LogSource("GH3ML");
+nylon::LogSource nylon::internal::LogGH3 = nylon::LogSource("GH3");
+std::string nylon::internal::ModsPath = { };
+std::map<std::string, nylon::ModInfo> nylon::internal::LoadedMods = { };
+bool nylon::internal::IsImGuiActive = true;
 
-uint32_t GetCFuncCount(void)
-{
-    return gh3ml::hook::Orig<0x004134a0, gh3ml::hook::cconv::CDecl, uint32_t>();
-}
-
-
-void gh3ml::internal::LoadMods()
+void nylon::internal::LoadMods()
 {
     Log.Info("Loading mods...");
 
@@ -62,7 +57,7 @@ void gh3ml::internal::LoadMods()
     Log.Info("Finished loading mods.");
 }
 
-void gh3ml::internal::SetupCFuncRedirection()
+void nylon::internal::SetupCFuncRedirection()
 {
     Log.Info("Setting up CFunc redirection...");
 
@@ -73,7 +68,7 @@ void gh3ml::internal::SetupCFuncRedirection()
 
 HANDLE _gh3Handle = nullptr;
 
-const HANDLE gh3ml::GetGH3Handle()
+const HANDLE nylon::GetGH3Handle()
 {
     return _gh3Handle;
 }
@@ -81,7 +76,7 @@ const HANDLE gh3ml::GetGH3Handle()
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
     _gh3Handle = GetCurrentProcess();
-    gh3ml::internal::ModsPath = std::filesystem::current_path().string() + "\\gh3ml\\Mods\\";
+    nylon::internal::ModsPath = std::filesystem::current_path().string() + "\\gh3ml\\Mods\\";
 
 
 
@@ -91,19 +86,19 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hinstDLL);
 
-        gh3ml::Log::CreateConsole();
+        nylon::Log::CreateConsole();
 
-        gh3ml::internal::ReadConfig();
+        nylon::internal::ReadConfig();
         if (MH_Initialize() != MH_OK)
-            gh3ml::internal::Log.Error("Minhook failed to initialize!");
+            nylon::internal::Log.Error("Minhook failed to initialize!");
         else
-            gh3ml::internal::Log.Info("Minhook initialized!");
+            nylon::internal::Log.Info("Minhook initialized!");
 
 
-        gh3ml::internal::SetupDefaultHooks();
-        gh3ml::internal::LoadMods();
+        nylon::internal::SetupDefaultHooks();
+        nylon::internal::LoadMods();
 
-        gh3ml::internal::Log.Info("Finished Core Initialization!");
+        nylon::internal::Log.Info("Finished Core Initialization!");
         break;
 
     case DLL_THREAD_ATTACH:

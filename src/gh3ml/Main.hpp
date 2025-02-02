@@ -6,7 +6,7 @@
 
 #include <GH3ML/ModInfo.hpp>
 
-namespace gh3ml::internal
+namespace nylon::internal
 {
 	extern LogSource Log;
 	extern LogSource LogGH3;
@@ -15,6 +15,8 @@ namespace gh3ml::internal
 
 	extern std::map<std::string, ModInfo> LoadedMods;
 	
+	extern bool IsImGuiActive;
+
 	extern void SetupDefaultHooks();
 	void SetupCFuncRedirection();
 

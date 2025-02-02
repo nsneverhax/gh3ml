@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace HashMap
+namespace gh3::hashmap
 {
 
 }

@@ -10,7 +10,7 @@
 // TODO: this is dumb!
 #include "../src/gh3ml/Main.hpp"
 
-namespace gh3ml::hook
+namespace nylon::hook
 {
     struct HookData
     {
@@ -132,15 +132,15 @@ namespace gh3ml::hook
 			uintptr_t orig = 0;
 			if (MH_CreateHook(reinterpret_cast<void*>(address), reinterpret_cast<void*>(&Cconv::template Handler<id, Ret, Args...>), reinterpret_cast<void**>(&orig)) != MH_OK)
 			{
-				gh3ml::internal::Log.Error("Failed to hook function at address: 0x%X", address);
+				nylon::internal::Log.Error("Failed to hook function at address: 0x%X", address);
                 return;
 			}
 			if (MH_EnableHook(reinterpret_cast<void*>(address)) != MH_OK)
             {
-				gh3ml::internal::Log.Error("Failed to enable function hook with address: 0x%X", address);
+				nylon::internal::Log.Error("Failed to enable function hook with address: 0x%X", address);
                 return;
             }
-			gh3ml::internal::Log.Info("Hooked function at address: 0x%X", address);
+			nylon::internal::Log.Info("Hooked function at address: 0x%X", address);
 
 			data.Hooks.push_back(orig);
 		}
@@ -165,7 +165,7 @@ namespace gh3ml::hook
         }
         operator Ret() const { return value; } // NOLINT(*-explicit-constructor)
         static Ret Orig(Args... args) {
-            return gh3ml::hook::Orig<Address, Cconv, Ret, Args...>(args...);
+            return nylon::hook::Orig<Address, Cconv, Ret, Args...>(args...);
         }
     };
 
@@ -178,7 +178,7 @@ namespace gh3ml::hook
             Cconv::template Trampoline<void, Args...>(Address, args...);
         }
         static void Orig(Args... args) {
-            gh3ml::hook::Orig<Address, Cconv, void, Args...>(args...);
+            nylon::hook::Orig<Address, Cconv, void, Args...>(args...);
         }
     };
 
@@ -187,4 +187,9 @@ namespace gh3ml::hook
     {
         CreateHook<Binding::address, typename Binding::cconv>(Binding::address, detour);
     }
+}
+
+namespace nylon
+{
+	using NodeArray_SetCFuncInfo = hook::Binding<0x00d94ee8, hook::cconv::CDecl, void, void*, uint32_t>;
 }

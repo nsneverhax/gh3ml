@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace gh3ml
+namespace nylon
 {
 	enum class ModTag
 	{

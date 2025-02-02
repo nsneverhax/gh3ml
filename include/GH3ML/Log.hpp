@@ -4,7 +4,7 @@
 #undef ERROR
 #endif // ERROR
 
-namespace gh3ml::Log
+namespace nylon::Log
 {
 	enum class LogLevel
 	{

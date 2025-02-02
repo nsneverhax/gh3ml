@@ -2,8 +2,7 @@
 
 #include <GH3ML/Core.hpp>
 
-
-namespace gh3ml::Config
+namespace nylon::Config
 {
 	enum class WindowStyle
 	{
@@ -18,7 +17,7 @@ namespace gh3ml::Config
 	uint32_t VersionMajor();
 	uint32_t VersionMinor();
 	uint32_t VersionPatch();
-	const std::string_view& VersionType();
+	std::string_view VersionType();
 	bool UnlockFPS();
 	bool OverrideWindProc();
 }

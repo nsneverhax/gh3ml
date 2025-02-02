@@ -104,11 +104,13 @@ void WINAPI XInputEnable(BOOL enable)
     return;
 }
 
+// TODO: Vultu: this !!!!
 static std::wstring getErrorString(DWORD error)
 {
     return L"Could not load Geode! Error code: " + std::to_wstring(error);
 }
 
+// TODO: Vultu: this !!!!
 static DWORD errorThread(LPVOID param) 
 {
     constexpr wchar_t REDIST_ERROR[] = L"Could not load Geode!\n"
@@ -140,10 +142,12 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     {
         DisableThreadLibraryCalls(hinstDLL);
 
-        // This is UB.
+        // This is UB. -- Vultu: Too bad!
         if (LoadLibraryW(L"gh3ml.dll") == NULL) 
         {
             const auto param = reinterpret_cast<LPVOID>(static_cast<DWORD64>(GetLastError()));
+
+            MessageBox(NULL, "LoadLibraryW returns NULL! The modloader will not be loaded.", "Unable to load \"g3ml.dll\"", MB_OK);
             // CreateThread(NULL, 0, &errorThread, param, 0, NULL);
         }
     }
