@@ -14,15 +14,15 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 #if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-#    copyfile(${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/xinput1_3.pdb ${NYLON_BIN_PATH}/xinput1_3.pdb)
+#    copyfile(${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/xinput1_3.pdb ${NYLON_OUT_PATH}/xinput1_3.pdb)
 #endif ()
-copyfile(${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/xinput1_3.dll ${NYLON_BIN_PATH}/xinput1_3.dll)
+copyfile(${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/xinput1_3.dll ${NYLON_OUT_PATH}/xinput1_3.dll)
 
 if (DEFINED GH3_DIR)
     #if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    #    copyfile(${PROJECT_NAME} ${NYLON_BIN_PATH}/xinput1_3.pdb ${GH3_DIR}/xinput1_3.pdb)
+    #    copyfile(${PROJECT_NAME} ${NYLON_OUT_PATH}/xinput1_3.pdb ${GH3_DIR}/xinput1_3.pdb)
     #endif ()
-    copyfile(${PROJECT_NAME} ${NYLON_BIN_PATH}/xinput1_3.dll ${GH3_DIR}/xinput1_3.dll)
+    copyfile(${PROJECT_NAME} ${NYLON_OUT_PATH}/xinput1_3.dll ${GH3_DIR}/xinput1_3.dll)
 endif ()
 
 if (MSVC)

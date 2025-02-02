@@ -34,9 +34,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    copyfile(${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/nylon.pdb ${NYLON_BIN_PATH}/nylon.pdb)
+    copyfile(${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/nylon.pdb ${NYLON_OUT_PATH}/nylon.pdb)
 endif ()
-copyfile(${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/nylon.dll ${NYLON_BIN_PATH}/nylon.dll)
+copyfile(${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/nylon.dll ${NYLON_OUT_PATH}/nylon.dll)
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC MAT_JSON_EXPORTING)
 target_link_libraries(${PROJECT_NAME} nylon mat-json-impl)
@@ -70,6 +70,6 @@ if (DEFINED GH3_DIR)
     add_custom_command(
         TARGET ${PROJECT_NAME}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${NYLON_BIN_PATH} ${GH3_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${NYLON_OUT_PATH} ${GH3_DIR}
     )
 endif ()
