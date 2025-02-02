@@ -1,17 +1,22 @@
 #include "Main.hpp"
+#include "Hooks/DirectXHooks.hpp"
 #include <GH3ML/Hook.hpp>
 #include <d3d9.h>
 #include <GH3ML/Core.hpp>
 #include <filesystem>
 #include <GH3ML/Config.hpp>
-
 #include <iostream>
-
 #include <dinput.h>
-
 #include <GH3/CFunc.hpp>
-
 #include <GH3/Addresses.hpp>
+#include <MinHook.h>
+
+#include <imgui.h>
+#include <imgui_impl_dx9.h>
+#include <imgui_impl_win32.h>
+
+#include <GH3/DirectX.hpp>
+
 
 constexpr int INST_NOP = 0x90;
 
@@ -30,53 +35,76 @@ void detourDebugLog(char* fmt, va_list args)
 }
 
 
+HWND WindowHandle = nullptr;
 
 HWND detourCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
 {
-    return gh3ml::hook::Orig<1, gh3ml::hook::cconv::STDCall, HWND>(dwExStyle, lpClassName, lpWindowName, WS_POPUP, 0, 0, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+    WindowHandle = gh3ml::hook::Orig<1, gh3ml::hook::cconv::STDCall, HWND>(dwExStyle, lpClassName, lpWindowName, WS_POPUP, 0, 0, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+
+
+    return WindowHandle;
 }
 
 using Video_InitializeDevice = gh3ml::hook::Binding<0x0057b940, gh3ml::hook::cconv::CDecl, void, void*>;
 
 void detourVideo_InitializeDevice(void* engineParams)
 {
-    // Vultu: We need to set the values we NOP'd out before
-    union
+    if (gh3ml::Config::UnlockFPS())
     {
-        uint8_t bytes[sizeof(uint32_t)];
-        uint32_t value;
-    } uint32_u;
+      // Vultu: We need to set the values we NOP'd out before
+      union
+      {
+          uint8_t bytes[sizeof(uint32_t)];
+          uint32_t value;
+      } uint32_u;
 
-    uint32_u.value = 0x01;
+       uint32_u.value = 0x01;
 
-    gh3ml::WriteMemory(0x00c5b918, uint32_u.bytes, sizeof(uint32_t));
+        gh3ml::WriteMemory(0x00c5b918, uint32_u.bytes, sizeof(uint32_t));
 
-    uint32_u.value = D3DPRESENT_INTERVAL_IMMEDIATE;
+        uint32_u.value = D3DPRESENT_INTERVAL_IMMEDIATE;
 
-    gh3ml::WriteMemory(0x00c5b934, uint32_u.bytes, sizeof(uint32_t));
+        gh3ml::WriteMemory(0x00c5b934, uint32_u.bytes, sizeof(uint32_t));
+    }
 
     Video_InitializeDevice::Orig(engineParams);
+
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsLight();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplWin32_Init(WindowHandle);
+    ImGui_ImplDX9_Init(*gh3::Direct3DDevice);
+
+
+    gh3ml::internal::Log.Info("Hooking DirectX 9...");
+    gh3ml::internal::CreateDirectXHooks();
+    gh3ml::internal::Log.Info("Finished hooking DirectX 9.");
 }
 
 using WindowProc = gh3ml::hook::Binding<0x00578880, gh3ml::hook::cconv::STDCall, LRESULT, HWND, UINT, WPARAM, LPARAM>;
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 
 LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    LRESULT result = WindowProc::Orig(hWnd, uMsg, wParam, lParam);
+    auto ret = WindowProc::Orig(hWnd, uMsg, wParam, lParam);
 
-    if ((uMsg == WM_SETCURSOR) && ((short)lParam == HTCLIENT))
-    {
-        if (GetCursor() == nullptr)
-        {
-            SetCursor(LoadCursor(NULL, IDC_ARROW));
-            ShowCursor(TRUE);
-            
-        }
-      
-        return 1;
-    }
+    (*gh3::MouseDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+    
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+        return true;
 
-    return result;
+    return ret;
 }
 
 using LoadPak = gh3ml::hook::Binding<0x004a1780, gh3ml::hook::cconv::CDecl, bool, QbStruct*>;
@@ -163,36 +191,6 @@ bool detourCFuncPrintF(void* param1)
 
 #pragma endregion
 
-using HashTableGetInt = gh3ml::hook::Binding<0x004a5960, gh3ml::hook::cconv::CDecl, uint32_t, uint32_t>;
-
-using  Wait_GameFrames = gh3ml::hook::Binding<0x00493020, gh3ml::hook::cconv::ThisCall, void, void*, float>;
-void detourWaitGameFrames(void* self, float wait)
-{
-
-    // Vultu: Waittime is hardcoded to "wait * (1/60)" so we need to remove that
-    float newWait = wait / (16.666666f);
-
-    // Vultu: Use a union to get the Deltatime var from memory
-    union
-    {
-        uint8_t bytes[sizeof(float)];
-        float value;
-    } float_u;
-
-    float_u.value = 0;
-
-    gh3ml::ReadMemory(0x009596bc, float_u.bytes, sizeof(float));
-
-    if (float_u.value != 0)
-        newWait *= (float_u.value * 1000);
-    else
-        newWait = wait;
-
-    //if (wait != 0)
-    //    gh3ml::internal::LogGH3.Info("WaitFrames: D: %f - %f - %X", float_u.value, newWait, wait);
-
-    Wait_GameFrames::Orig(self, wait);
-}
 
 using func_SetNewWhammyValue = gh3ml::hook::Binding<0x0041de60, gh3ml::hook::cconv::CDecl, bool, QbStruct*>;
 bool detourSetNewWhammyValue(QbStruct* self)
@@ -206,23 +204,27 @@ using CreateHighwayDrawRect = gh3ml::hook::Binding<0x00601d30, gh3ml::hook::ccon
 
 int deoutCreateHighwayDrawRect(double * array, float param_2, float param_3, float whammyTopWidth, float param_5, float whammyWidthOffset , float param_7, float param_8, float param_9, float param_10, float param_11)
 {
-    //std::cout
-    //    << " param_2: " << param_2
-    //    << " param_3: " << param_3
-    //    << " whammyTopWidth: " << whammyTopWidth
-    //    << " param_5: " << param_3
-    //    << " whammyWidthOffset: " 
-    //    << whammyWidthOffset 
-    //    << " param_7: " << param_7
-    //    << " param_8: " << param_8
-    //    << " param_9: " << param_9
-    //    << " param_10: " << param_10
-    //    << " param_11: " << param_11
-    //    << std::endl;
-    //    
-    float delta = (*DeltaTime * 60);
-
     return CreateHighwayDrawRect::Orig(array, param_2, param_3, whammyTopWidth, param_5, whammyWidthOffset, param_7 * (1080.0f / 720.0f) * 1.25f, param_8, param_9, param_10, param_11);
+}
+
+using Nx_DirectInput_InitMouse = gh3ml::hook::Binding<0x0047dfa0, gh3ml::hook::cconv::CDecl, HRESULT>;
+
+HRESULT detourNx_DirectInput_InitMouse()
+{
+    HRESULT ret = Nx_DirectInput_InitMouse::Orig();
+
+
+    return ret;
+
+}
+
+using D3DDeviceLostFUN_0057ae20 = gh3ml::hook::Binding<0x0057ae20, gh3ml::hook::cconv::CDecl, void>;
+
+void detourD3DDeviceLostFUN_0057ae20()
+{
+    ImGui_ImplDX9_InvalidateDeviceObjects();
+    D3DDeviceLostFUN_0057ae20::Orig();
+    ImGui_ImplDX9_CreateDeviceObjects();
 }
 
 
@@ -241,25 +243,23 @@ void gh3ml::internal::SetupDefaultHooks()
         gh3ml::WriteMemory(FUNC_INITIALIZEDEVICE + 0x239, buffer, sizeof(buffer)); // 0x0057bb79 : dword ptr [D3DPresentParams.PresentationInterval],EDI
     }
 
+
     gh3ml::hook::CreateHook<1, gh3ml::hook::cconv::STDCall>(
         reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "CreateWindowExA")),
         detourCreateWindowExA
     );
 
-
     gh3ml::hook::CreateHook<DebugLog>(detourDebugLog);
     gh3ml::hook::CreateHook<Video_InitializeDevice>(detourVideo_InitializeDevice);
-
-    if (gh3ml::Config::OverrideWindProc())
-        gh3ml::hook::CreateHook<WindowProc>(detourWindowProc);
+    
+    gh3ml::hook::CreateHook<WindowProc>(detourWindowProc);
 
     gh3ml::hook::CreateHook<LoadPak>(detourLoadPak);
     gh3ml::hook::CreateHook<CFuncPrintF>(detourCFuncPrintF);
 
-    //gh3ml::hook::CreateHook<Wait_GameFrames>(detourWaitGameFrames);
-
-    // gh3ml::hook::CreateHook<func_SetNewWhammyValue>(detourSetNewWhammyValue);
     gh3ml::hook::CreateHook<CreateHighwayDrawRect>(deoutCreateHighwayDrawRect);
+    gh3ml::hook::CreateHook<Nx_DirectInput_InitMouse>(detourNx_DirectInput_InitMouse);
+    gh3ml::hook::CreateHook<D3DDeviceLostFUN_0057ae20>(detourD3DDeviceLostFUN_0057ae20);
 
-    // Log.Info("Finished setting up default hooks.");
+    Log.Info("Finished setting up default hooks.");
 }

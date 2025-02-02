@@ -8,9 +8,29 @@ project(gh3ml VERSION 1.0.0)
 
 set(GH3_GAME_DIR "C:/Program Files (x86)/Aspyr/Guitar Hero III")
 
+include(cmake/get_cpm.cmake)
+
+CPMAddPackage("gh:ocornut/imgui#master")
+
 add_library(${PROJECT_NAME} SHARED
-  src/gh3ml/main.cpp src/gh3ml/Core.cpp "src/gh3ml/Log.cpp" "src/gh3ml/LogSource.cpp" "src/gh3ml/Config.cpp" "src/gh3ml/DefaultHooks.cpp" "src/gh3ml/Hook.cpp"
+  "src/gh3ml/main.cpp" 
+  "src/gh3ml/Core.cpp"
+  "src/gh3ml/Log.cpp"
+  "src/gh3ml/LogSource.cpp" 
+  "src/gh3ml/Config.cpp"
+  "src/gh3ml/DefaultHooks.cpp" 
+  "src/gh3ml/Hook.cpp" 
+  "src/gh3ml/Hook.cpp"
+  "src/gh3ml/Hooks/DirectXHooks.cpp"
   "src/gh3ml/ModInfo.cpp"
+
+  "${imgui_SOURCE_DIR}/imgui.cpp"
+  "${imgui_SOURCE_DIR}/imgui_demo.cpp"
+  "${imgui_SOURCE_DIR}/imgui_draw.cpp"
+  "${imgui_SOURCE_DIR}/imgui_tables.cpp"
+  "${imgui_SOURCE_DIR}/imgui_widgets.cpp"
+  "${imgui_SOURCE_DIR}/backends/imgui_impl_dx9.cpp"
+  "${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp"
 
   "libGH3/src/main.cpp" "libGH3/src/GH3/Qb/QbStruct.cpp" "libGH3/src/GH3/CFunc.cpp"
   # source files here
@@ -35,8 +55,10 @@ endfunction()
 
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-    include/
+    "include/"
     "libGH3/include/"
+    "${imgui_SOURCE_DIR}"
+    "${imgui_SOURCE_DIR}/backends/"
 )
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
@@ -54,7 +76,6 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
   add_definitions("--target=i386-pc-windows-msvc")
 endif()
 
-include(cmake/get_cpm.cmake)
 
 CPMAddPackage("gh:TsudaKageyu/minhook#master")
 CPMAddPackage("gh:geode-sdk/json#main")

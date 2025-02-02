@@ -4,19 +4,17 @@
 #include <iostream>
 
 #include <GH3ML.hpp>
+#include "Main.hpp"
 #include <MinHook.h>
-
-
 #include <GH3ML/Hook.hpp>
 #include <GH3ML/Log.hpp>
-
 #include <filesystem>
-
 #include <Gh3ml/Config.hpp>
-
-#include "Main.hpp"
-
 #include <d3d9.h>
+
+#include <imgui.h>
+#include <imgui_impl_dx9.h>
+#include <imgui_impl_win32.h>
 
 namespace fs = std::filesystem;
 
@@ -80,11 +78,11 @@ const HANDLE gh3ml::GetGH3Handle()
     return _gh3Handle;
 }
 
-
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
     _gh3Handle = GetCurrentProcess();
     gh3ml::internal::ModsPath = std::filesystem::current_path().string() + "\\gh3ml\\Mods\\";
+
 
 
     // Perform actions based on the reason for calling.
@@ -100,6 +98,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             gh3ml::internal::Log.Error("Minhook failed to initialize!");
         else
             gh3ml::internal::Log.Info("Minhook initialized!");
+
 
         gh3ml::internal::SetupDefaultHooks();
         gh3ml::internal::LoadMods();
