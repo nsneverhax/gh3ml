@@ -38,16 +38,6 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 endif ()
 copyfile(${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/nylon.dll ${NYLON_BIN_PATH}/nylon.dll)
 
-if (NOT EXISTS ${NYLON_BIN_PATH}/nylon)
-    file(MAKE_DIRECTORY ${NYLON_BIN_PATH}/nylon)
-endif()
-if (NOT EXISTS ${NYLON_BIN_PATH}/nylon/Mods)
-    file(MAKE_DIRECTORY ${NYLON_BIN_PATH}/nylon/Mods)
-endif()
-
-file(GLOB_RECURSE NYLON_RESOURCES ${NYLON_ROOT_PATH}/resources/*)
-file(COPY ${NYLON_RESOURCES} DESTINATION ${NYLON_BIN_PATH}/nylon/Resources)
-
 target_compile_definitions(${PROJECT_NAME} PUBLIC MAT_JSON_EXPORTING)
 target_link_libraries(${PROJECT_NAME} nylon mat-json-impl)
 
