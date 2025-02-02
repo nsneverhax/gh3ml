@@ -11,9 +11,8 @@ project(nylon VERSION 1.0.0 LANGUAGES CXX C)
 
 add_library(${PROJECT_NAME} INTERFACE)
 
-set(NYLON_BIN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-set(NYLON_LOADER_PATH ${CMAKE_CURRENT_SOURCE_DIR}/loader)
 set(NYLON_ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+set(NYLON_BIN_PATH ${NYLON_ROOT_PATH}/bin)
 
 # mat: this is so stupid -- vultu: Too bad!
 set(CMAKE_SIZEOF_VOID_P 4)
@@ -58,7 +57,7 @@ set(MAT_JSON_AS_INTERFACE ON)
 CPMAddPackage("gh:geode-sdk/json#main")
 target_compile_definitions(${PROJECT_NAME} INTERFACE MAT_JSON_DYNAMIC=1)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libGH3)
+add_subdirectory(${NYLON_ROOT_PATH}/libGH3)
 target_link_libraries(${PROJECT_NAME} INTERFACE libGH3)
 
 if (NOT EXISTS ${NYLON_BIN_PATH})
