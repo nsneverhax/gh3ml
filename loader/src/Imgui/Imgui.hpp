@@ -4,9 +4,9 @@
 #include <imgui_impl_dx9.h>
 #include <imgui_impl_win32.h>
 
-#include <GH3ML/Core.hpp>
+#include <Nylon/Core.hpp>
 
-namespace gh3ml::imgui
+namespace nylon::imgui
 {
 	void BeginFrame();
 	void EndFrame();

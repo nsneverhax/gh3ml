@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 
-#include <GH3ML/Log.hpp>
+#include <Nylon/Log.hpp>
 
 namespace nylon
 {

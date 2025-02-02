@@ -1,4 +1,4 @@
-#include <GH3ML/ModInfo.hpp>
+#include <Nylon/ModInfo.hpp>
 #include <matjson.hpp>
 #include <iostream>
 #include <fstream>

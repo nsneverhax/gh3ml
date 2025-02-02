@@ -5,7 +5,7 @@
 #include <map>
 #include <string>
 
-#include <GH3ML/LogSource.hpp>
+#include <Nylon/LogSource.hpp>
 
 #include <GH3/CFunc.hpp>
 

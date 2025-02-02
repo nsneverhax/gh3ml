@@ -1,13 +1,13 @@
 #include "../Main.hpp"
 #include "DirectXHooks.hpp"
-#include <GH3ML/Hook.hpp>
+#include <Nylon/Hook.hpp>
 #include <GH3/DirectX.hpp>
 #include <iostream>
 #include <imgui.h>
 #include <imgui_impl_dx9.h>
 #include <imgui_impl_win32.h>
 #include <GH3/Addresses.hpp>
-#include <GH3ML/Config.hpp>
+#include <Nylon/Config.hpp>
 
 #include <D3dx9tex.h>
 
@@ -25,7 +25,7 @@ HRESULT Present(void* self, const RECT* pSourceRect, const RECT* pDestRect, HWND
 
 	static bool aaa = true;
 
-	gh3ml::imgui::BeginFrame();
+	nylon::imgui::BeginFrame();
 
 	if (nylon::internal::IsImGuiActive)
 	{
@@ -74,7 +74,7 @@ HRESULT Present(void* self, const RECT* pSourceRect, const RECT* pDestRect, HWND
 		conduitFrame = (conduitFrame + 1) % 2;
 		conduitTapTimer -= 0.125;
 	}
-	gh3ml::imgui::EndFrame();
+	nylon::imgui::EndFrame();
 
 
 
@@ -90,11 +90,11 @@ bool nylon::internal::CreateDirectXHooks()
 		Present
 	);
 
-	if (D3DXCreateTextureFromFile(*gh3::Direct3DDevice, "gh3ml\\Resources\\conduit_tap_l.png", &conduitTapTextures[0]) != D3D_OK)
+	if (D3DXCreateTextureFromFile(*gh3::Direct3DDevice, "nylon\\Resources\\conduit_tap_l.png", &conduitTapTextures[0]) != D3D_OK)
 	{
 
 	}
-	if (D3DXCreateTextureFromFile(*gh3::Direct3DDevice, "gh3ml\\Resources\\conduit_tap_r.png", &conduitTapTextures[1]) != D3D_OK)
+	if (D3DXCreateTextureFromFile(*gh3::Direct3DDevice, "nylon\\Resources\\conduit_tap_r.png", &conduitTapTextures[1]) != D3D_OK)
 	{
 
 	}

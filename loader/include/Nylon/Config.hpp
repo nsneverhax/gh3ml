@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GH3ML/Core.hpp>
+#include <Nylon/Core.hpp>
 
 namespace nylon::Config
 {
@@ -12,7 +12,7 @@ namespace nylon::Config
 		BorderlessFullscreen
 	};
 
-	constexpr const char* ConfigFilepath = "gh3ml/config.json";
+	constexpr const char* ConfigFilepath = "nylon/config.json";
 
 	uint32_t VersionMajor();
 	uint32_t VersionMinor();

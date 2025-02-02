@@ -1,10 +1,10 @@
 #pragma once
 
-#include <GH3ML/LogSource.hpp>
+#include <Nylon/LogSource.hpp>
 
 #include <map>
 
-#include <GH3ML/ModInfo.hpp>
+#include <Nylon/ModInfo.hpp>
 
 namespace nylon::internal
 {

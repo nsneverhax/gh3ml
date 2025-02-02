@@ -27,9 +27,9 @@ static HMODULE getXInput()
 
             // Vultu: Some people have special xinput1_3.dll for their guitars.. apparently
             // We are already modding the game might as well give them support for it.
-            if (std::filesystem::exists("gh3ml\\xinput1_3.dll"))
+            if (std::filesystem::exists("nylon\\xinput1_3.dll"))
             {
-                return LoadLibraryW(L"gh3ml\\xinput1_3.dll");
+                return LoadLibraryW(L"nylon\\xinput1_3.dll");
             }
 
             auto size = GetSystemDirectoryW(path.data(), path.size());
@@ -143,11 +143,11 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         DisableThreadLibraryCalls(hinstDLL);
 
         // This is UB. -- Vultu: Too bad!
-        if (LoadLibraryW(L"gh3ml.dll") == NULL) 
+        if (LoadLibraryW(L"nylon.dll") == NULL)
         {
             const auto param = reinterpret_cast<LPVOID>(static_cast<DWORD64>(GetLastError()));
 
-            MessageBox(NULL, "LoadLibraryW returns NULL! The modloader will not be loaded.", "Unable to load \"g3ml.dll\"", MB_OK);
+            MessageBox(NULL, "LoadLibraryW returns NULL! The modloader will not be loaded.", "Unable to load \"nylon.dll\"", MB_OK);
             // CreateThread(NULL, 0, &errorThread, param, 0, NULL);
         }
     }

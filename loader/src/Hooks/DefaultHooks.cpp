@@ -1,17 +1,17 @@
 #include "../Main.hpp"
 #include "DirectXHooks.hpp"
-#include <GH3ML/Hook.hpp>
+#include <Nylon/Hook.hpp>
 #include <d3d9.h>
-#include <GH3ML/Core.hpp>
+#include <Nylon/Core.hpp>
 #include <filesystem>
-#include <GH3ML/Config.hpp>
+#include <Nylon/Config.hpp>
 #include <iostream>
 #include <dinput.h>
 #include <GH3/CFunc.hpp>
 #include <GH3/Addresses.hpp>
 #include <MinHook.h>
 
-#include <GH3ML/CFuncManager.hpp>
+#include <Nylon/CFuncManager.hpp>
 
 #include <imgui.h>
 #include <imgui_impl_dx9.h>
@@ -185,7 +185,7 @@ bool detourLoadPak(QbStruct* qbStruct)
                 continue;
             }
 
-            expectedPakPath.insert(0, "..\\gh3ml\\Mods\\");
+            expectedPakPath.insert(0, "..\\nylon\\Mods\\");
 
             nylon::internal::LogGH3.Info("Found it! Loading...");
             QbStruct modPakStruct = QbStruct();
@@ -224,7 +224,7 @@ bool detourCFuncPrintF(void* param1)
     }
 
     nylon::internal::LogGH3.Info(buffer);
-    //return gh3ml::hook::Orig<0x00530940, gh3ml::hook::cconv::CDecl, bool, char*>(param1);
+    //return nylon::hook::Orig<0x00530940, nylon::hook::cconv::CDecl, bool, char*>(param1);
     return true;
 }
 

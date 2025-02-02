@@ -1,4 +1,4 @@
-#include <GH3ML/Core.hpp>
+#include <Nylon/Core.hpp>
 #include "Main.hpp"
 
 const std::string& nylon::ModsDirectory()

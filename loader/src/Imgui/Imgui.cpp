@@ -2,14 +2,14 @@
 
 #include <GH3/DirectX.hpp>
 
-void gh3ml::imgui::BeginFrame()
+void nylon::imgui::BeginFrame()
 {
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 }
 
-void gh3ml::imgui::EndFrame()
+void nylon::imgui::EndFrame()
 {
 	ImGui::EndFrame();
 

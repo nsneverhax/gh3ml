@@ -5,10 +5,10 @@
 
 #include "Main.hpp"
 #include <MinHook.h>
-#include <GH3ML/Hook.hpp>
-#include <GH3ML/Log.hpp>
+#include <Nylon/Hook.hpp>
+#include <Nylon/Log.hpp>
 #include <filesystem>
-#include <Gh3ml/Config.hpp>
+#include <Nylon/Config.hpp>
 #include <d3d9.h>
 
 #include <imgui.h>
@@ -18,7 +18,7 @@
 
 namespace fs = std::filesystem;
 
-nylon::LogSource nylon::internal::Log = nylon::LogSource("GH3ML");
+nylon::LogSource nylon::internal::Log = nylon::LogSource("Nylon");
 nylon::LogSource nylon::internal::LogGH3 = nylon::LogSource("GH3");
 std::string nylon::internal::ModsPath = { };
 std::map<std::string, nylon::ModInfo> nylon::internal::LoadedMods = { };
@@ -61,7 +61,7 @@ void nylon::internal::SetupCFuncRedirection()
 {
     Log.Info("Setting up CFunc redirection...");
 
-    //gh3ml::hook::CreateHook<0x004134a0, gh3ml::hook::cconv::CDecl>(GetCFuncCount);
+    //nylon::hook::CreateHook<0x004134a0, nylon::hook::cconv::CDecl>(GetCFuncCount);
 
     Log.Info("Finished setting up CFunc redirection.");
 }
@@ -76,7 +76,7 @@ const HANDLE nylon::GetGH3Handle()
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
     _gh3Handle = GetCurrentProcess();
-    nylon::internal::ModsPath = std::filesystem::current_path().string() + "\\gh3ml\\Mods\\";
+    nylon::internal::ModsPath = std::filesystem::current_path().string() + "\\nylon\\Mods\\";
 
 
 

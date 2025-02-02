@@ -1,6 +1,6 @@
-#include <GH3ML/CFuncManager.hpp>
+#include <Nylon/CFuncManager.hpp>
 
-#include <GH3ML/Hook.hpp>
+#include <Nylon/Hook.hpp>
 
 
 nylon::CFuncManager::CFuncManager()

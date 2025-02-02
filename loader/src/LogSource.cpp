@@ -1,5 +1,5 @@
-#include <GH3ML/LogSource.hpp>
-#include <GH3ML/Log.hpp>
+#include <Nylon/LogSource.hpp>
+#include <Nylon/Log.hpp>
 
 #include <Windows.h>
 #include <stdio.h>

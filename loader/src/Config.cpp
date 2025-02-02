@@ -1,4 +1,4 @@
-#include <GH3ML/Config.hpp>
+#include <Nylon/Config.hpp>
 #include "Main.hpp"
 
 #include <matjson.hpp>

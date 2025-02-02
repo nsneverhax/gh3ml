@@ -1,52 +1,34 @@
-﻿cmake_minimum_required(VERSION 3.21.0)
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-project(gh3ml VERSION 1.0.0)
-
-set(GH3_GAME_DIR "C:/Program Files (x86)/Aspyr/Guitar Hero III")
+﻿cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 
 include(cmake/get_cpm.cmake)
 
-CPMAddPackage("gh:ocornut/imgui#master")
+if (NOT DEFINED CPM_SOURCE_CACHE)
+    message(NOTICE "Not using CPM cache (CPM_SOURCE_CACHE). "
+        "It is recommended to use it to improve configure times.")
+endif()
 
-add_library(${PROJECT_NAME} SHARED
-  "src/gh3ml/main.cpp" 
-  "src/gh3ml/Core.cpp"
-  "src/gh3ml/Log.cpp"
-  "src/gh3ml/LogSource.cpp" 
-  "src/gh3ml/Config.cpp"
-  "src/gh3ml/Hooks/DefaultHooks.cpp" 
-  "src/gh3ml/Hooks/Hook.cpp" 
-  "src/gh3ml/Hooks/DirectXHooks.cpp"
-  "src/gh3ml/ModInfo.cpp"
-  "src/gh3ml/CFuncManager.cpp"
-  "src/gh3ml/Imgui/Imgui.cpp"
+project(nylon VERSION 1.0.0 LANGUAGES CXX C)
 
-  "${imgui_SOURCE_DIR}/imgui.cpp"
-  "${imgui_SOURCE_DIR}/imgui_demo.cpp"
-  "${imgui_SOURCE_DIR}/imgui_draw.cpp"
-  "${imgui_SOURCE_DIR}/imgui_tables.cpp"
-  "${imgui_SOURCE_DIR}/imgui_widgets.cpp"
-  "${imgui_SOURCE_DIR}/backends/imgui_impl_dx9.cpp"
-  "${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp"
+add_library(${PROJECT_NAME} INTERFACE)
 
-  # Vultu: these need to be moved to a seperate project!
-  "libGH3/src/main.cpp" "libGH3/src/GH3/Qb/QbStruct.cpp" "libGH3/src/GH3/CFunc.cpp" "libGH3/src/GH3/CRC32.cpp"
-  # source files here
-)
+set(NYLON_BIN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+set(NYLON_LOADER_PATH ${CMAKE_CURRENT_SOURCE_DIR}/loader)
+set(NYLON_ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
-if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    message(FATAL_ERROR "x64 bit libraries are not supported by x32 bit executables.")
+# mat: this is so stupid -- vultu: Too bad!
+set(CMAKE_SIZEOF_VOID_P 4)
+if (WIN32)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND
+        CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
+        # target x86 on windows with clang
+        target_compile_options(${PROJECT_NAME} INTERFACE --target=i686-pc-windows-msvc)
+        target_link_options(${PROJECT_NAME} INTERFACE --target=i686-pc-windows-msvc)
+        add_compile_options(--target=i686-pc-windows-msvc)
+        add_link_options(--target=i686-pc-windows-msvc)
+    endif()
 endif()
 
 function(copyfile targ src dst)
-    if (NOT EXISTS ${src})
-        return()
-    endif()
-
     add_custom_command(
         TARGET ${targ}
         POST_BUILD
@@ -54,73 +36,38 @@ function(copyfile targ src dst)
     )
 endfunction()
 
-
-
-target_include_directories(${PROJECT_NAME} PUBLIC
-    "include/"
-    "libGH3/include/"
-    "${imgui_SOURCE_DIR}"
-    "${imgui_SOURCE_DIR}/backends/"
-    "$ENV{DXSDK_DIR}Include/"
+cmake_host_system_information(
+    RESULT GH3_DIR
+    QUERY WINDOWS_REGISTRY "HKLM/SOFTWARE/Aspyr/Guitar Hero III"
+    VALUE "Path"
+    VIEW 32
 )
+cmake_path(IS_ABSOLUTE GH3_DIR GH3_DIR_ABSOLUTE)
+if (NOT ${GH3_DIR_ABSOLUTE} OR NOT EXISTS ${GH3_DIR})
+    unset(GH3_DIR)
+endif ()
+unset(GH3_DIR_ABSOLUTE)
 
+if (DEFINED GH3_DIR)
+    message(STATUS "Guitar Hero III path set to \"${GH3_DIR}\", will install on build.")
+else ()
+    message(STATUS "Guitar Hero III installation not found.")
+endif ()
 
-if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    copyfile(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pdb ${GH3_GAME_DIR}/${PROJECT_NAME}.pdb)
-endif()
-
-copyfile(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.dll ${GH3_GAME_DIR}/${PROJECT_NAME}.dll)
-
-# mat: this is so stupid -- vultu: Too bad!
-set(CMAKE_SIZEOF_VOID_P 4)
-if (${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
-  # ensure 32 bit on clang
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -target i386-pc-windows-msvc")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -target i386-pc-windows-msvc")
-  add_definitions("--target=i386-pc-windows-msvc")
-endif()
-
-
-CPMAddPackage("gh:TsudaKageyu/minhook#master")
+set(MAT_JSON_AS_INTERFACE ON)
 CPMAddPackage("gh:geode-sdk/json#main")
+target_compile_definitions(${PROJECT_NAME} INTERFACE MAT_JSON_DYNAMIC=1)
 
-target_link_libraries(${PROJECT_NAME} minhook)
-target_link_libraries(${PROJECT_NAME} mat-json)
-target_link_libraries(${PROJECT_NAME} "$ENV{DXSDK_DIR}Lib/x86/d3dx9.lib")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libGH3)
+target_link_libraries(${PROJECT_NAME} INTERFACE libGH3)
 
-# -- PORXY LAODER
-
-add_library(ProxyLoader SHARED "src/ProxyLoader/ProxyLoader.cpp")
-
-set_target_properties(ProxyLoader PROPERTIES
-  PREFIX ""
-  OUTPUT_NAME "xinput1_3"
-)
-if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    copyfile(ProxyLoader ${CMAKE_BINARY_DIR}/xinput1_3.pdb ${GH3_GAME_DIR}/xinput1_3.pdb)
+if (NOT EXISTS ${NYLON_BIN_PATH})
+    file(MAKE_DIRECTORY ${NYLON_BIN_PATH})
 endif()
 
-copyfile(ProxyLoader ${CMAKE_BINARY_DIR}/xinput1_3.dll ${GH3_GAME_DIR}/xinput1_3.dll)
-
-# Vultu - don't feel like working with shitty cmake rn.
-# -- libGH3
-
-# add_library(libGH3 SHARED "libGH3/src/main.cpp" "libGH3/src/GH3/Qb/QbStruct.cpp" "libGH3/src/GH3/CFunc.cpp")
-
-#set_target_properties(libGH3 PROPERTIES
- # PREFIX ""
- # OUTPUT_NAME "libGH3"
-#)
-
-#target_include_directories(libGH3 PUBLIC
-#    "libGH3/include/"
-#)
-
-if (MSVC)
-  include(CheckLinkerFlag)
-  check_linker_flag(CXX /NOEXP SUPPORTS_NOEXP)
-  if (SUPPORTS_NOEXP)
-    target_link_options(ProxyLoader PRIVATE /NOEXP)
-  endif()
-  target_link_options(ProxyLoader PRIVATE /NOIMPLIB /DEBUG:NONE)
-endif()
+if (PROJECT_IS_TOP_LEVEL)
+    add_subdirectory(loader)
+    target_link_libraries(${PROJECT_NAME} INTERFACE nylon-loader)
+else ()
+    target_link_libraries(${PROJECT_NAME} INTERFACE "${NYLON_BIN_PATH}")
+endif ()

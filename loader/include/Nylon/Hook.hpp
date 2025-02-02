@@ -8,7 +8,7 @@
 #include <MinHook.h>
 
 // TODO: this is dumb!
-#include "../src/gh3ml/Main.hpp"
+#include "../src/Main.hpp"
 
 namespace nylon::hook
 {
