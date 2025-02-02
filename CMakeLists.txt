@@ -23,6 +23,7 @@ add_library(${PROJECT_NAME} SHARED
   "src/gh3ml/Hooks/DirectXHooks.cpp"
   "src/gh3ml/ModInfo.cpp"
   "src/gh3ml/CFuncManager.cpp"
+  "src/gh3ml/Imgui/Imgui.cpp"
 
   "${imgui_SOURCE_DIR}/imgui.cpp"
   "${imgui_SOURCE_DIR}/imgui_demo.cpp"

@@ -6,63 +6,77 @@
 #include <imgui.h>
 #include <imgui_impl_dx9.h>
 #include <imgui_impl_win32.h>
+#include <GH3/Addresses.hpp>
+#include <GH3ML/Config.hpp>
 
 #include <D3dx9tex.h>
-//#pragma comment(lib, "d3d9.lib")
+
+#include "../Imgui/Imgui.hpp"
+
 
 constexpr int PresentHookID = 2;
 
-LPDIRECT3DTEXTURE9 tolietTexture = nullptr;
+LPDIRECT3DTEXTURE9 conduitTapTextures[] = { nullptr, nullptr };
 
 HRESULT Present(void* self, const RECT* pSourceRect, const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)
 {
+	static float conduitTapTimer = 0;
+	static int conduitFrame = 0;
+
 	static bool aaa = true;
 
-
-	ImGui_ImplDX9_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-
+	gh3ml::imgui::BeginFrame();
 
 	if (nylon::internal::IsImGuiActive)
 	{
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar;
-		ImGui::Begin("Nylon Menu", &nylon::internal::IsImGuiActive, window_flags);
-		if (ImGui::BeginMenuBar())
+		std::string title = "Nylon Menu " + std::string(nylon::VersionString);
+
+		if (ImGui::Begin(title.c_str(), &nylon::internal::IsImGuiActive, window_flags))
 		{
-			if (ImGui::BeginMenu("Chart"))
+			if (ImGui::BeginMenuBar())
 			{
-				ImGui::EndMenu();
-			}
+				if (ImGui::BeginMenu("Windows"))
+				{
+					if (ImGui::MenuItem("Hash Map Browser"))
+					{
 
-			if (ImGui::BeginMenu("Hash Map"))
-			{
-				ImGui::EndMenu();
-			}
+					}
+					ImGui::EndMenu();
+				}
+				if (ImGui::BeginMenu("Chart"))
+				{
+					ImGui::EndMenu();
+				}
 
-			if (ImGui::BeginMenu("Debug"))
-			{
-				ImGui::EndMenu();
-			}
+				if (ImGui::BeginMenu("Debug"))
+				{
 
-			ImGui::EndMenuBar();
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMenuBar();
+			}
+			D3DSURFACE_DESC surfaceDesc;
+			conduitTapTextures[conduitFrame]->GetLevelDesc(0, &surfaceDesc);
+
+
+			ImGui::Image((ImTextureID)(intptr_t)conduitTapTextures[conduitFrame], ImVec2(surfaceDesc.Width, surfaceDesc.Height));
+
+			ImGui::End();
 		}
-		D3DSURFACE_DESC surfaceDesc;
-		tolietTexture->GetLevelDesc(0, &surfaceDesc);
-		
-		ImGui::Image((ImTextureID)(intptr_t)tolietTexture, ImVec2(surfaceDesc.Width / 4.0f, surfaceDesc.Height / 4.0f));
-
-		ImGui::End();
 	}
 
-	ImGui::EndFrame();
+	conduitTapTimer += *DeltaTime;
 
-	if ((*gh3::Direct3DDevice)->BeginScene() >= 0)
+	if (conduitTapTimer >= 0.125)
 	{
-		ImGui::Render();
-		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
-		(*gh3::Direct3DDevice)->EndScene();
+		conduitFrame = (conduitFrame + 1) % 2;
+		conduitTapTimer -= 0.125;
 	}
+	gh3ml::imgui::EndFrame();
+
+
 
 	return nylon::hook::Orig<PresentHookID, nylon::hook::cconv::STDCall, HRESULT>(self, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 }
@@ -76,12 +90,14 @@ bool nylon::internal::CreateDirectXHooks()
 		Present
 	);
 
-	if (D3DXCreateTextureFromFile(*gh3::Direct3DDevice, "gh3ml\\toilet.png", &tolietTexture) != D3D_OK)
+	if (D3DXCreateTextureFromFile(*gh3::Direct3DDevice, "gh3ml\\Resources\\conduit_tap_l.png", &conduitTapTextures[0]) != D3D_OK)
 	{
-		std::cout << "FAILED OT MAKE TOLIET!!" << std::endl;
+
 	}
-	else
-		std::cout << "MADE TOLIET!!" << std::endl;
+	if (D3DXCreateTextureFromFile(*gh3::Direct3DDevice, "gh3ml\\Resources\\conduit_tap_r.png", &conduitTapTextures[1]) != D3D_OK)
+	{
+
+	}
 
 	return true;
 }

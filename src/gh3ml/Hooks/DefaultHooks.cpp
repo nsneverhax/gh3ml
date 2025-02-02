@@ -303,11 +303,11 @@ void nylon::internal::SetupDefaultHooks()
     nylon::hook::CreateHook<CreateHighwayDrawRect>(deoutCreateHighwayDrawRect);
     nylon::hook::CreateHook<Nx_DirectInput_InitMouse>(detourNx_DirectInput_InitMouse);
     nylon::hook::CreateHook<D3DDeviceLostFUN_0057ae20>(detourD3DDeviceLostFUN_0057ae20);
-    //nylon::hook::CreateHook<nylon::NodeArray_SetCFuncInfo>(detourNodeArray_SetCFuncInfo);
+    nylon::hook::CreateHook<nylon::NodeArray_SetCFuncInfo>(detourNodeArray_SetCFuncInfo);
 
-    //_CFuncManager = { };
+    _CFuncManager = { };
 
-    //_CFuncManager.Register();
+    _CFuncManager.Register();
 
     Log.Info("Finished setting up default hooks.");
 }
