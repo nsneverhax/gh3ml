@@ -1,4 +1,5 @@
 #include <Nylon/CFuncManager.hpp>
+#include "DefaultCFuncs.hpp"
 
 #include <Nylon/Hook.hpp>
 

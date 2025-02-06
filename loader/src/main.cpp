@@ -22,7 +22,6 @@ nylon::LogSource nylon::internal::Log = nylon::LogSource("Nylon");
 nylon::LogSource nylon::internal::LogGH3 = nylon::LogSource("GH3");
 std::string nylon::internal::ModsPath = { };
 std::map<std::string, nylon::ModInfo> nylon::internal::LoadedMods = { };
-bool nylon::internal::IsImGuiActive = true;
 
 void nylon::internal::LoadMods()
 {

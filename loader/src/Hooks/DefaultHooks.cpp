@@ -1,4 +1,5 @@
 #include "../Main.hpp"
+#include "../Imgui/Imgui.hpp"
 #include "DirectXHooks.hpp"
 #include <Nylon/Hook.hpp>
 #include <d3d9.h>
@@ -12,7 +13,6 @@
 #include <MinHook.h>
 
 #include <Nylon/CFuncManager.hpp>
-
 #include <imgui.h>
 #include <imgui_impl_dx9.h>
 #include <imgui_impl_win32.h>
@@ -120,7 +120,7 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         case VK_TAB:
 
             if (!waitForTabRelease)
-                nylon::internal::IsImGuiActive = !nylon::internal::IsImGuiActive;
+                nylon::imgui::NylonMenuActive = !nylon::imgui::NylonMenuActive;
 
             waitForTabRelease = true;
             break;
@@ -271,6 +271,16 @@ void detourNodeArray_SetCFuncInfo(void* startAddress, uint32_t count)
     // Vultu: Don't do anything becuase CFunc Manager will handle it all
 }
 
+
+
+using  GetSongTimeInMs = nylon::hook::Binding<0x0053bb90, nylon::hook::cconv::CDecl, double, float>;
+double detourGetSongTimeInMs(float param)
+{
+    return 1;
+
+    return GetSongTimeInMs::Orig(param);
+}
+
 void nylon::internal::SetupDefaultHooks()
 {
     Log.Info("Setting up default hooks...");
@@ -285,7 +295,7 @@ void nylon::internal::SetupDefaultHooks()
         nylon::WriteMemory(FUNC_INITIALIZEDEVICE + 0x1C7, buffer, sizeof(buffer)); // 0x0057BB07 : dword ptr [D3DPresentParams.SwapEffect],EDI
         nylon::WriteMemory(FUNC_INITIALIZEDEVICE + 0x239, buffer, sizeof(buffer)); // 0x0057bb79 : dword ptr [D3DPresentParams.PresentationInterval],EDI
     }
-
+    
 
     nylon::hook::CreateHook<1, nylon::hook::cconv::STDCall>(
         reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "CreateWindowExA")),
@@ -304,6 +314,9 @@ void nylon::internal::SetupDefaultHooks()
     nylon::hook::CreateHook<Nx_DirectInput_InitMouse>(detourNx_DirectInput_InitMouse);
     nylon::hook::CreateHook<D3DDeviceLostFUN_0057ae20>(detourD3DDeviceLostFUN_0057ae20);
     nylon::hook::CreateHook<nylon::NodeArray_SetCFuncInfo>(detourNodeArray_SetCFuncInfo);
+
+    nylon::hook::CreateHook<GetSongTimeInMs>(detourGetSongTimeInMs);
+
 
     _CFuncManager = { };
 

@@ -27,53 +27,8 @@ HRESULT Present(void* self, const RECT* pSourceRect, const RECT* pDestRect, HWND
 
 	nylon::imgui::BeginFrame();
 
-	if (nylon::internal::IsImGuiActive)
-	{
-		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar;
-		std::string title = "Nylon Menu " + std::string(nylon::VersionString);
+	nylon::imgui::NylonMenu();
 
-		if (ImGui::Begin(title.c_str(), &nylon::internal::IsImGuiActive, window_flags))
-		{
-			if (ImGui::BeginMenuBar())
-			{
-				if (ImGui::BeginMenu("Windows"))
-				{
-					if (ImGui::MenuItem("Hash Map Browser"))
-					{
-
-					}
-					ImGui::EndMenu();
-				}
-				if (ImGui::BeginMenu("Chart"))
-				{
-					ImGui::EndMenu();
-				}
-
-				if (ImGui::BeginMenu("Debug"))
-				{
-
-					ImGui::EndMenu();
-				}
-
-				ImGui::EndMenuBar();
-			}
-			D3DSURFACE_DESC surfaceDesc;
-			conduitTapTextures[conduitFrame]->GetLevelDesc(0, &surfaceDesc);
-
-
-			ImGui::Image((ImTextureID)(intptr_t)conduitTapTextures[conduitFrame], ImVec2(surfaceDesc.Width, surfaceDesc.Height));
-
-			ImGui::End();
-		}
-	}
-
-	conduitTapTimer += *DeltaTime;
-
-	if (conduitTapTimer >= 0.125)
-	{
-		conduitFrame = (conduitFrame + 1) % 2;
-		conduitTapTimer -= 0.125;
-	}
 	nylon::imgui::EndFrame();
 
 

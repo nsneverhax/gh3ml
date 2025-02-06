@@ -15,8 +15,6 @@ namespace nylon::internal
 
 	extern std::map<std::string, ModInfo> LoadedMods;
 	
-	extern bool IsImGuiActive;
-
 	extern void SetupDefaultHooks();
 	void SetupCFuncRedirection();
 

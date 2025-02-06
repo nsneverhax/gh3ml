@@ -10,4 +10,8 @@ namespace nylon::imgui
 {
 	void BeginFrame();
 	void EndFrame();
+
+	extern bool NylonMenuActive;
+	void NylonMenu();
+
 }
