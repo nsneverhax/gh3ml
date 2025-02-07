@@ -26,7 +26,7 @@ public:
 	bool GetPair(uint32_t key, float& out, int param_3 = 1);
 	bool GetVector(uint32_t key, float& out, int param_3 = 1);
 	bool GetStruct(uint32_t key, float& out, int param_3 = 1);
-
+	bool HasKey(uint32_t key);
 };
 
 namespace Functions

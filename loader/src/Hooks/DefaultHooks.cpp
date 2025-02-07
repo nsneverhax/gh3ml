@@ -17,6 +17,8 @@
 #include <imgui_impl_dx9.h>
 #include <imgui_impl_win32.h>
 
+#include <GH3/EngineParams.hpp>
+
 #include <GH3/DirectX.hpp>
 #include <GH3/CRC32.hpp>
 constexpr int INST_NOP = 0x90;
@@ -79,7 +81,7 @@ void detourVideo_InitializeDevice(void* engineParams)
 
     
     ImGuiIO& io = ImGui::GetIO();
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
@@ -104,13 +106,15 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     static bool waitForTabRelease = false;
 
+
     auto ret = WindowProc::Orig(hWnd, uMsg, wParam, lParam);
+
+
+    (*gh3::MouseDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+    (*gh3::KeyboardDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 
     if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
         return true;
-
-    (*gh3::MouseDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-
 
     switch (uMsg)
     {
@@ -243,7 +247,22 @@ using CreateHighwayDrawRect = nylon::hook::Binding<0x00601d30, nylon::hook::ccon
 
 int deoutCreateHighwayDrawRect(double * array, float param_2, float param_3, float whammyTopWidth, float param_5, float whammyWidthOffset , float param_7, float param_8, float param_9, float param_10, float param_11)
 {
-    return CreateHighwayDrawRect::Orig(array, param_2, param_3, whammyTopWidth, param_5, whammyWidthOffset, param_7 * (1080.0f / 720.0f) * 1.25f, param_8, param_9, param_10, param_11);
+    // Vultu: I am not sure of the perf implications of calling this every call, but this will do until resizable windows get implemented i guess
+    static int backBufferWidth = 0;
+    // temp
+    if (backBufferWidth == 0)
+    {
+        auto instance = (gh3::EngineParams::Instance());
+        IDirect3DSurface9* pSurface;
+        (*gh3::Direct3DDevice)->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pSurface);
+        D3DSURFACE_DESC SurfaceDesc;
+        pSurface->GetDesc(&SurfaceDesc);
+        backBufferWidth = SurfaceDesc.Width;
+        pSurface->Release();
+    }
+
+    float whammySizeMultiplier = ((float)backBufferWidth / 1280.0f) * 1.25f;
+    return CreateHighwayDrawRect::Orig(array, param_2, param_3, whammyTopWidth * whammySizeMultiplier, param_5, whammyWidthOffset, param_7 * whammySizeMultiplier, param_8, param_9, param_10, param_11);
 }
 
 using Nx_DirectInput_InitMouse = nylon::hook::Binding<0x0047dfa0, nylon::hook::cconv::CDecl, HRESULT>;
@@ -271,15 +290,35 @@ void detourNodeArray_SetCFuncInfo(void* startAddress, uint32_t count)
     // Vultu: Don't do anything becuase CFunc Manager will handle it all
 }
 
+using CFuncWait = nylon::hook::Binding<0x0052eaf0, nylon::hook::cconv::CDecl, bool, QbStruct*, void*>;
 
-
-using  GetSongTimeInMs = nylon::hook::Binding<0x0053bb90, nylon::hook::cconv::CDecl, double, float>;
-double detourGetSongTimeInMs(float param)
+bool detourCFuncWait(QbStruct* params, void* script)
 {
-    return 1;
+    // Vultu: Write out deltatime to the memory before we get there, honestly it might be better to rewrite this function later.
 
-    return GetSongTimeInMs::Orig(param);
+    union
+    {
+        float value = 0;
+        uint8_t bytes[sizeof(float)];
+    } deltaBuffer;
+
+    float waitTime = 0;
+    params->GetFloat(0, waitTime);
+
+
+    deltaBuffer.value = (*DeltaTime) * 1000.0f; // convert to ms
+
+    nylon::WriteMemory(0x008a71bc, deltaBuffer.bytes, sizeof(float));
+
+    auto orig = CFuncWait::Orig(params, script);
+
+    // Restore this to be safe
+    //deltaBuffer.value = 16.666666f;
+    //nylon::WriteMemory(0x008a71bc, deltaBuffer.bytes, sizeof(float));
+
+    return orig;
 }
+
 
 void nylon::internal::SetupDefaultHooks()
 {
@@ -288,7 +327,7 @@ void nylon::internal::SetupDefaultHooks()
     if (nylon::Config::UnlockFPS())
     {
         // Vultu: I really don't feel like rewriting the entire function for right now
-        // so I'm going NOP where some global variables are setr
+        // so I'm going NOP where some global variables are set
         uint8_t buffer[6];
         memset(buffer, INST_NOP, sizeof(buffer));
 
@@ -315,8 +354,7 @@ void nylon::internal::SetupDefaultHooks()
     nylon::hook::CreateHook<D3DDeviceLostFUN_0057ae20>(detourD3DDeviceLostFUN_0057ae20);
     nylon::hook::CreateHook<nylon::NodeArray_SetCFuncInfo>(detourNodeArray_SetCFuncInfo);
 
-    nylon::hook::CreateHook<GetSongTimeInMs>(detourGetSongTimeInMs);
-
+    nylon::hook::CreateHook<CFuncWait>(detourCFuncWait);
 
     _CFuncManager = { };
 

@@ -2,7 +2,6 @@
 
 #include <GH3/DirectX.hpp>
 
-
 void nylon::imgui::BeginFrame()
 {
 	ImGui_ImplDX9_NewFrame();
@@ -57,6 +56,7 @@ void nylon::imgui::NylonMenu()
 	
 			ImGui::EndMenuBar();
 		}
+
 		D3DSURFACE_DESC surfaceDesc;
 		//conduitTapTextures[conduitFrame]->GetLevelDesc(0, &surfaceDesc);
 	

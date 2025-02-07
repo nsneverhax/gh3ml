@@ -13,7 +13,6 @@
 
 #include "../Imgui/Imgui.hpp"
 
-
 constexpr int PresentHookID = 2;
 
 LPDIRECT3DTEXTURE9 conduitTapTextures[] = { nullptr, nullptr };
