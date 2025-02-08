@@ -14,6 +14,9 @@ nylon::CFuncManager::CFuncManager()
 	}
 }
 
+#include <iostream>
+#include <fstream>
+
 void nylon::CFuncManager::Register()
 {
 	// TODO: REIMPLEMENT THE DAMN CFUNC FUNC
@@ -23,14 +26,25 @@ void nylon::CFuncManager::Register()
 
 	gh3::CFuncDescriptor* funcs = new gh3::CFuncDescriptor[m_functions.size()];
 
+	std::ofstream myfile("example.txt");
+
 	uint32_t i = 0;
 	for (auto kv : m_functions)
 	{
 		funcs[i] = gh3::CFuncDescriptor();
 		funcs[i].Function = reinterpret_cast<void*>(kv.first);
 		funcs[i].Name = kv.second.data();
+
+		std::uint8_t magic = *reinterpret_cast<std::uint8_t*>(kv.first + 2);
+
+		if (magic == 0xC3)
+			myfile << "[S] ";
+		else
+			myfile << "[ ] ";
+		myfile << kv.second.data() << "\n";
 		i++;
 	}
+	myfile.close();
 
 	NodeArray_SetCFuncInfo::Orig(funcs, m_functions.size());
 	delete[] funcs;

@@ -56,15 +56,6 @@ void nylon::internal::LoadMods()
     Log.Info("Finished loading mods.");
 }
 
-void nylon::internal::SetupCFuncRedirection()
-{
-    Log.Info("Setting up CFunc redirection...");
-
-    //nylon::hook::CreateHook<0x004134a0, nylon::hook::cconv::CDecl>(GetCFuncCount);
-
-    Log.Info("Finished setting up CFunc redirection.");
-}
-
 HANDLE _gh3Handle = nullptr;
 
 const HANDLE nylon::GetGH3Handle()
@@ -85,9 +76,11 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hinstDLL);
 
-        nylon::Log::CreateConsole();
-
         nylon::internal::ReadConfig();
+
+        if (nylon::Config::OpenConsole())
+            nylon::Log::CreateConsole();
+
         if (MH_Initialize() != MH_OK)
             nylon::internal::Log.Error("Minhook failed to initialize!");
         else

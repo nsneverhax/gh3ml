@@ -11,7 +11,8 @@ uint32_t _versionMajor = 0;
 uint32_t _versionMinor = 0;
 uint32_t _versionPatch = 0;
 bool _unlockFPS = false;
-bool _overrideWindProc = false;
+bool _openConsole = false;
+bool _allowScriptPrintf = false;
 
 std::string_view _versionType = { };
 
@@ -48,8 +49,11 @@ void nylon::internal::ReadConfig()
 	if (object.contains("unlockfps"))
 		_unlockFPS = object["unlockfps"].asBool().unwrap();
 
-	if (object.contains("overrideWindProc"))
-		_overrideWindProc = object["overrideWindProc"].asBool().unwrap();
+	if (object.contains("openGH3Console"))
+		_openConsole = object["openGH3Console"].asBool().unwrap();
+
+	if (object.contains("allowQScriptPrintf"))
+		_allowScriptPrintf = object["allowQScriptPrintf"].asBool().unwrap();
 }
 
 uint32_t nylon::Config::VersionMajor()
@@ -72,7 +76,12 @@ bool nylon::Config::UnlockFPS()
 {
 	return _unlockFPS;
 }
-bool nylon::Config::OverrideWindProc()
+
+bool nylon::Config::OpenConsole()
 {
-	return _overrideWindProc;
+	return _openConsole;
+}
+bool nylon::Config::AllowQScriptPrintf()
+{
+	return _allowScriptPrintf;
 }

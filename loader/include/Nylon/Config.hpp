@@ -19,5 +19,6 @@ namespace nylon::Config
 	uint32_t VersionPatch();
 	std::string_view VersionType();
 	bool UnlockFPS();
-	bool OverrideWindProc();
+	bool OpenConsole();
+	bool AllowQScriptPrintf();
 }

@@ -209,6 +209,8 @@ bool detourLoadPak(QbStruct* qbStruct)
 using CFuncPrintF = nylon::hook::Binding<0x00530940, nylon::hook::cconv::CDecl, bool, void*>;
 bool detourCFuncPrintF(void* param1)
 {
+    if (!nylon::Config::AllowQScriptPrintf())
+        return;
 
     char buffer[1024];
     memset(buffer, 0, sizeof(buffer));
