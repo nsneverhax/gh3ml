@@ -1,10 +1,10 @@
 ### Note: this readme is still a wip and probably will be for a while! Feel free to join the discord and ask as I am very active there.
 
-[Latest Release](https://github.com/nsneverhax/gh3ml/releases)\
+[Latest Release](https://github.com/nsneverhax/gh3ml/releases)
 ### Sections
 [How To Install](#how-to-install)\
 [How do I Make a Mod?](#how-do-i-make-a-mod)\
-[Neverhax Server](https://discord.gg/h4KY26nyya)\
+[Neverhax Server](https://discord.gg/h4KY26nyya)
 
 ## How To Install
 1) Get the latest release [here](https://github.com/nsneverhax/gh3ml/releases).
