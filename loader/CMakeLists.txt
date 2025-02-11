@@ -21,6 +21,9 @@ add_library(${PROJECT_NAME} SHARED
     "src/Hooks/DirectXHooks.cpp"
     "src/ModInfo.cpp"
     "src/CFunc/CFuncManager.cpp"
+
+    "src/Hooks/CFuncHooks.cpp"
+
     "src/Imgui/Imgui.cpp"
 )
 
