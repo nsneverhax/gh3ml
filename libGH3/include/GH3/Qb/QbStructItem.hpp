@@ -5,7 +5,7 @@
 #include <GH3/Qb/QbNodeFlags.hpp>
 #include <GH3/Qb/QbValueType.hpp>
 
-namespace GH3
+namespace gh3
 {
 
 	/// <summary>

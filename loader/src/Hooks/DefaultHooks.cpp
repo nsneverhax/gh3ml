@@ -150,16 +150,16 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return ret;
 }
 
-using LoadPak = nylon::hook::Binding<0x004a1780, nylon::hook::cconv::CDecl, bool, QbStruct*>;
+using LoadPak = nylon::hook::Binding<0x004a1780, nylon::hook::cconv::CDecl, bool, gh3::QbStruct*>;
 
 int loadPakCount = 0;
 
 std::unordered_map<uint32_t, std::string> keyMap = { };
 
 
-using FUN_004788b0 = nylon::hook::Binding<0x004788b0, nylon::hook::cconv::ThisCall, bool, QbStruct*, uint32_t, void*, uint32_t>;
+using FUN_004788b0 = nylon::hook::Binding<0x004788b0, nylon::hook::cconv::ThisCall, bool, gh3::QbStruct*, uint32_t, void*, uint32_t>;
 
-bool detourLoadPak(QbStruct* qbStruct)
+bool detourLoadPak(gh3::QbStruct* qbStruct)
 {
     static bool _doPakCheck = true;
 
@@ -192,9 +192,9 @@ bool detourLoadPak(QbStruct* qbStruct)
             expectedPakPath.insert(0, "..\\nylon\\Mods\\");
 
             nylon::internal::LogGH3.Info("Found it! Loading...");
-            QbStruct modPakStruct = QbStruct();
+            gh3::QbStruct modPakStruct = gh3::QbStruct();
 
-            Functions::InsertCStringItem(&modPakStruct, 0, expectedPakPath.data());
+            gh3::Functions::InsertCStringItem(&modPakStruct, 0, expectedPakPath.data());
 
             LoadPak::Orig(&modPakStruct);
             nylon::internal::LogGH3.Info("Done!");
@@ -206,39 +206,12 @@ bool detourLoadPak(QbStruct* qbStruct)
     return ret;
 }
 
-using CFuncPrintF = nylon::hook::Binding<0x00530940, nylon::hook::cconv::CDecl, bool, void*>;
-bool detourCFuncPrintF(void* param1)
-{
-    if (!nylon::Config::AllowQScriptPrintf())
-        return;
-
-    char buffer[1024];
-    memset(buffer, 0, sizeof(buffer));
-
-    reinterpret_cast<void(*)(char*, size_t, void*)>(0x00532a80)(buffer, 1023, param1);
-
-
-    // Replace linebreaks becuase we take care of them ourself
-    for (auto i = 0; i < 1024; i++)
-    {
-        if (buffer[i] == '\n')
-        {
-            buffer[i] = ' ';
-        }
-        if (buffer[i] == '\0')
-            break;
-    }
-
-    nylon::internal::LogGH3.Info(buffer);
-    //return nylon::hook::Orig<0x00530940, nylon::hook::cconv::CDecl, bool, char*>(param1);
-    return true;
-}
 
 #pragma endregion
 
 
-using func_SetNewWhammyValue = nylon::hook::Binding<0x0041de60, nylon::hook::cconv::CDecl, bool, QbStruct*>;
-bool detourSetNewWhammyValue(QbStruct* self)
+using func_SetNewWhammyValue = nylon::hook::Binding<0x0041de60, nylon::hook::cconv::CDecl, bool, gh3::QbStruct*>;
+bool detourSetNewWhammyValue(gh3::QbStruct* self)
 {
     return SetNewWhammyValue(self);
     //return func_SetNewWhammyValue::Orig(self);
@@ -292,9 +265,9 @@ void detourNodeArray_SetCFuncInfo(void* startAddress, uint32_t count)
     // Vultu: Don't do anything becuase CFunc Manager will handle it all
 }
 
-using CFuncWait = nylon::hook::Binding<0x0052eaf0, nylon::hook::cconv::CDecl, bool, QbStruct*, void*>;
+using CFuncWait = nylon::hook::Binding<0x0052eaf0, nylon::hook::cconv::CDecl, bool, gh3::QbStruct*, void*>;
 
-bool detourCFuncWait(QbStruct* params, void* script)
+bool detourCFuncWait(gh3::QbStruct* params, void* script)
 {
     // Vultu: Write out deltatime to the memory before we get there, honestly it might be better to rewrite this function later.
 

@@ -2,7 +2,7 @@
 
 #include <GH3/Qb.hpp>
 
-namespace GH3
+namespace gh3
 {
 	enum class QbNodeFlags
 	{

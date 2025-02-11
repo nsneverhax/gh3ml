@@ -6,7 +6,7 @@
 #include "Qb/QbNodeFlags.hpp"
 #include "Qb/QbStructItem.hpp"
 #include "Qb/QbStruct.hpp"
-
+#include "Qb/QbScript.hpp"
 
 
 /*

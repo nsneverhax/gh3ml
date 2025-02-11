@@ -116,7 +116,7 @@ namespace nylon::hook
 	}
 
 	template<uintptr_t id, typename Cconv, typename Ret, typename... Args>
-	void CreateHook(uintptr_t address, Ret(&detour)(Args...))
+	void CreateHook(uintptr_t address, Ret(&detour)(Args...), const char* name = nullptr)
 	{
 		bool isNew = !Hooks.contains(id);
 
