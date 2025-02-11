@@ -2,8 +2,13 @@
 
 #include <Nylon/Config.hpp>
 
+#include <filesystem>
+
+namespace binding = nylon::internal::binding;
+
 bool PrintStruct(gh3::QbStruct* params, gh3::QbScript* script)
 {
+    nylon::internal::LogGH3.Info("PrintStruct");
 	return true;
 }
 
@@ -33,9 +38,54 @@ bool PrintF(gh3::QbStruct* params, gh3::QbScript* script)
     return true;
 }
 
+bool LoadPak(gh3::QbStruct* params, gh3::QbScript* script)
+{
+    static bool _doPakCheck = true;
+
+    auto ret = binding::CFunc_LoadPak::Orig(params, script);
+
+    if (!_doPakCheck)
+        return ret;
+
+    char* pakNameBuffer;
+
+    params->GetString(0, &pakNameBuffer, 0);
+
+    if (strcmp("pak/qb.pak", pakNameBuffer) == 0)
+    {
+        for (const auto pair : nylon::internal::LoadedMods)
+        {
+            auto expectedPakPath = pair.second.GetDirectory() + "\\pak\\" + pair.first + ".pak";
+
+            nylon::internal::LogGH3.Info("Expecting: \"%s\"", expectedPakPath.c_str());
+
+            if (!std::filesystem::exists(nylon::ModsDirectory() + expectedPakPath + ".xen"))
+            {
+                nylon::internal::LogGH3.Info("Unable to find pak file.");
+                continue;
+            }
+
+            expectedPakPath.insert(0, "..\\nylon\\Mods\\");
+
+            nylon::internal::LogGH3.Info("Found it! Loading...");
+            gh3::QbStruct modPakStruct = gh3::QbStruct();
+
+            gh3::Functions::InsertCStringItem(&modPakStruct, 0, expectedPakPath.data());
+
+            binding::CFunc_LoadPak::Orig(&modPakStruct, script);
+            nylon::internal::LogGH3.Info("Done!");
+        }
+
+        _doPakCheck = false;
+    }
+
+    return ret;
+}
+
 
 void nylon::internal::CreateCFuncHooks()
 {
 	hook::CreateHook<binding::CFunc_PrintStruct>(PrintStruct);
     hook::CreateHook<binding::CFunc_PrintF>(PrintF);
+    hook::CreateHook<binding::CFunc_LoadPak>(LoadPak);
 }

@@ -36,18 +36,18 @@ void nylon::internal::LoadMods()
         Log.Info("Checking for: \"%s\"...", infoPath.c_str());
         if (fs::exists(infoPath))
         {
-            Log.Info("Loading Mod from: \"%s\"", infoPath.c_str());
+            Log.Info("Loading...");
             ModInfo info = { };
 
             if (!ModInfo::TryRead(infoPath, info))
             {
-                Log.Error("Unable to load mod.");
+                Log.Error("Unable read load modinfo.json");
                 continue;
             }
             else
             {
                 LoadedMods.emplace(info.GetName(), info);
-                Log.Info("Finished loading mod.");
+                Log.Info("Found mod: %s", info.GetName().c_str());
             }
         }
 

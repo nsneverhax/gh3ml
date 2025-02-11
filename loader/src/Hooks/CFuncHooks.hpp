@@ -10,6 +10,7 @@ namespace nylon::internal
 	{
 		using CFunc_PrintStruct = nylon::hook::Binding<0x00530970, nylon::hook::cconv::CDecl, bool, gh3::QbStruct*, gh3::QbScript*>;
 		using CFunc_PrintF = nylon::hook::Binding<0x00530940, nylon::hook::cconv::CDecl, bool, gh3::QbStruct*, gh3::QbScript*>;
+		using CFunc_LoadPak = nylon::hook::Binding<0x004a1780, nylon::hook::cconv::CDecl, bool, gh3::QbStruct*, gh3::QbScript*>;
 	}
 
 	void CreateCFuncHooks();

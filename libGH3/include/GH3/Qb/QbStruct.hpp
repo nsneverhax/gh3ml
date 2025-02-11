@@ -22,10 +22,10 @@ namespace gh3
 		bool GetInt(uint32_t key, int32_t& value, int param_3 = 1);
 		bool GetUInt(uint32_t key, uint32_t& value, int param_3 = 1);
 
-		bool GetString(uint32_t key, float& out, int param_3 = 1);
-		bool GetWString(uint32_t key, float& out, int param_3 = 1);
-		bool GetPair(uint32_t key, float& out, int param_3 = 1);
-		bool GetVector(uint32_t key, float& out, int param_3 = 1);
+		bool GetString(uint32_t key, char** out, int param_3 = 1);
+		//bool GetWString(uint32_t key, const& out, int param_3 = 1);
+		//bool GetPair(uint32_t key, float& out, int param_3 = 1);
+		//bool GetVector(uint32_t key, float& out, int param_3 = 1);
 		bool GetStruct(uint32_t key, float& out, int param_3 = 1);
 		bool HasKey(uint32_t key);
 	};

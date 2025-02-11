@@ -1,6 +1,8 @@
 #include "../Main.hpp"
 #include "../Imgui/Imgui.hpp"
 #include "DirectXHooks.hpp"
+#include "CFuncHooks.hpp"
+
 #include <Nylon/Hook.hpp>
 #include <d3d9.h>
 #include <Nylon/Core.hpp>
@@ -150,61 +152,6 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return ret;
 }
 
-using LoadPak = nylon::hook::Binding<0x004a1780, nylon::hook::cconv::CDecl, bool, gh3::QbStruct*>;
-
-int loadPakCount = 0;
-
-std::unordered_map<uint32_t, std::string> keyMap = { };
-
-
-using FUN_004788b0 = nylon::hook::Binding<0x004788b0, nylon::hook::cconv::ThisCall, bool, gh3::QbStruct*, uint32_t, void*, uint32_t>;
-
-bool detourLoadPak(gh3::QbStruct* qbStruct)
-{
-    static bool _doPakCheck = true;
-
-    auto ret = LoadPak::Orig(qbStruct);
-
-    if (!_doPakCheck)
-        return ret;
-
-    char* pakNameBuffer[128];
-    memset(pakNameBuffer, 0, 128);
-
-    FUN_004788b0(qbStruct, 0, pakNameBuffer, 0);
-
-    if (strcmp("pak/qb.pak", pakNameBuffer[0]) == 0)
-    {
-
-        for (const auto pair : nylon::internal::LoadedMods)
-        {
-
-            auto expectedPakPath = pair.second.GetDirectory() + "\\pak\\" + pair.first + ".pak";
-
-            nylon::internal::LogGH3.Info("Expecting: \"%s\"", expectedPakPath.c_str());
-
-            if (!std::filesystem::exists(nylon::ModsDirectory() + expectedPakPath + ".xen"))
-            {
-                nylon::internal::LogGH3.Info("Unable to find pak file.");
-                continue;
-            }
-
-            expectedPakPath.insert(0, "..\\nylon\\Mods\\");
-
-            nylon::internal::LogGH3.Info("Found it! Loading...");
-            gh3::QbStruct modPakStruct = gh3::QbStruct();
-
-            gh3::Functions::InsertCStringItem(&modPakStruct, 0, expectedPakPath.data());
-
-            LoadPak::Orig(&modPakStruct);
-            nylon::internal::LogGH3.Info("Done!");
-        }
-
-        _doPakCheck = false;
-    }
-
-    return ret;
-}
 
 
 #pragma endregion
@@ -316,13 +263,12 @@ void nylon::internal::SetupDefaultHooks()
         detourCreateWindowExA
     );
 
+    nylon::internal::CreateCFuncHooks();
+
     nylon::hook::CreateHook<DebugLog>(detourDebugLog);
     nylon::hook::CreateHook<Video_InitializeDevice>(detourVideo_InitializeDevice);
     
     nylon::hook::CreateHook<WindowProc>(detourWindowProc);
-
-    nylon::hook::CreateHook<LoadPak>(detourLoadPak);
-    nylon::hook::CreateHook<CFuncPrintF>(detourCFuncPrintF);
 
     nylon::hook::CreateHook<CreateHighwayDrawRect>(deoutCreateHighwayDrawRect);
     nylon::hook::CreateHook<Nx_DirectInput_InitMouse>(detourNx_DirectInput_InitMouse);
@@ -330,6 +276,7 @@ void nylon::internal::SetupDefaultHooks()
     nylon::hook::CreateHook<nylon::NodeArray_SetCFuncInfo>(detourNodeArray_SetCFuncInfo);
 
     nylon::hook::CreateHook<CFuncWait>(detourCFuncWait);
+
 
     _CFuncManager = { };
 
