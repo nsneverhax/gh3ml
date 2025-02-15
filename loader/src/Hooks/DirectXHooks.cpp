@@ -22,8 +22,6 @@ HRESULT Present(void* self, const RECT* pSourceRect, const RECT* pDestRect, HWND
 	static float conduitTapTimer = 0;
 	static int conduitFrame = 0;
 
-	static bool aaa = true;
-
 	nylon::imgui::BeginFrame();
 
 	nylon::imgui::NylonMenu();
@@ -44,11 +42,11 @@ bool nylon::internal::CreateDirectXHooks()
 		Present
 	);
 
-	if (D3DXCreateTextureFromFile(*gh3::Direct3DDevice, "nylon\\Resources\\conduit_tap_l.png", &conduitTapTextures[0]) != D3D_OK)
+	if (D3DXCreateTextureFromFile(*gh3::Direct3DDevice, "nylon\\Resources\\conduit\\conduit_tap_l.png", &conduitTapTextures[0]) != D3D_OK)
 	{
 
 	}
-	if (D3DXCreateTextureFromFile(*gh3::Direct3DDevice, "nylon\\Resources\\conduit_tap_r.png", &conduitTapTextures[1]) != D3D_OK)
+	if (D3DXCreateTextureFromFile(*gh3::Direct3DDevice, "nylon\\Resources\\conduit\\conduit_tap_r.png", &conduitTapTextures[1]) != D3D_OK)
 	{
 
 	}

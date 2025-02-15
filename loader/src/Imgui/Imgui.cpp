@@ -21,7 +21,7 @@ void nylon::imgui::EndFrame()
 	}
 }
 
-bool nylon::imgui::NylonMenuActive = true;
+bool nylon::imgui::NylonMenuActive = false;
 
 void nylon::imgui::NylonMenu()
 {

@@ -1,0 +1,18 @@
+{
+  "openGH3Console": true,
+  "allowQScriptPrintf": true,
+  "windowStyle": 1,
+  "pluginLogType": 1,
+  "vsync": true,
+  "windowWidth": 1920,
+  "windowHeight": 1080,
+  "enabledMods": [
+    "vultumast.testmod1"
+  ],
+  "versionInfo": {
+    "major": 0,
+    "minor": 2,
+    "revision": 0,
+    "type": 1
+  }
+}

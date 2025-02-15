@@ -8,7 +8,7 @@ namespace binding = nylon::internal::binding;
 
 bool PrintStruct(gh3::QbStruct* params, gh3::QbScript* script)
 {
-    nylon::internal::LogGH3.Info("PrintStruct");
+    // nylon::internal::LogGH3.Info("PrintStruct");
 	return true;
 }
 
