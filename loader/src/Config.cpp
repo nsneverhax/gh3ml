@@ -47,9 +47,9 @@ void nylon::internal::ReadConfig()
 		_versionMinor = object["versionInfo"]["minor"].asUInt().unwrap();
 		_versionPatch = object["versionInfo"]["revision"].asUInt().unwrap();
 		_versionType = object["versionInfo"]["type"].asUInt().unwrap();
-
-		nylon::internal::Log.Warn("Config has no version info!");
 	}
+	else
+		nylon::internal::Log.Warn("Config has no version info!");
 	if (object.contains("unlockfps"))
 		_unlockFPS = object["unlockfps"].asBool().unwrap();
 
