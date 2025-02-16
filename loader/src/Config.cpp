@@ -50,6 +50,7 @@ void nylon::internal::ReadConfig()
 	}
 	else
 		nylon::internal::Log.Warn("Config has no version info!");
+
 	if (object.contains("unlockfps"))
 		_unlockFPS = object["unlockfps"].asBool().unwrap();
 

@@ -123,7 +123,7 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_KEYDOWN:
         switch (LOWORD(wParam))
         {
-        case VK_TAB:
+        case VK_OEM_3:
 
             if (!waitForTabRelease)
                 nylon::imgui::NylonMenuActive = !nylon::imgui::NylonMenuActive;
@@ -137,7 +137,7 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_KEYUP:
         switch (LOWORD(wParam))
         {
-        case VK_TAB:
+        case VK_OEM_3:
             waitForTabRelease = false;
             break;
         default:
