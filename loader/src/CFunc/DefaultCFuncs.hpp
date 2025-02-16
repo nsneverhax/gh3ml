@@ -4,7 +4,7 @@
 
 namespace nylon::internal
 {
-	bool IsNylon();
+	bool IsNylon(gh3::QbStruct* params, gh3::QbScript* script);
 	bool ImGui_Begin(gh3::QbStruct* params, gh3::QbScript* script);
 	bool ImGui_Begin(gh3::QbStruct* params, gh3::QbScript* script);
 }

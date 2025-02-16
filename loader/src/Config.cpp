@@ -17,17 +17,21 @@ bool _openConsole = false;
 bool _allowScriptPrintf = false;
 
 namespace fs = std::filesystem;
-namespace ml = nylon::internal;
+namespace in = nylon::internal;
+namespace cfg = nylon::Config;
 
 void nylon::internal::ReadConfig()
 {
-	if (!fs::exists(nylon::Config::ConfigFilepath))
+	bool malformed = false;
+
+	if (!fs::exists(cfg::ConfigFilepath()))
 	{
-		// TODO: this
+		in::Log.Warn("Unable to find \"{}\" so it will be remade.", cfg::ConfigFilepath());
+
 	}
 
 
-	std::ifstream t(nylon::Config::ConfigFilepath);
+	std::ifstream t(cfg::ConfigFilepath().c_str());
 	std::stringstream buffer;
 	buffer << t.rdbuf();
 	t.close();
@@ -36,6 +40,8 @@ void nylon::internal::ReadConfig()
 
 	if (!result)
 	{
+		in::Log.Warn("Unable to parse \"{}\" so it will be remade.", cfg::ConfigFilepath());
+
 		return;
 	}
 
@@ -49,44 +55,61 @@ void nylon::internal::ReadConfig()
 		_versionType = object["versionInfo"]["type"].asUInt().unwrap();
 	}
 	else
-		nylon::internal::Log.Warn("Config has no version info!");
+		malformed = true;
 
 	if (object.contains("unlockfps"))
 		_unlockFPS = object["unlockfps"].asBool().unwrap();
+	else
+		malformed = true;
 
 	if (object.contains("openGH3Console"))
 		_openConsole = object["openGH3Console"].asBool().unwrap();
+	else
+		malformed = true;
 
 	if (object.contains("allowQScriptPrintf"))
 		_allowScriptPrintf = object["allowQScriptPrintf"].asBool().unwrap();
+	else
+		malformed = true;
+
+	if (malformed)
+	{
+		in::Log.Warn("\"{}\" was malformed, so it will be remade using known values.", cfg::ConfigFilepath());
+
+	}
 }
 
-uint32_t nylon::Config::VersionMajor()
+std::filesystem::path ConfigFilepath()
+{
+	return nylon::NylonDirectory() / "config.json";
+}
+
+uint32_t cfg::VersionMajor()
 {
 	return _versionMajor;
 }
-uint32_t nylon::Config::VersionMinor()
+uint32_t cfg::VersionMinor()
 {
 	return _versionMinor;
 }
-uint32_t nylon::Config::VersionPatch()
+uint32_t cfg::VersionPatch()
 {
 	return _versionPatch;
 }
-uint32_t nylon::Config::VersionType()
+uint32_t cfg::VersionType()
 {
 	return _versionType;
 }
-bool nylon::Config::UnlockFPS()
+bool cfg::UnlockFPS()
 {
 	return _unlockFPS;
 }
 
-bool nylon::Config::OpenConsole()
+bool cfg::OpenConsole()
 {
 	return _openConsole;
 }
-bool nylon::Config::AllowQScriptPrintf()
+bool cfg::AllowQScriptPrintf()
 {
 	return _allowScriptPrintf;
 }

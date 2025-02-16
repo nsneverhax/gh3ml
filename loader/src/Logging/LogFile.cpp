@@ -7,7 +7,7 @@ fs::path logFilePath = { };
 
 std::ofstream logStream = { };
 
-fs::path nylon::internal::GetLogFilePath()
+fs::path nylon::internal::LogFilePath()
 {
 	return logFilePath;
 }

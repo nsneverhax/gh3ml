@@ -2,6 +2,8 @@
 
 #include <Nylon/Core.hpp>
 
+#include <filesystem>
+
 namespace nylon::Config
 {
 	enum class WindowStyle
@@ -11,8 +13,8 @@ namespace nylon::Config
 		BorderlessWindowed,
 		BorderlessFullscreen
 	};
-
-	constexpr const char* ConfigFilepath = "nylon/config.json";
+	
+	std::filesystem::path ConfigFilepath();
 
 	uint32_t VersionMajor();
 	uint32_t VersionMinor();

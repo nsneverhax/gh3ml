@@ -13,12 +13,12 @@ namespace nylon
 	// Patch : backwards compatible bug fixes
 
 	constexpr uint32_t VersionMajor = 1;
-	constexpr uint32_t VersionMinor = 1;
+	constexpr uint32_t VersionMinor = 2;
 	constexpr uint32_t VersionPatch = 0;
 
 	constexpr std::string_view VersionType = "alpha";
 
-	constexpr std::string_view VersionString = "1.1.0-alpha";
+	constexpr std::string_view VersionString = "1.2.0-alpha";
 
 	/// <summary>
 	/// The current directory of the Guitar Hero III executable
@@ -42,10 +42,16 @@ namespace nylon
 	std::filesystem::path LogDirectory();
 
 
-	const HANDLE GetGH3Handle();
+
+	const HANDLE GH3Handle();
 
 	bool ReadMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size, size_t* actualSize = nullptr);
 	bool WriteMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size, size_t* actualSize = nullptr);
 
+	/// <summary>
+	/// not yet functional! 
+	/// </summary>
+	/// <param name="filepath"></param>
+	/// <returns></returns>
 	std::string ParseFilepath(std::string_view filepath);
 }
