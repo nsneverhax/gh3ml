@@ -3,7 +3,7 @@
   "allowQScriptPrintf": true,
   "windowStyle": 1,
   "pluginLogType": 1,
-  "vsync": true,
+  "unlockfps": false,
   "windowWidth": 1920,
   "windowHeight": 1080,
   "enabledMods": [

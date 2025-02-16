@@ -10,33 +10,23 @@
 #include <iostream>
 #include <fstream>
 
-// Vultu: We are going to provide the needed imports for GH3 from xinput3_1.dll since we are replacing it
+// Vultu: We are going to provide the needed imports for GH3 from DINPUT8.dll since we are replacing it
 // We are going to manually specify WINAPI (__stdcall) calling convention and then manually parse the decorated names
 // into non-decorated ones. This is probably a bad idea, but it will work for now.
 
-struct XINPUT_STATE;
-struct XINPUT_CAPABILITIES;
-struct XINPUT_VIBRATION;
 
 constexpr static auto MAX_PATH_CHARS = 32768u;
-static HMODULE getXInput() 
+static HMODULE getDINPUT() 
 {
     static auto xinput = []() -> HMODULE
         {
             std::wstring path(MAX_PATH_CHARS, L'\0');
 
-            // Vultu: Some people have special xinput1_3.dll for their guitars.. apparently
-            // We are already modding the game might as well give them support for it.
-            if (std::filesystem::exists("nylon\\xinput1_3.dll"))
-            {
-                return LoadLibraryW(L"nylon\\xinput1_3.dll");
-            }
-
             auto size = GetSystemDirectoryW(path.data(), path.size());
             if (size)
             {
                 path.resize(size);
-                return LoadLibraryW((path + L"\\xinput1_3.dll").c_str());
+                return LoadLibraryW((path + L"\\DINPUT8.dll").c_str());
             }
             return NULL;
         }();
@@ -46,12 +36,25 @@ static HMODULE getXInput()
 
 static FARPROC getFP(const std::string& sym) 
 {
-    if (auto xinput = getXInput())
+    if (auto xinput = getDINPUT())
         return GetProcAddress(xinput, sym.c_str());
 
     return NULL;
 }
+#pragma comment(linker, "/export:DirectInput8Create@@YGJPAUHINSTANCE__@@KABU_GUID@@PAPAXPAUIUnknown@@@Z=DirectInput8Create,@5")
+HRESULT WINAPI DirectInput8Create(HINSTANCE hinst,DWORD dwVersion,REFIID riidltf,LPVOID* ppvOut,LPUNKNOWN punkOuter)
+{
+    static auto fp = getFP("DirectInput8Create");
+    if (fp)
+    {
+        using FPType = decltype(&DirectInput8Create);
+        return reinterpret_cast<FPType>(fp)(hinst, dwVersion, riidltf, ppvOut, punkOuter);
+    }
 
+    return -1;
+}
+
+/*
 #pragma comment(linker, "/export:XInputGetState@@YGKKPAUXINPUT_STATE@@@Z=XInputGetState,@2")
 DWORD WINAPI XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 {
@@ -103,6 +106,7 @@ void WINAPI XInputEnable(BOOL enable)
 
     return;
 }
+*/
 
 // TODO: Vultu: this !!!!
 static std::wstring getErrorString(DWORD error)

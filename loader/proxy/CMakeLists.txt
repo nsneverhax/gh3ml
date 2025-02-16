@@ -10,19 +10,19 @@ add_library(${PROJECT_NAME} SHARED "src/ProxyLoader.cpp")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
-    OUTPUT_NAME "xinput1_3"
+    OUTPUT_NAME "DINPUT8"
 )
 
 #if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 #    copyfile(${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/xinput1_3.pdb ${NYLON_OUT_PATH}/xinput1_3.pdb)
 #endif ()
-copyfile(${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/xinput1_3.dll ${NYLON_OUT_PATH}/xinput1_3.dll)
+copyfile(${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/DINPUT8.dll ${NYLON_OUT_PATH}/DINPUT8.dll)
 
 if (DEFINED GH3_DIR)
     #if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     #    copyfile(${PROJECT_NAME} ${NYLON_OUT_PATH}/xinput1_3.pdb ${GH3_DIR}/xinput1_3.pdb)
     #endif ()
-    copyfile(${PROJECT_NAME} ${NYLON_OUT_PATH}/xinput1_3.dll ${GH3_DIR}/xinput1_3.dll)
+    copyfile(${PROJECT_NAME} ${NYLON_OUT_PATH}/DINPUT8.dll ${GH3_DIR}/DINPUT8.dll)
 endif ()
 
 if (MSVC)

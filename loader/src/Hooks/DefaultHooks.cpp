@@ -275,7 +275,7 @@ void nylon::internal::SetupDefaultHooks()
     nylon::hook::CreateHook<D3DDeviceLostFUN_0057ae20>(detourD3DDeviceLostFUN_0057ae20);
     nylon::hook::CreateHook<nylon::NodeArray_SetCFuncInfo>(detourNodeArray_SetCFuncInfo);
 
-    nylon::hook::CreateHook<CFuncWait>(detourCFuncWait);
+    // nylon::hook::CreateHook<CFuncWait>(detourCFuncWait);
 
 
     _CFuncManager = { };
