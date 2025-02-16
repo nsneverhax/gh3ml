@@ -78,6 +78,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         DisableThreadLibraryCalls(hinstDLL);
 
         in::CreateLogFile();
+
         filePath = in::GetLogFilePath();
 
         in::ReadConfig();

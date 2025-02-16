@@ -1,22 +1,17 @@
 #include <Windows.h>
+
 #include <string>
 #include <array>
 #include <vector>
 #include <filesystem>
 
-#include <stdio.h>
-#include <fcntl.h>
-#include <io.h>
-#include <iostream>
-#include <fstream>
-
-// Vultu: We are going to provide the needed imports for GH3 from DINPUT8.dll since we are replacing it
+// Vultu: We are going to provide the needed imports for GH3 from d3d9.dll since we are replacing it
 // We are going to manually specify WINAPI (__stdcall) calling convention and then manually parse the decorated names
 // into non-decorated ones. This is probably a bad idea, but it will work for now.
 
 
 constexpr static auto MAX_PATH_CHARS = 32768u;
-static HMODULE getDINPUT() 
+static HMODULE getWINMM() 
 {
     static auto xinput = []() -> HMODULE
         {
@@ -26,7 +21,7 @@ static HMODULE getDINPUT()
             if (size)
             {
                 path.resize(size);
-                return LoadLibraryW((path + L"\\DINPUT8.dll").c_str());
+                return LoadLibraryW((path + L"\\d3d9.dll").c_str());
             }
             return NULL;
         }();
@@ -36,123 +31,63 @@ static HMODULE getDINPUT()
 
 static FARPROC getFP(const std::string& sym) 
 {
-    if (auto xinput = getDINPUT())
-        return GetProcAddress(xinput, sym.c_str());
+    if (auto module = getWINMM())
+        return GetProcAddress(module, sym.c_str());
 
     return NULL;
 }
-#pragma comment(linker, "/export:DirectInput8Create@@YGJPAUHINSTANCE__@@KABU_GUID@@PAPAXPAUIUnknown@@@Z=DirectInput8Create,@5")
-HRESULT WINAPI DirectInput8Create(HINSTANCE hinst,DWORD dwVersion,REFIID riidltf,LPVOID* ppvOut,LPUNKNOWN punkOuter)
+
+#pragma comment(linker, "/export:Direct3DCreate9@@YGPAXI@Z=Direct3DCreate9")
+void* WINAPI Direct3DCreate9(UINT SDKVersion)
 {
-    static auto fp = getFP("DirectInput8Create");
+    static auto fp = getFP("Direct3DCreate9");
     if (fp)
     {
-        using FPType = decltype(&DirectInput8Create);
-        return reinterpret_cast<FPType>(fp)(hinst, dwVersion, riidltf, ppvOut, punkOuter);
+        using FPType = decltype(&Direct3DCreate9);
+        return reinterpret_cast<FPType>(fp)(SDKVersion);
     }
 
-    return -1;
+    return NULL;
 }
-
-/*
-#pragma comment(linker, "/export:XInputGetState@@YGKKPAUXINPUT_STATE@@@Z=XInputGetState,@2")
-DWORD WINAPI XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
-{
-    static auto fp = getFP("XInputGetState");
-    if (fp) 
-    {
-        using FPType = decltype(&XInputGetState);
-        return reinterpret_cast<FPType>(fp)(dwUserIndex, pState);
-    }
-
-    return ERROR_DEVICE_NOT_CONNECTED;
-}
-
-#pragma comment(linker, "/export:XInputSetState@@YGKKPAUXINPUT_VIBRATION@@@Z=XInputSetState,@3")
-DWORD WINAPI XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
-{
-    static auto fp = getFP("XInputSetState");
-    if (fp) 
-    {
-        using FPType = decltype(&XInputSetState);
-        return reinterpret_cast<FPType>(fp)(dwUserIndex, pVibration);
-    }
-
-    return ERROR_DEVICE_NOT_CONNECTED;
-}
-
-#pragma comment(linker, "/export:XInputGetCapabilities@@YGKKKPAUXINPUT_CAPABILITIES@@@Z=XInputGetCapabilities,@4")
-DWORD WINAPI XInputGetCapabilities(DWORD dwUserIndex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities)
-{
-    static auto fp = getFP("XInputGetCapabilities");
-    if (fp) 
-    {
-        using FPType = decltype(&XInputGetCapabilities);
-        return reinterpret_cast<FPType>(fp)(dwUserIndex, dwFlags, pCapabilities);
-    }
-
-    return ERROR_DEVICE_NOT_CONNECTED;
-}
-
-#pragma comment(linker, "/export:XInputEnable@@YGXH@Z=XInputEnable,@5")
-void WINAPI XInputEnable(BOOL enable)
-{
-    static auto fp = getFP("XInputEnable");
-    if (fp) 
-    {
-        using FPType = decltype(&XInputEnable);
-        reinterpret_cast<FPType>(fp)(enable);
-    }
-
-    return;
-}
-*/
-
-// TODO: Vultu: this !!!!
-static std::wstring getErrorString(DWORD error)
-{
-    return L"Could not load Geode! Error code: " + std::to_wstring(error);
-}
-
-// TODO: Vultu: this !!!!
-static DWORD errorThread(LPVOID param) 
-{
-    constexpr wchar_t REDIST_ERROR[] = L"Could not load Geode!\n"
-        "This is likely due to an outdated redist package.\n"
-        "Do you want to update Microsoft Visual C++ Redistributable 2022 to try to fix this issue?";
-    constexpr wchar_t ALT_REDIST_ERROR[] = L"Could not load Geode!\n\n"
-        "Please **delete** the following files from your Geometry Dash directory and try again: ";
-    const DWORD error = reinterpret_cast<DWORD64>(param);
-
-    if (error == ERROR_DLL_INIT_FAILED) 
-    {
-
-    }
-    else {
-        MessageBoxW(NULL, getErrorString(error).c_str(), L"Load failed", MB_OK | MB_ICONWARNING);
-    }
-
-    return 0u;
-}
-
-
-
 
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
+    std::string message = { };
 
     if (fdwReason == DLL_PROCESS_ATTACH)
     {
         DisableThreadLibraryCalls(hinstDLL);
+        
+        std::wstring path = (std::filesystem::current_path() / L"nylon.dll").wstring();
+
+        if (!std::filesystem::exists(path))
+        {
+            MessageBox(NULL, "Unable to find nylon.dll", "Unable to load \"nylon.dll\"", MB_OK);
+            return FALSE;
+        }
 
         // This is UB. -- Vultu: Too bad!
-        if (LoadLibraryW(L"nylon.dll") == NULL)
+        if (LoadLibraryW(path.c_str()) == NULL)
         {
-            const auto param = reinterpret_cast<LPVOID>(static_cast<DWORD64>(GetLastError()));
+            DWORD errorMessageID = GetLastError();
+            LPSTR messageBuffer = nullptr;
+            //Ask Win32 to give us the string version of that message ID.
+            //The parameters we pass in, tell Win32 to create the buffer that holds the message for us (because we don't yet know how long the message string will be).
+            size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
 
-            MessageBox(NULL, "LoadLibraryW returns NULL! The modloader will not be loaded.", "Unable to load \"nylon.dll\"", MB_OK);
+            //Copy the error message into a std::string.
+
+            message = "An error occured when loading Nylon, the error details are as follows:\n";
+            message.append(messageBuffer, size);
+
+          
+            MessageBox(NULL, message.c_str(), "Unable to load \"nylon.dll\"", MB_OK);
             // CreateThread(NULL, 0, &errorThread, param, 0, NULL);
+
+            //Free the Win32's string's buffer.
+            LocalFree(messageBuffer);
         }
     }
     
