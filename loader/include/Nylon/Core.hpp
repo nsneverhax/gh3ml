@@ -12,13 +12,13 @@ namespace nylon
 	// Minor : a change resulting in API differences that are backwards compatible
 	// Patch : backwards compatible bug fixes
 
-	constexpr uint32_t VersionMajor = 0;
-	constexpr uint32_t VersionMinor = 2;
+	constexpr uint32_t VersionMajor = 1;
+	constexpr uint32_t VersionMinor = 1;
 	constexpr uint32_t VersionPatch = 0;
 
 	constexpr std::string_view VersionType = "alpha";
 
-	constexpr std::string_view VersionString = "0.2.0-alpha";
+	constexpr std::string_view VersionString = "1.1.0-alpha";
 
 	/// <summary>
 	/// The current directory of the Guitar Hero III executable
