@@ -60,7 +60,7 @@ void in::LoadMods()
 
 HANDLE _gh3Handle = nullptr;
 
-const HANDLE nylon::GetGH3Handle()
+const HANDLE nylon::GH3Handle()
 {
     return _gh3Handle;
 }
@@ -79,7 +79,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
         in::CreateLogFile();
 
-        filePath = in::GetLogFilePath();
+        filePath = in::LogFilePath();
 
         in::ReadConfig();
 

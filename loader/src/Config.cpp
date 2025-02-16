@@ -26,7 +26,7 @@ void nylon::internal::ReadConfig()
 
 	if (!fs::exists(cfg::ConfigFilepath()))
 	{
-		in::Log.Warn("Unable to find \"{}\" so it will be remade.", cfg::ConfigFilepath());
+		in::Log.Warn("Unable to find \"{}\" so it will be remade.", cfg::ConfigFilepath().string());
 
 	}
 
@@ -40,7 +40,7 @@ void nylon::internal::ReadConfig()
 
 	if (!result)
 	{
-		in::Log.Warn("Unable to parse \"{}\" so it will be remade.", cfg::ConfigFilepath());
+		in::Log.Warn("Unable to parse \"{}\" so it will be remade.", cfg::ConfigFilepath().string());
 
 		return;
 	}
@@ -74,12 +74,12 @@ void nylon::internal::ReadConfig()
 
 	if (malformed)
 	{
-		in::Log.Warn("\"{}\" was malformed, so it will be remade using known values.", cfg::ConfigFilepath());
+		in::Log.Warn("\"{}\" was malformed, so it will be remade using known values.", cfg::ConfigFilepath().string());
 
 	}
 }
 
-std::filesystem::path ConfigFilepath()
+std::filesystem::path cfg::ConfigFilepath()
 {
 	return nylon::NylonDirectory() / "config.json";
 }

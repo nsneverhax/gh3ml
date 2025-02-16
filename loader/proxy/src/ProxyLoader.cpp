@@ -5,23 +5,33 @@
 #include <vector>
 #include <filesystem>
 
-// Vultu: We are going to provide the needed imports for GH3 from d3d9.dll since we are replacing it
+// Vultu: We are going to provide the needed imports for GH3 from xinput3_1.dll since we are replacing it
 // We are going to manually specify WINAPI (__stdcall) calling convention and then manually parse the decorated names
 // into non-decorated ones. This is probably a bad idea, but it will work for now.
 
+struct XINPUT_STATE;
+struct XINPUT_CAPABILITIES;
+struct XINPUT_VIBRATION;
 
 constexpr static auto MAX_PATH_CHARS = 32768u;
-static HMODULE getWINMM() 
+static HMODULE getXInput() 
 {
     static auto xinput = []() -> HMODULE
         {
             std::wstring path(MAX_PATH_CHARS, L'\0');
 
+            // Vultu: Some people have special xinput1_3.dll for their guitars.. apparently
+            // We are already modding the game might as well give them support for it.
+            if (std::filesystem::exists("nylon\\xinput1_3.dll"))
+            {
+                return LoadLibraryW(L"nylon\\xinput1_3.dll");
+            }
+
             auto size = GetSystemDirectoryW(path.data(), path.size());
             if (size)
             {
                 path.resize(size);
-                return LoadLibraryW((path + L"\\d3d9.dll").c_str());
+                return LoadLibraryW((path + L"\\xinput1_3.dll").c_str());
             }
             return NULL;
         }();
@@ -31,23 +41,62 @@ static HMODULE getWINMM()
 
 static FARPROC getFP(const std::string& sym) 
 {
-    if (auto module = getWINMM())
+    if (auto module = getXInput())
         return GetProcAddress(module, sym.c_str());
 
     return NULL;
 }
 
-#pragma comment(linker, "/export:Direct3DCreate9@@YGPAXI@Z=Direct3DCreate9")
-void* WINAPI Direct3DCreate9(UINT SDKVersion)
+#pragma comment(linker, "/export:XInputGetState@@YGKKPAUXINPUT_STATE@@@Z=XInputGetState,@2")
+DWORD WINAPI XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 {
-    static auto fp = getFP("Direct3DCreate9");
+    static auto fp = getFP("XInputGetState");
     if (fp)
     {
-        using FPType = decltype(&Direct3DCreate9);
-        return reinterpret_cast<FPType>(fp)(SDKVersion);
+        using FPType = decltype(&XInputGetState);
+        return reinterpret_cast<FPType>(fp)(dwUserIndex, pState);
     }
 
-    return NULL;
+    return ERROR_DEVICE_NOT_CONNECTED;
+}
+
+#pragma comment(linker, "/export:XInputSetState@@YGKKPAUXINPUT_VIBRATION@@@Z=XInputSetState,@3")
+DWORD WINAPI XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
+{
+    static auto fp = getFP("XInputSetState");
+    if (fp)
+    {
+        using FPType = decltype(&XInputSetState);
+        return reinterpret_cast<FPType>(fp)(dwUserIndex, pVibration);
+    }
+
+    return ERROR_DEVICE_NOT_CONNECTED;
+}
+
+#pragma comment(linker, "/export:XInputGetCapabilities@@YGKKKPAUXINPUT_CAPABILITIES@@@Z=XInputGetCapabilities,@4")
+DWORD WINAPI XInputGetCapabilities(DWORD dwUserIndex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities)
+{
+    static auto fp = getFP("XInputGetCapabilities");
+    if (fp)
+    {
+        using FPType = decltype(&XInputGetCapabilities);
+        return reinterpret_cast<FPType>(fp)(dwUserIndex, dwFlags, pCapabilities);
+    }
+
+    return ERROR_DEVICE_NOT_CONNECTED;
+}
+
+#pragma comment(linker, "/export:XInputEnable@@YGXH@Z=XInputEnable,@5")
+void WINAPI XInputEnable(BOOL enable)
+{
+    static auto fp = getFP("XInputEnable");
+    if (fp)
+    {
+        using FPType = decltype(&XInputEnable);
+        reinterpret_cast<FPType>(fp)(enable);
+    }
+
+    return;
 }
 
 
