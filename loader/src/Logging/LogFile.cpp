@@ -17,11 +17,21 @@ void nylon::internal::CreateLogFile()
 	if (!fs::exists(LogDirectory()) || !fs::is_directory(LogDirectory()))
 		fs::create_directory(LogDirectory());
 	
-	const auto now = std::chrono::system_clock::now();
+	auto const time = std::chrono::current_zone()->to_local(std::chrono::system_clock::now());
 
-	logFilePath = LogDirectory() / std::format("{:%H:%M:%OS %d-%m-%Y}.log", now);
+	for (const auto& entry : fs::directory_iterator(LogDirectory()))
+	{
+		if (entry.path().filename().string().starts_with("latest"))
+		{
+			std::string newName = entry.path().filename().string();
+			newName = newName.substr(newName.find_first_of('-') + 1);
+			fs::rename(entry.path(), LogDirectory() / newName);
+		}
+	}
 
-	logStream.open(logFilePath.string(), std::ofstream::out | std::ofstream::ate | std::ofstream::trunc);
+	logFilePath = LogDirectory() / std::format("latest-{:%H-%M-%OS %d-%m-%Y}.log", time);
+
+	logStream.open(logFilePath.string());
 }
 
 std::ofstream& nylon::internal::LogStream()

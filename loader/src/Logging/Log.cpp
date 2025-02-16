@@ -136,7 +136,7 @@ void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const cha
     if (level < GetLogLevel())
         return;
 
-    const auto now = std::chrono::system_clock::now();
+    auto const now = std::chrono::current_zone()->to_local(std::chrono::system_clock::now());
 
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     int consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
@@ -173,7 +173,6 @@ void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const cha
 
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 
-    //std::string str = std::vformat(fmt, std::make_format_args(args...));
-
     std::cout << prefix << message << std::endl;
+    nylon::internal::LogStream() << prefix << message << std::endl;
 }
