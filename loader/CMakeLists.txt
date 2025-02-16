@@ -13,14 +13,15 @@ endif ()
 add_library(${PROJECT_NAME} SHARED
     "src/main.cpp"
     "src/Core.cpp"
-    "src/Log.cpp"
-    "src/LogSource.cpp"
+    "src/Logging/Log.cpp"
     "src/Config.cpp"
     "src/Hooks/DefaultHooks.cpp"
     "src/Hooks/Hook.cpp"
     "src/Hooks/DirectXHooks.cpp"
     "src/ModInfo.cpp"
     "src/CFunc/CFuncManager.cpp"
+    "src/Logging/LogFile.cpp"
+    "src/Logging/LogSource.cpp"
 
     "src/Hooks/CFuncHooks.cpp"
 

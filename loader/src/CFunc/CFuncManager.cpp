@@ -49,7 +49,7 @@ void nylon::CFuncManager::Register()
 	NodeArray_SetCFuncInfo::Orig(funcs, m_functions.size());
 	delete[] funcs;
 
-	log.Info("Registered %d functions.", i);
+	// log.Info("Registered %d functions.", i);
 }
 
 void nylon::CFuncManager::Add(const gh3::CFuncDescriptor& descriptor)

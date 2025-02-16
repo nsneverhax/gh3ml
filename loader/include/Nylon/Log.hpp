@@ -1,5 +1,10 @@
 #pragma once
 
+#include <Windows.h>
+#include <format>
+#include <chrono>
+#include <iostream>
+
 #ifdef ERROR
 #undef ERROR
 #endif // ERROR
@@ -26,6 +31,6 @@ namespace nylon::Log
 	bool CreateConsole();
 	bool ReleaseConsole();
 	
-	void WriteToOutput(LogLevel level, const char* sourceName, const char* fmt, va_list argList);
+	void WriteToOutput(LogLevel level, const char* sourceName, const char* message);
 
 }

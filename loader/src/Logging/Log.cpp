@@ -2,6 +2,7 @@
 #include <cstdarg>
 
 #include <Nylon/Log.hpp>
+#include "LogFile.hpp"
 
 #include <Windows.h>
 #include <stdio.h>
@@ -10,6 +11,8 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <format>
+
 // "Borrowed" from https://stackoverflow.com/questions/191842/how-do-i-get-console-output-in-c-with-a-windows-program
 
 #undef ERROR
@@ -67,52 +70,7 @@ bool nylon::Log::RedirectConsoleIO()
     return result;
 }
 
-void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const char* fmt, va_list args)
-{
-    if (level < _currentLogLevel)
-        return;
 
-    time_t now = time(0);
-    tm* localtm = localtime(&now);
-
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    int consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-
-    char levelStr[6];
-    switch (level)
-    {
-    case nylon::Log::LogLevel::TRACE:
-        consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-        strncpy(levelStr, "TRACE", sizeof(levelStr) - 1);
-        break;
-    case nylon::Log::LogLevel::DEBUG:
-        consoleColorAttribute =  FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-        strncpy(levelStr, "DEBUG", sizeof(levelStr) - 1);
-        break;
-    case nylon::Log::LogLevel::INFO:
-        strncpy(levelStr, "INFO ", sizeof(levelStr) - 1);
-        break;
-    case nylon::Log::LogLevel::WARN:
-        consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-        strncpy(levelStr, "WARN ", sizeof(levelStr) - 1);
-        break;
-    case nylon::Log::LogLevel::ERROR:
-    default:
-        consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_RED;
-        strncpy(levelStr, "ERROR", sizeof(levelStr) - 1);
-        break;
-    }
-    levelStr[5] = '\0';
-
-    SetConsoleTextAttribute(hConsole, consoleColorAttribute);
-
-    printf("%02i:%02i:%02i %s [%s]: ", localtm->tm_hour, localtm->tm_min, localtm->tm_sec, levelStr, sourceName);
-
-    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
-
-    vprintf(fmt,args);
-    std::cout << std::endl;
-}
 
 nylon::Log::LogLevel nylon::Log::GetLogLevel()
 {
@@ -171,4 +129,51 @@ bool nylon::Log::ReleaseConsole()
         result = false;
 
     return result;
+}
+
+void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const char* message)
+{
+    if (level < GetLogLevel())
+        return;
+
+    const auto now = std::chrono::system_clock::now();
+
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    int consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+
+    char levelStr[6];
+    switch (level)
+    {
+    case nylon::Log::LogLevel::TRACE:
+        consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
+        strncpy(levelStr, "TRACE", sizeof(levelStr) - 1);
+        break;
+    case nylon::Log::LogLevel::DEBUG:
+        consoleColorAttribute = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+        strncpy(levelStr, "DEBUG", sizeof(levelStr) - 1);
+        break;
+    case nylon::Log::LogLevel::INFO:
+        strncpy(levelStr, "INFO ", sizeof(levelStr) - 1);
+        break;
+    case nylon::Log::LogLevel::WARN:
+        consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+        strncpy(levelStr, "WARN ", sizeof(levelStr) - 1);
+        break;
+    case nylon::Log::LogLevel::ERROR:
+    default:
+        consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_RED;
+        strncpy(levelStr, "ERROR", sizeof(levelStr) - 1);
+        break;
+    }
+    levelStr[5] = '\0';
+
+    SetConsoleTextAttribute(hConsole, consoleColorAttribute);
+
+    std::string prefix = std::format("{:%H:%M:%OS} {} [{}]: ", now, levelStr, sourceName);
+
+    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+
+    //std::string str = std::vformat(fmt, std::make_format_args(args...));
+
+    std::cout << prefix << message << std::endl;
 }

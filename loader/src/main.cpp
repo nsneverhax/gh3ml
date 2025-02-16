@@ -11,29 +11,31 @@
 #include <Nylon/Config.hpp>
 #include <d3d9.h>
 
+#include "Logging/LogFile.hpp"
+
 #include <imgui.h>
 #include <imgui_impl_dx9.h>
 #include <imgui_impl_win32.h>
 
 
 namespace fs = std::filesystem;
+namespace in = nylon::internal;
 
-nylon::LogSource nylon::internal::Log = nylon::LogSource("Nylon");
-nylon::LogSource nylon::internal::LogGH3 = nylon::LogSource("GH3");
-std::string nylon::internal::ModsPath = { };
-std::map<std::string, nylon::ModInfo> nylon::internal::LoadedMods = { };
+nylon::LogSource in::Log = nylon::LogSource("Nylon");
+nylon::LogSource in::LogGH3 = nylon::LogSource("GH3");
+std::map<std::string, nylon::ModInfo> in::LoadedMods = { };
 
-void nylon::internal::LoadMods()
+void in::LoadMods()
 {
     Log.Info("Loading mods...");
 
-    Log.Info("Loading mods from: \"%s\"", ModsPath.c_str());
+    Log.Info("Loading mods from: \"{}\"", ModsDirectory().string());
 
-    for (const auto& dir : fs::directory_iterator(ModsPath))
+    for (const auto& dir : fs::directory_iterator(ModsDirectory()))
     {
         auto infoPath = dir.path().string() + "\\modinfo.json";
 
-        Log.Info("Checking for: \"%s\"...", infoPath.c_str());
+        Log.Info("Checking for: \"{}\"...", infoPath);
         if (fs::exists(infoPath))
         {
             Log.Info("Loading...");
@@ -47,7 +49,7 @@ void nylon::internal::LoadMods()
             else
             {
                 LoadedMods.emplace(info.GetName(), info);
-                Log.Info("Found mod: %s", info.GetName().c_str());
+                Log.Info("Found mod: {}", info.GetName());
             }
         }
 
@@ -66,9 +68,8 @@ const HANDLE nylon::GetGH3Handle()
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
     _gh3Handle = GetCurrentProcess();
-    nylon::internal::ModsPath = std::filesystem::current_path().string() + "\\nylon\\Mods\\";
 
-
+    fs::path filePath = { };
 
     // Perform actions based on the reason for calling.
     switch (fdwReason)
@@ -76,21 +77,24 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hinstDLL);
 
-        nylon::internal::ReadConfig();
+        in::CreateLogFile();
+        filePath = in::GetLogFilePath();
+
+        in::ReadConfig();
 
         if (nylon::Config::OpenConsole())
             nylon::Log::CreateConsole();
 
         if (MH_Initialize() != MH_OK)
-            nylon::internal::Log.Error("Minhook failed to initialize!");
+            in::Log.Error("Minhook failed to initialize!");
         else
-            nylon::internal::Log.Info("Minhook initialized!");
+            in::Log.Info("Minhook initialized!");
 
 
-        nylon::internal::SetupDefaultHooks();
-        nylon::internal::LoadMods();
+        in::SetupDefaultHooks();
+        in::LoadMods();
 
-        nylon::internal::Log.Info("Finished Core Initialization!");
+        in::Log.Info("Finished Core Initialization!");
         break;
 
     case DLL_THREAD_ATTACH:

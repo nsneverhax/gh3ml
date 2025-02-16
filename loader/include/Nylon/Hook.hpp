@@ -10,6 +10,8 @@
 // TODO: this is dumb!
 #include "../src/Main.hpp"
 
+#include <format>
+
 namespace nylon::hook
 {
     struct HookData
@@ -132,15 +134,15 @@ namespace nylon::hook
 			uintptr_t orig = 0;
 			if (MH_CreateHook(reinterpret_cast<void*>(address), reinterpret_cast<void*>(&Cconv::template Handler<id, Ret, Args...>), reinterpret_cast<void**>(&orig)) != MH_OK)
 			{
-				nylon::internal::Log.Error("Failed to hook function at address: 0x%X", address);
+				nylon::internal::Log.Error("Failed to hook function at address: {:X}", address);
                 return;
 			}
 			if (MH_EnableHook(reinterpret_cast<void*>(address)) != MH_OK)
             {
-				nylon::internal::Log.Error("Failed to enable function hook with address: 0x%X", address);
+				nylon::internal::Log.Error("Failed to enable function hook with address: {:X}", address);
                 return;
             }
-			nylon::internal::Log.Info("Hooked function at address: 0x%X", address);
+			nylon::internal::Log.Info("Hooked function at address: 0x{:X}", address);
 
 			data.Hooks.push_back(orig);
 		}

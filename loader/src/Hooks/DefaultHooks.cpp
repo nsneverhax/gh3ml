@@ -37,7 +37,7 @@ using DebugLog = nylon::hook::Binding<0x00472b50, nylon::hook::cconv::CDecl, voi
 
 void detourDebugLog(char* fmt, va_list args)
 {
-    nylon::internal::LogGH3.Info(fmt, args);
+    //nylon::internal::LogGH3.Info(fmt, args);
 
     DebugLog::Orig(fmt, args);
 }

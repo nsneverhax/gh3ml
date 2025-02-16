@@ -1,9 +1,23 @@
 #include <Nylon/Core.hpp>
 #include "Main.hpp"
 
-const std::string& nylon::ModsDirectory()
+#include <filesystem>
+
+std::filesystem::path nylon::GameDirectory()
 {
-	return nylon::internal::ModsPath;
+	return std::filesystem::current_path();
+}
+std::filesystem::path nylon::NylonDirectory()
+{
+	return GameDirectory() / "nylon";
+}
+std::filesystem::path nylon::ModsDirectory()
+{
+	return NylonDirectory() / "mods";
+}
+std::filesystem::path nylon::LogDirectory()
+{
+	return NylonDirectory() / "log";
 }
 
 bool nylon::ReadMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size, size_t* actualSize)

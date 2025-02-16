@@ -17,7 +17,7 @@ namespace nylon::Config
 	uint32_t VersionMajor();
 	uint32_t VersionMinor();
 	uint32_t VersionPatch();
-	std::string_view VersionType();
+	uint32_t VersionType();
 	bool UnlockFPS();
 	bool OpenConsole();
 	bool AllowQScriptPrintf();

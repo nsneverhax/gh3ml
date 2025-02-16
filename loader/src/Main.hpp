@@ -11,8 +11,6 @@ namespace nylon::internal
 	extern LogSource Log;
 	extern LogSource LogGH3;
 	
-	extern std::string ModsPath;
-
 	extern std::map<std::string, ModInfo> LoadedMods;
 	
 	extern void SetupDefaultHooks();

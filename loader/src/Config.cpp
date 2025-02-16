@@ -10,11 +10,11 @@
 uint32_t _versionMajor = 0;
 uint32_t _versionMinor = 0;
 uint32_t _versionPatch = 0;
+uint32_t _versionType = 0;
+
 bool _unlockFPS = false;
 bool _openConsole = false;
 bool _allowScriptPrintf = false;
-
-std::string_view _versionType = { };
 
 namespace fs = std::filesystem;
 namespace ml = nylon::internal;
@@ -41,11 +41,15 @@ void nylon::internal::ReadConfig()
 
 	matjson::Value object = result.unwrap();
 
-	_versionMajor = object["versionInfo"]["major"].asUInt().unwrap();
-	_versionMinor = object["versionInfo"]["minor"].asUInt().unwrap();
-	_versionPatch = object["versionInfo"]["patch"].asUInt().unwrap();
-	_versionType = object["versionInfo"]["type"].asString().unwrap();
+	if (object.contains("versionInfo"))
+	{
+		_versionMajor = object["versionInfo"]["major"].asUInt().unwrap();
+		_versionMinor = object["versionInfo"]["minor"].asUInt().unwrap();
+		_versionPatch = object["versionInfo"]["revision"].asUInt().unwrap();
+		_versionType = object["versionInfo"]["type"].asUInt().unwrap();
 
+		nylon::internal::Log.Warn("Config has no version info!");
+	}
 	if (object.contains("unlockfps"))
 		_unlockFPS = object["unlockfps"].asBool().unwrap();
 
@@ -68,7 +72,7 @@ uint32_t nylon::Config::VersionPatch()
 {
 	return _versionPatch;
 }
-std::string_view nylon::Config::VersionType()
+uint32_t nylon::Config::VersionType()
 {
 	return _versionType;
 }
