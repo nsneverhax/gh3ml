@@ -6,6 +6,8 @@
 
 #include <Nylon/Core.hpp>
 
+extern float* whammyMultipliers;
+
 namespace nylon::imgui
 {
 	void BeginFrame();

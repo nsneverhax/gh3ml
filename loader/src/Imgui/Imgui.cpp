@@ -1,6 +1,7 @@
 #include "Imgui.hpp"
 
 #include <GH3/DirectX.hpp>
+#include <GH3/Addresses.hpp>
 
 void nylon::imgui::BeginFrame()
 {
@@ -20,11 +21,21 @@ void nylon::imgui::EndFrame()
 		(*gh3::Direct3DDevice)->EndScene();
 	}
 }
+float* whammyMultipliers = new float[9];
 
 bool nylon::imgui::NylonMenuActive = false;
 
 void nylon::imgui::NylonMenu()
 {
+	static bool whammyMAde = false;
+
+	if (!whammyMAde)
+	{
+		for (auto i = 0; i < 9; i++)
+			whammyMultipliers[i] = 1.0f;
+		whammyMAde = true;
+	}
+
 	if (!NylonMenuActive)
 		return;
 
@@ -63,6 +74,16 @@ void nylon::imgui::NylonMenu()
 	
 		//ImGui::Image((ImTextureID)(intptr_t)conduitTapTextures[conduitFrame], ImVec2(surfaceDesc.Width, surfaceDesc.Height));
 	
+		ImGui::InputDouble("FrameTime?", GH3::Time::DOUBLE_00b544b8);
+
+		for (auto i = 0; i < 9; i++)
+		{
+			std::string str = "Param";
+			str.append(std::to_string(i));
+
+			ImGui::SliderFloat(str.data(), &whammyMultipliers[i], 0.0, 10.0f);
+		}
+
 		ImGui::End();
 	}
 }

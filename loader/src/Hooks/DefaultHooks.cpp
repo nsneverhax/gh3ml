@@ -182,9 +182,21 @@ int deoutCreateHighwayDrawRect(double * array, float param_2, float param_3, flo
         backBufferWidth = SurfaceDesc.Width;
         pSurface->Release();
     }
-
+    
     float whammySizeMultiplier = ((float)backBufferWidth / 1280.0f) * 1.25f;
-    return CreateHighwayDrawRect::Orig(array, param_2, param_3, whammyTopWidth * whammySizeMultiplier, param_5, whammyWidthOffset, param_7 * whammySizeMultiplier, param_8, param_9, param_10, param_11);
+    return CreateHighwayDrawRect::Orig(
+        array, 
+        param_2 * whammyMultipliers[1],
+        param_3 * whammyMultipliers[2],
+        whammyTopWidth * whammySizeMultiplier, 
+        param_5 * whammyMultipliers[3],
+        whammyWidthOffset * whammySizeMultiplier,
+        param_7 * whammySizeMultiplier, 
+        param_8 * whammyMultipliers[5],
+        param_9 * whammyMultipliers[6],
+        param_10 * whammyMultipliers[7], // Whammy Tail End
+        param_11 * whammyMultipliers[8] // Whammy Tail Begin
+    );
 }
 
 using Nx_DirectInput_InitMouse = nylon::hook::Binding<0x0047dfa0, nylon::hook::cconv::CDecl, HRESULT>;
@@ -241,6 +253,22 @@ bool detourCFuncWait(gh3::QbStruct* params, void* script)
     return orig;
 }
 
+using Time_UpdateTime = nylon::hook::Binding<0x00492780, nylon::hook::cconv::CDecl, void>;
+void detourTimeUpdateTime()
+{
+    double frameTime = *GH3::Time::DOUBLE_00b544b8;
+    *GH3::Time::CurrentFrameTime = *GH3::Time::CurrentSlowDown;
+
+    double temp = *reinterpret_cast<double*>(0x008b1068);
+    double awawa = (1.0 / 60.0);
+    if (((*GH3::Time::UnknownFrameTimeRelated_009596c8) * frameTime * 100 < *GH3::Time::DOUBLE_00b544b8) || *GH3::Time::DOUBLE_00b544b8 < 0.0)
+    {
+        frameTime = (*GH3::Time::UnknownFrameTimeRelated_009596c8) * frameTime;
+    }
+    *GH3::Time::NoSlowFrameTime = (float)frameTime;
+    *GH3::Time::DOUBLE_00b544b0 = *GH3::Time::DOUBLE_00b544b8;
+    *GH3::Time::DeltaTime = (float)frameTime * *GH3::Time::CurrentSlowDown;
+}
 
 void nylon::internal::SetupDefaultHooks()
 {
@@ -274,6 +302,8 @@ void nylon::internal::SetupDefaultHooks()
     nylon::hook::CreateHook<Nx_DirectInput_InitMouse>(detourNx_DirectInput_InitMouse);
     nylon::hook::CreateHook<D3DDeviceLostFUN_0057ae20>(detourD3DDeviceLostFUN_0057ae20);
     nylon::hook::CreateHook<nylon::NodeArray_SetCFuncInfo>(detourNodeArray_SetCFuncInfo);
+
+    // nylon::hook::CreateHook<Time_UpdateTime>(detourTimeUpdateTime);
 
     // nylon::hook::CreateHook<CFuncWait>(detourCFuncWait);
 
