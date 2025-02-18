@@ -24,6 +24,7 @@
 #include <GH3/DirectX.hpp>
 #include <GH3/CRC.hpp>
 
+namespace cfg = nylon::Config;
 constexpr int INST_NOP = 0x90;
 
 constexpr int FUNC_INITIALIZEDEVICE = 0x0057B940;
@@ -48,6 +49,29 @@ HWND WindowHandle = nullptr;
 
 HWND detourCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
 {
+    uint32_t* debugFullScreen = reinterpret_cast<uint32_t*>(0x00c4cbdc);
+
+    uint32_t style = 0;
+    switch (cfg::GameWindowStyle())
+    {
+    case cfg::WindowStyle::Fullscreen:
+        *debugFullScreen = 0;
+        break;
+    case cfg::WindowStyle::Windowed:
+        *debugFullScreen = 1;
+        style = WS_TILEDWINDOW;
+        break;
+    case cfg::WindowStyle::BorderlessWindowed:
+        *debugFullScreen = 1;
+        style = WS_POPUP;
+        break;
+    case cfg::WindowStyle::BorderlessFullscreen:
+        *debugFullScreen = 1;
+        style = WS_POPUP;
+        break;
+    default:
+        break;
+    }
     WindowHandle = nylon::hook::Orig<1, nylon::hook::cconv::STDCall, HWND>(dwExStyle, lpClassName, lpWindowName, WS_TILEDWINDOW, 0, 0, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 
 

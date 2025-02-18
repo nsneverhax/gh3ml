@@ -7,6 +7,10 @@
 
 #include <filesystem>
 
+namespace fs = std::filesystem;
+namespace in = nylon::internal;
+namespace cfg = nylon::Config;
+
 uint32_t _versionMajor = 0;
 uint32_t _versionMinor = 0;
 uint32_t _versionPatch = 0;
@@ -15,10 +19,8 @@ uint32_t _versionType = 0;
 bool _unlockFPS = false;
 bool _openConsole = false;
 bool _allowScriptPrintf = false;
+cfg::WindowStyle _windowStyle = cfg::WindowStyle::Fullscreen;
 
-namespace fs = std::filesystem;
-namespace in = nylon::internal;
-namespace cfg = nylon::Config;
 
 void nylon::internal::ReadConfig()
 {
@@ -72,6 +74,11 @@ void nylon::internal::ReadConfig()
 	else
 		malformed = true;
 
+	if (object.contains("windowStyle"))
+		_windowStyle = static_cast<cfg::WindowStyle>(object["windowStyle"].asUInt().unwrap());
+	else
+		malformed = true;
+
 	if (malformed)
 	{
 		in::Log.Warn("\"{}\" was malformed, so it will be remade using known values.", cfg::ConfigFilepath().string());
@@ -112,4 +119,8 @@ bool cfg::OpenConsole()
 bool cfg::AllowQScriptPrintf()
 {
 	return _allowScriptPrintf;
+}
+cfg::WindowStyle cfg::GameWindowStyle()
+{
+	return _windowStyle;
 }

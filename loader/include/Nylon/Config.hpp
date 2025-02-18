@@ -23,4 +23,5 @@ namespace nylon::Config
 	bool UnlockFPS();
 	bool OpenConsole();
 	bool AllowQScriptPrintf();
+	WindowStyle GameWindowStyle();
 }
