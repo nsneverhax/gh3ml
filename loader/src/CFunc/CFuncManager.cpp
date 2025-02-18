@@ -6,9 +6,9 @@
 
 nylon::CFuncManager::CFuncManager()
 {
-	for (uint32_t i = 0; i < gh3::CFuncArrayCount; i++)
+	for (uint32_t i = 0; i < GH3::CFuncArrayCount; i++)
 	{
-		auto descriptor = gh3::CFuncArray[i];
+		auto descriptor = GH3::CFuncArray[i];
 
 		m_functions.emplace(reinterpret_cast<uintptr_t>(descriptor.Function), std::string(descriptor.Name));
 	}
@@ -24,14 +24,14 @@ void nylon::CFuncManager::Register()
 	// Vultu: I don't feel like reimplementing it right now so let's just put our data into a format
 	// that the GH3 function will like, this *should* only be called once ever, so... 
 
-	gh3::CFuncDescriptor* funcs = new gh3::CFuncDescriptor[m_functions.size()];
+	GH3::CFuncDescriptor* funcs = new GH3::CFuncDescriptor[m_functions.size()];
 
 	std::ofstream myfile("example.txt");
 
 	uint32_t i = 0;
 	for (auto kv : m_functions)
 	{
-		funcs[i] = gh3::CFuncDescriptor();
+		funcs[i] = GH3::CFuncDescriptor();
 		funcs[i].Function = reinterpret_cast<void*>(kv.first);
 		funcs[i].Name = kv.second.data();
 
@@ -52,7 +52,7 @@ void nylon::CFuncManager::Register()
 	// log.Info("Registered %d functions.", i);
 }
 
-void nylon::CFuncManager::Add(const gh3::CFuncDescriptor& descriptor)
+void nylon::CFuncManager::Add(const GH3::CFuncDescriptor& descriptor)
 {
 	m_functions.emplace(reinterpret_cast<uintptr_t>(descriptor.Function), std::string(descriptor.Name));
 }

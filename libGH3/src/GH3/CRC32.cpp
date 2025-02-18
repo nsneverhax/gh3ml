@@ -1,10 +1,10 @@
 #include <GH3/CRC32.hpp>
 #include <string>
 
-uint32_t gh3::crc32::CRC32TableLength = 256;
-uint32_t* gh3::crc32::CRC32Table = reinterpret_cast<uint32_t*>(0x0095CD28);
+uint32_t GH3::CRC::CRC32TableLength = 256;
+uint32_t* GH3::CRC::CRC32Table = reinterpret_cast<uint32_t*>(0x0095CD28);
 
-gh3::GH3Key gh3::crc32::CreateKeyFromStringOut(GH3Key* outKey, const char* srcString)
+GH3::CRCKey GH3::CRC::CreateKeyFromStringOut(CRCKey* outKey, const char* srcString)
 {
 	if (srcString == nullptr)
 	{
@@ -13,7 +13,7 @@ gh3::GH3Key gh3::crc32::CreateKeyFromStringOut(GH3Key* outKey, const char* srcSt
 		return 0;
 	}
 
-	GH3Key finalKey = 0xFFFFFFFF;
+	CRCKey finalKey = 0xFFFFFFFF;
 	char currChar = *srcString;
 
 	auto string = std::string_view(srcString);
@@ -41,13 +41,13 @@ gh3::GH3Key gh3::crc32::CreateKeyFromStringOut(GH3Key* outKey, const char* srcSt
 	return finalKey;
 }
 
-gh3::GH3Key gh3::crc32::CreateKeyFromString(const char* srcString)
+GH3::CRCKey GH3::CRC::CreateKeyFromString(const char* srcString)
 {
 	return CreateKeyFromStringOut(nullptr, srcString);
 }
 
 
-void gh3::crc32::CreateKeyNameAssociation(GH3Key key, char* name)
+void GH3::CRC::CreateKeyNameAssociation(CRCKey key, char* name)
 {
-	reinterpret_cast<void(__cdecl*)(GH3Key, char*)>(key, name);
+	reinterpret_cast<void(__cdecl*)(CRCKey, char*)>(key, name);
 }

@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace gh3
+namespace GH3
 {
 	enum class QbValueType : uint8_t
 	{

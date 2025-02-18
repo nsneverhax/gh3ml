@@ -6,13 +6,13 @@
 
 namespace binding = nylon::internal::binding;
 
-bool PrintStruct(gh3::QbStruct* params, gh3::QbScript* script)
+bool PrintStruct(GH3::QbStruct* params, GH3::QbScript* script)
 {
     // nylon::internal::LogGH3.Info("PrintStruct");
 	return true;
 }
 
-bool PrintF(gh3::QbStruct* params, gh3::QbScript* script)
+bool PrintF(GH3::QbStruct* params, GH3::QbScript* script)
 {
     if (!nylon::Config::AllowQScriptPrintf())
         return true;
@@ -38,7 +38,7 @@ bool PrintF(gh3::QbStruct* params, gh3::QbScript* script)
     return true;
 }
 
-bool LoadPak(gh3::QbStruct* params, gh3::QbScript* script)
+bool LoadPak(GH3::QbStruct* params, GH3::QbScript* script)
 {
     static bool _doPakCheck = true;
 
@@ -68,9 +68,9 @@ bool LoadPak(gh3::QbStruct* params, gh3::QbScript* script)
             expectedPakPath.insert(0, "..\\nylon\\Mods\\");
 
             nylon::internal::Log.Info("Found it! Loading...");
-            gh3::QbStruct modPakStruct = gh3::QbStruct();
+            GH3::QbStruct modPakStruct = GH3::QbStruct();
 
-            gh3::Functions::InsertCStringItem(&modPakStruct, 0, expectedPakPath.data());
+            GH3::Functions::InsertCStringItem(&modPakStruct, 0, expectedPakPath.data());
 
             binding::CFunc_LoadPak::Orig(&modPakStruct, script);
             nylon::internal::Log.Info("Done!");

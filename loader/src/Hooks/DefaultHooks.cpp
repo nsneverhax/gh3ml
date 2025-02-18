@@ -157,8 +157,8 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 #pragma endregion
 
 
-using func_SetNewWhammyValue = nylon::hook::Binding<0x0041de60, nylon::hook::cconv::CDecl, bool, gh3::QbStruct*>;
-bool detourSetNewWhammyValue(gh3::QbStruct* self)
+using func_SetNewWhammyValue = nylon::hook::Binding<0x0041de60, nylon::hook::cconv::CDecl, bool, GH3::QbStruct*>;
+bool detourSetNewWhammyValue(GH3::QbStruct* self)
 {
     return SetNewWhammyValue(self);
     //return func_SetNewWhammyValue::Orig(self);
@@ -174,7 +174,7 @@ int deoutCreateHighwayDrawRect(double * array, float param_2, float param_3, flo
     // temp
     if (backBufferWidth == 0)
     {
-        auto instance = (gh3::EngineParams::Instance());
+        auto instance = (GH3::EngineParams::Instance());
         IDirect3DSurface9* pSurface;
         (*gh3::Direct3DDevice)->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pSurface);
         D3DSURFACE_DESC SurfaceDesc;
@@ -224,9 +224,9 @@ void detourNodeArray_SetCFuncInfo(void* startAddress, uint32_t count)
     // Vultu: Don't do anything becuase CFunc Manager will handle it all
 }
 
-using CFuncWait = nylon::hook::Binding<0x0052eaf0, nylon::hook::cconv::CDecl, bool, gh3::QbStruct*, void*>;
+using CFuncWait = nylon::hook::Binding<0x0052eaf0, nylon::hook::cconv::CDecl, bool, GH3::QbStruct*, void*>;
 
-bool detourCFuncWait(gh3::QbStruct* params, void* script)
+bool detourCFuncWait(GH3::QbStruct* params, void* script)
 {
     // Vultu: Write out deltatime to the memory before we get there, honestly it might be better to rewrite this function later.
 

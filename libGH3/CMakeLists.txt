@@ -12,6 +12,6 @@ add_library(${PROJECT_NAME} STATIC
     "src/GH3/CFunc.cpp"
     "src/GH3/CRC32.cpp"
     "src/GH3/Addresses.cpp"
-)
+ "src/GH3/Lst/Node.cpp")
 
 target_include_directories(${PROJECT_NAME} PUBLIC "include/")

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Global.hpp"
+#include "Keys.hpp"
 
-namespace gh3::crc32
+namespace GH3::CRC
 {
 	extern uint32_t CRC32TableLength;
 	extern uint32_t* CRC32Table;
 
-	GH3Key CreateKeyFromStringOut(GH3Key* outKey, const char* srcString);
-	GH3Key CreateKeyFromString(const char* srcString);
-	void CreateKeyNameAssociation(GH3Key key, char* name);
+	CRCKey CreateKeyFromStringOut(CRCKey* outKey, const char* srcString);
+	CRCKey CreateKeyFromString(const char* srcString);
+	void CreateKeyNameAssociation(CRCKey key, char* name);
 }

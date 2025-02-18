@@ -1,11 +1,11 @@
 #pragma once
 
-#include <GH3/Qb/QbStructItem.hpp>
+#include <GH3/Qb/CComponent.hpp>
 
 
-namespace gh3
+namespace GH3
 {
-	struct alignas(4) QbStruct
+	struct QbStruct
 	{
 	private:
 		uint16_t m_itemChainPosition = 0;
@@ -13,7 +13,7 @@ namespace gh3
 		uint8_t m_unk2 = 0;
 
 	public:
-		void* first;
+		CComponent* ComponentList;
 
 		bool GetKey(uint32_t key, uint32_t& outKey, int param_3 = 1);
 		bool GetFloat(uint32_t key, float& out, int param_3 = 1);

@@ -2,7 +2,7 @@
 
 #include "Qb.hpp"
 
-namespace gh3
+namespace GH3
 {
 	struct CFuncDescriptor
 	{

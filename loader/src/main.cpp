@@ -65,6 +65,7 @@ const HANDLE nylon::GH3Handle()
     return _gh3Handle;
 }
 
+
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
     _gh3Handle = GetCurrentProcess();

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace gh3
+namespace GH3
 {
 	// TODO: EMPTY!
 	struct QbScript

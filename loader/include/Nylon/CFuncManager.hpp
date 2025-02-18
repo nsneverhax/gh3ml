@@ -25,7 +25,7 @@ namespace nylon
 		/// </summary>
 		void Register();
 
-		void Add(const gh3::CFuncDescriptor& descriptor);
+		void Add(const GH3::CFuncDescriptor& descriptor);
 	};
 
 

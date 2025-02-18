@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <GH3/Qb/QbValueType.hpp>
 
-namespace gh3
+namespace GH3
 {
 	struct HashMapNode
 	{

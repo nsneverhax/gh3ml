@@ -4,8 +4,9 @@
 
 namespace GH3
 {
-	typedef std::uint32_t Key;
+	typedef uint32_t CRCKey;
 }
+
 
 // Vultu: This code is take from: https://github.com/donnaken15/GH3-Plus/blob/bb94e491746a449a48feaf41348ec69a126de544/src/gh3/GH3Keys.h
 
