@@ -10,7 +10,7 @@
 
 namespace GH3
 {
-	enum class CComponetType
+	enum class CComponentType : std::uint8_t
 	{
 		QFlagNone = 0x00,
 		QFlagStructItem = 0x01,
@@ -35,15 +35,19 @@ namespace GH3
 		QTypeMap = 0x36,
 	};
 
-	struct CComponent
+	class CComponent
 	{
 	public:
-		undefined1 Unknown0x1_1;
-		CComponetType Flags;
+		CComponentType Flags;
 		std::uint16_t ScriptSize;
 		GH3::CRCKey Key;
 		void* Value;
 
 		CComponent* Next;
+
+		CComponentType GetType() const
+		{
+			return static_cast<CComponentType>(static_cast<uint32_t>(Flags) >> 1);
+		}
 	};
 }
