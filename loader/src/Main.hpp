@@ -6,6 +6,8 @@
 
 #include <Nylon/ModInfo.hpp>
 
+#include <GH3/Keys.hpp>
+
 namespace nylon::internal
 {
 	extern LogSource Log;
@@ -20,4 +22,5 @@ namespace nylon::internal
 	
 	void ReadConfig();
 	
+	extern std::map<GH3::CRCKey, char*> KeyAssociations;
 }

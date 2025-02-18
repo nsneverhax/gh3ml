@@ -13,7 +13,7 @@ namespace GH3
 		uint8_t m_unk2 = 0;
 
 	public:
-		CComponent* ComponentList;
+		Script::CComponent* ComponentList;
 
 		bool GetKey(uint32_t key, uint32_t& outKey, int param_3 = 1);
 		bool GetFloat(uint32_t key, float& out, int param_3 = 1);

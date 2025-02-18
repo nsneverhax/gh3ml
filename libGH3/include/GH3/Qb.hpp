@@ -4,7 +4,7 @@
 
 #include "Keys.hpp"
 #include "Qb/QbStruct.hpp"
-#include "Qb/QbScript.hpp"
+#include "Qb/CScript.hpp"
 
 
 /*

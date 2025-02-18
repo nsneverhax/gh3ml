@@ -22,7 +22,8 @@
 #include <GH3/EngineParams.hpp>
 
 #include <GH3/DirectX.hpp>
-#include <GH3/CRC32.hpp>
+#include <GH3/CRC.hpp>
+
 constexpr int INST_NOP = 0x90;
 
 constexpr int FUNC_INITIALIZEDEVICE = 0x0057B940;
@@ -47,7 +48,7 @@ HWND WindowHandle = nullptr;
 
 HWND detourCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
 {
-    WindowHandle = nylon::hook::Orig<1, nylon::hook::cconv::STDCall, HWND>(dwExStyle, lpClassName, lpWindowName, WS_POPUP, 0, 0, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+    WindowHandle = nylon::hook::Orig<1, nylon::hook::cconv::STDCall, HWND>(dwExStyle, lpClassName, lpWindowName, WS_TILEDWINDOW, 0, 0, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 
 
     return WindowHandle;
@@ -112,9 +113,12 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     auto ret = WindowProc::Orig(hWnd, uMsg, wParam, lParam);
 
 
+    //(*gh3::MouseDevice)->Unacquire();
+
+    /*
     (*gh3::MouseDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
     (*gh3::KeyboardDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-
+    */
     if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
         return true;
 
@@ -270,6 +274,12 @@ void detourTimeUpdateTime()
     *GH3::Time::DeltaTime = (float)frameTime * *GH3::Time::CurrentSlowDown;
 }
 
+using CRC_CreateKeyNameAssociation = nylon::hook::Binding<0x004a6820, nylon::hook::cconv::CDecl, void, GH3::CRCKey, char*>;
+void detour__CRC_CreateKeyNameAssociate(GH3::CRCKey key, char* string)
+{
+    CRC_CreateKeyNameAssociation::Orig(key, string);
+}
+
 void nylon::internal::SetupDefaultHooks()
 {
     Log.Info("Setting up default hooks...");
@@ -302,6 +312,7 @@ void nylon::internal::SetupDefaultHooks()
     nylon::hook::CreateHook<Nx_DirectInput_InitMouse>(detourNx_DirectInput_InitMouse);
     nylon::hook::CreateHook<D3DDeviceLostFUN_0057ae20>(detourD3DDeviceLostFUN_0057ae20);
     nylon::hook::CreateHook<nylon::NodeArray_SetCFuncInfo>(detourNodeArray_SetCFuncInfo);
+    nylon::hook::CreateHook<CRC_CreateKeyNameAssociation>(detour__CRC_CreateKeyNameAssociate);
 
     // nylon::hook::CreateHook<Time_UpdateTime>(detourTimeUpdateTime);
 

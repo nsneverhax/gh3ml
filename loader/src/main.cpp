@@ -25,6 +25,8 @@ nylon::LogSource in::Log = nylon::LogSource("Nylon");
 nylon::LogSource in::LogGH3 = nylon::LogSource("GH3");
 std::map<std::string, nylon::ModInfo> in::LoadedMods = { };
 
+std::map<GH3::CRCKey, char*> in::KeyAssociations = { };
+
 void in::LoadMods()
 {
     Log.Info("Loading mods...");

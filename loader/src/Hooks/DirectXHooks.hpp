@@ -10,5 +10,4 @@ namespace nylon::internal
 
 	bool CreateDirectXHooks();
 
-
 }

@@ -21,5 +21,17 @@ nylon::LogSource::LogSource(const std::string& name)
 {
 	_name = name;
 }
+void nylon::LogSource::SetIndentLevel(uint32_t level)
+{
+	_indentLevel = level;
+}
+uint32_t nylon::LogSource::GetIndentLevel() const
+{
+	return _indentLevel;
+}
 
+std::string_view nylon::LogSource::GetName()
+{
+	return _name;
+}
 

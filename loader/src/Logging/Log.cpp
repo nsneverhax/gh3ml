@@ -131,7 +131,7 @@ bool nylon::Log::ReleaseConsole()
     return result;
 }
 
-void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const char* message)
+void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const char* message, uint32_t indentLevel)
 {
     if (level < GetLogLevel())
         return;
@@ -168,8 +168,12 @@ void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const cha
     levelStr[5] = '\0';
 
     SetConsoleTextAttribute(hConsole, consoleColorAttribute);
+    std::string indentString = "";
 
-    std::string prefix = std::format("{:%H:%M:%OS} {} [{}]: ", now, levelStr, sourceName);
+    for (auto i = 0; i < indentLevel; i++)
+        indentString.append("\t");
+    
+    std::string prefix = std::format("{:%H:%M:%OS} {} [{}]: {}", now, levelStr, sourceName, indentString);
 
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 

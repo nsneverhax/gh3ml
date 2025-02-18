@@ -31,6 +31,6 @@ namespace nylon::Log
 	bool CreateConsole();
 	bool ReleaseConsole();
 	
-	void WriteToOutput(LogLevel level, const char* sourceName, const char* message);
+	void WriteToOutput(LogLevel level, const char* sourceName, const char* message, uint32_t indentLevel = 0);
 
 }

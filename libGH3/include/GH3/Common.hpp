@@ -1,10 +1,12 @@
 #pragma once
 
 #define SIZE_ASSERT(x, s) static_assert(sizeof(x) == s)
-
-#include <cstdint>
+#define GH3_API __declspec(dllexport)
 
 #include <GH3/Keys.hpp>
+
+#include <cstdint>
+#include <string>
 
 namespace GH3
 {
