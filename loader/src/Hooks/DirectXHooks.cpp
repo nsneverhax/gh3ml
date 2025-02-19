@@ -43,7 +43,7 @@ HRESULT Present(void* self, const RECT* pSourceRect, const RECT* pDestRect, HWND
 
 	nylon::imgui::NylonMenu();
 
-	ImGui::ShowDemoWindow();
+	// ImGui::ShowDemoWindow();
 
 	nylon::imgui::EndFrame();
 
