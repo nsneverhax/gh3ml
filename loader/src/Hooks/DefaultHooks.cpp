@@ -55,18 +55,18 @@ HWND detourCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowN
     switch (cfg::GameWindowStyle())
     {
     case cfg::WindowStyle::Fullscreen:
-        *debugFullScreen = 0;
+        *debugFullScreen = 1;
         break;
     case cfg::WindowStyle::Windowed:
-        *debugFullScreen = 1;
+        *debugFullScreen = 0;
         style = WS_TILEDWINDOW;
         break;
     case cfg::WindowStyle::BorderlessWindowed:
-        *debugFullScreen = 1;
+        *debugFullScreen = 0;
         style = WS_POPUP;
         break;
     case cfg::WindowStyle::BorderlessFullscreen:
-        *debugFullScreen = 1;
+        *debugFullScreen = 0;
         style = WS_POPUP;
         break;
     default:
@@ -108,7 +108,7 @@ void detourVideo_InitializeDevice(void* engineParams)
 
     
     ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
@@ -133,16 +133,15 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     static bool waitForTabRelease = false;
 
+    (*gh3::MouseDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+    (*gh3::KeyboardDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 
     auto ret = WindowProc::Orig(hWnd, uMsg, wParam, lParam);
 
-
+    
     //(*gh3::MouseDevice)->Unacquire();
+    //(*gh3::KeyboardDevice)->Unacquire();
 
-    /*
-    (*gh3::MouseDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-    (*gh3::KeyboardDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-    */
     if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
         return true;
 
@@ -154,7 +153,15 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         case VK_OEM_3:
 
             if (!waitForTabRelease)
+            {
                 nylon::imgui::NylonMenuActive = !nylon::imgui::NylonMenuActive;
+
+                if (nylon::imgui::NylonMenuActive)
+                {
+                    //(*gh3::MouseDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+                    //(*gh3::MouseDevice)->Unacquire();
+                }
+            }
 
             waitForTabRelease = true;
             break;

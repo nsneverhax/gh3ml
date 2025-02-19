@@ -41,7 +41,7 @@ bool nylon::internal::CreateDirectXHooks()
 		d3dVFTable[17],
 		Present
 	);
-
+	/*
 	if (D3DXCreateTextureFromFile(*gh3::Direct3DDevice, "nylon\\Resources\\conduit\\conduit_tap_l.png", &conduitTapTextures[0]) != D3D_OK)
 	{
 
@@ -50,6 +50,6 @@ bool nylon::internal::CreateDirectXHooks()
 	{
 
 	}
-
+	*/
 	return true;
 }

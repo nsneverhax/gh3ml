@@ -25,7 +25,8 @@ add_library(${PROJECT_NAME} SHARED
 
     "src/Hooks/CFuncHooks.cpp"
 
-    "src/Imgui/Imgui.cpp"
+    "src/Imgui/ImGui.cpp"
+    "src/Imgui/ImguiConsole.cpp"
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

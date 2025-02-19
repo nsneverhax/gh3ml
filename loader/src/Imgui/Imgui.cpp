@@ -1,7 +1,10 @@
 #include "Imgui.hpp"
+#include "ImGuiConsole.hpp"
 
 #include <GH3/DirectX.hpp>
 #include <GH3/Addresses.hpp>
+
+nylon::internal::ImGuiConsole _console = { };
 
 void nylon::imgui::BeginFrame()
 {
@@ -50,7 +53,7 @@ void nylon::imgui::NylonMenu()
 			{
 				if (ImGui::MenuItem("Hash Map Browser"))
 				{
-	
+
 				}
 				ImGui::EndMenu();
 			}
@@ -83,7 +86,9 @@ void nylon::imgui::NylonMenu()
 
 			ImGui::SliderFloat(str.data(), &whammyMultipliers[i], 0.0, 10.0f);
 		}
-
 		ImGui::End();
 	}
+
+	_console.Draw();
+
 }
