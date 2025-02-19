@@ -77,6 +77,27 @@ HWND detourCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowN
 
     return WindowHandle;
 }
+constexpr int KeyboardSetCooperativeLevelID = 4;
+
+HRESULT KeyboardSetCooperativeLevel(void* self, HWND hwnd, DWORD dwFlags)
+{
+    nylon::internal::Log.Info("KeyboardSetCooperativeLevel -> {:X}", dwFlags);
+    auto ret = nylon::hook::Orig<KeyboardSetCooperativeLevelID, nylon::hook::cconv::STDCall, HRESULT>(self, hwnd, DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
+    (*gh3::KeyboardDevice)->Unacquire();
+
+    return ret;
+}
+constexpr int MouseSetCooperativeLevelID = 5;
+
+HRESULT MouseSetCooperativeLevel(void* self, HWND hwnd, DWORD dwFlags)
+{
+    nylon::internal::Log.Info("MouseSetCooperativeLevel -> {:X}", dwFlags);
+    auto ret = nylon::hook::Orig<MouseSetCooperativeLevelID, nylon::hook::cconv::STDCall, HRESULT>(self, hwnd, DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
+    (*gh3::MouseDevice)->Unacquire();
+
+    return ret;
+}
+
 
 using Video_InitializeDevice = nylon::hook::Binding<0x0057b940, nylon::hook::cconv::CDecl, void, void*>;
 
@@ -106,11 +127,6 @@ void detourVideo_InitializeDevice(void* engineParams)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    
-    ImGuiIO& io = ImGui::GetIO();
-    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsLight();
@@ -119,31 +135,44 @@ void detourVideo_InitializeDevice(void* engineParams)
     ImGui_ImplWin32_Init(WindowHandle);
     ImGui_ImplDX9_Init(*gh3::Direct3DDevice);
 
-
     nylon::internal::Log.Info("Hooking DirectX 9...");
     nylon::internal::CreateDirectXHooks();
     nylon::internal::Log.Info("Finished hooking DirectX 9.");
+
+    uintptr_t* kbdVFTable = **reinterpret_cast<uintptr_t***>(gh3::KeyboardDevice);
+    nylon::hook::CreateHook<KeyboardSetCooperativeLevelID, nylon::hook::cconv::STDCall>(
+        kbdVFTable[13],
+        KeyboardSetCooperativeLevel
+    );
+
+    uintptr_t* mseVFTable = **reinterpret_cast<uintptr_t***>(gh3::MouseDevice);
+    nylon::hook::CreateHook<MouseSetCooperativeLevelID, nylon::hook::cconv::STDCall>(
+        mseVFTable[13],
+        MouseSetCooperativeLevel
+    );
 }
 
 using WindowProc = nylon::hook::Binding<0x00578880, nylon::hook::cconv::STDCall, LRESULT, HWND, UINT, WPARAM, LPARAM>;
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+LRESULT(__cdecl** AspyrDefWindowProcA)(HWND, UINT, WPARAM, LPARAM) = reinterpret_cast<LRESULT(__cdecl**)(HWND, UINT, WPARAM, LPARAM)>(0x00898020);
+
+
+void textBufferWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    if ((((uMsg != WM_KEYDOWN) && (uMsg != WM_KEYUP)) && (uMsg != WM_SYSKEYDOWN)) && (uMsg != WM_SYSKEYUP))
+    {
+        return;
+    }
+
+}
 
 LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     static bool waitForTabRelease = false;
 
-    (*gh3::MouseDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-    (*gh3::KeyboardDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+    WindowProc::Orig(hWnd, uMsg, wParam, lParam);
 
-    auto ret = WindowProc::Orig(hWnd, uMsg, wParam, lParam);
-
-    
-    //(*gh3::MouseDevice)->Unacquire();
-    //(*gh3::KeyboardDevice)->Unacquire();
-
-    if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-        return true;
 
     switch (uMsg)
     {
@@ -153,15 +182,7 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         case VK_OEM_3:
 
             if (!waitForTabRelease)
-            {
                 nylon::imgui::NylonMenuActive = !nylon::imgui::NylonMenuActive;
-
-                if (nylon::imgui::NylonMenuActive)
-                {
-                    //(*gh3::MouseDevice)->SetCooperativeLevel(WindowHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-                    //(*gh3::MouseDevice)->Unacquire();
-                }
-            }
 
             waitForTabRelease = true;
             break;
@@ -183,8 +204,10 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
     }
 
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+        return true;
 
-    return ret;
+    return false;
 }
 
 
@@ -311,9 +334,11 @@ void detour__CRC_CreateKeyNameAssociate(GH3::CRCKey key, char* string)
     CRC_CreateKeyNameAssociation::Orig(key, string);
 }
 
+
 void nylon::internal::SetupDefaultHooks()
 {
     Log.Info("Setting up default hooks...");
+
 
     if (nylon::Config::UnlockFPS())
     {

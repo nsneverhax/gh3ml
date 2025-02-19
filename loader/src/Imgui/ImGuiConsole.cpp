@@ -3,6 +3,11 @@
 
 namespace in = nylon::internal;
 
+int ACallback(ImGuiInputTextCallbackData* data)
+{
+	return 0;
+}
+
 void in::ImGuiConsole::DrawLogWindow()
 {
 	float footerHeightReserved = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
@@ -33,10 +38,12 @@ void in::ImGuiConsole::Draw()
 		ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_CallbackCharFilter | ImGuiInputTextFlags_CallbackCompletion |
 		ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways;
 
+
 	if (ImGui::InputText("ConsoleInput", _buffer, 256))
 	{
 
 	}
+
 
 	ImGui::End();
 }
