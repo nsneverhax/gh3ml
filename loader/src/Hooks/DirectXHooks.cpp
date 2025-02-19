@@ -35,12 +35,6 @@ HRESULT Reset(void* self, D3DPRESENT_PARAMETERS* pPresentationParameters)
 
 HRESULT Present(void* self, const RECT* pSourceRect, const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)
 {
-	MSG msg;
-	while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
-	{
-		::TranslateMessage(&msg);
-		::DispatchMessage(&msg);
-	}
 
 	static float conduitTapTimer = 0;
 	static int conduitFrame = 0;

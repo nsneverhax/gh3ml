@@ -171,8 +171,8 @@ LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     static bool waitForTabRelease = false;
 
-    WindowProc::Orig(hWnd, uMsg, wParam, lParam);
-
+    if (WindowProc::Orig(hWnd, uMsg, wParam, lParam))
+        return true;
 
     switch (uMsg)
     {
