@@ -37,7 +37,7 @@ namespace nylon::hook
                 Cconv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
             else
                 reinterpret_cast<Ret(*)(Args...)>(data.Hooks[index])(args...);
-            data.OrigIndex--;
+            data.OrigIndex = 0;
         }
         else
         {
@@ -46,7 +46,7 @@ namespace nylon::hook
                 ret = Cconv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
             else
                 ret = reinterpret_cast<Ret(*)(Args...)>(data.Hooks[index])(args...);
-            data.OrigIndex--;
+            data.OrigIndex = 0;
             return ret;
         }
     }
