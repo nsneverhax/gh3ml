@@ -20,16 +20,16 @@ namespace nylon::hook
 
         uintptr_t Address = NULL;
         std::vector<uintptr_t> Hooks = std::vector<uintptr_t>();
-        size_t OrigIndex = 0;
     };
 
     extern std::unordered_map<uintptr_t, HookData> Hooks;
+    extern thread_local size_t OrigIndex;
 
     template<uintptr_t id, typename Cconv, typename Ret, typename... Args>
     Ret Orig(Args... args)
     {
         auto& data = Hooks[id];
-        size_t index = data.Hooks.size() - ++data.OrigIndex;
+        size_t index = data.Hooks.size() - ++OrigIndex;
 
         if constexpr (std::is_same_v<Ret, void>)
         {
@@ -37,7 +37,7 @@ namespace nylon::hook
                 Cconv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
             else
                 reinterpret_cast<Ret(*)(Args...)>(data.Hooks[index])(args...);
-            data.OrigIndex--;
+            OrigIndex--;
         }
         else
         {
@@ -46,7 +46,7 @@ namespace nylon::hook
                 ret = Cconv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
             else
                 ret = reinterpret_cast<Ret(*)(Args...)>(data.Hooks[index])(args...);
-            data.OrigIndex--;
+            OrigIndex--;
             return ret;
         }
     }
