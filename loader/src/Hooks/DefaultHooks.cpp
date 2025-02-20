@@ -92,7 +92,7 @@ LRESULT detourDispatchMessageA(MSG* lmMsg)
     if (windProcResult = nylon::imgui::WindowProc(lmMsg->hwnd, lmMsg->message, lmMsg->wParam, lmMsg->lParam))
         return windProcResult;
 
-    return nylon::hook::Orig<1600, nylon::hook::cconv::STDCall, LRESULT, MSG*>(lmMsg);
+    return nylon::hook::Orig<1002, nylon::hook::cconv::STDCall, LRESULT, MSG*>(lmMsg);
 }
 
 constexpr int KeyboardSetCooperativeLevelID = 4;
@@ -170,31 +170,37 @@ void detourVideo_InitializeDevice(void* engineParams)
     );
 }
 
-using WindowProc = nylon::hook::Binding<0x00578880, nylon::hook::cconv::STDCall, LRESULT, HWND, UINT, WPARAM, LPARAM>;
+// using WindowProc = nylon::hook::Binding<0x00578880, nylon::hook::cconv::STDCall, LRESULT, HWND, UINT, WPARAM, LPARAM>;
 LRESULT(__cdecl** AspyrDefWindowProcA)(HWND, UINT, WPARAM, LPARAM) = reinterpret_cast<LRESULT(__cdecl**)(HWND, UINT, WPARAM, LPARAM)>(0x00898020);
 bool(__cdecl* Kbd_KeyboardStringHandler_sUpdate)(HWND, uint32_t, WPARAM, LPARAM) = reinterpret_cast<bool(__cdecl*)(HWND, uint32_t, WPARAM, LPARAM)>(0x00554850);
 
-LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT __stdcall WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     LRESULT windProcResult = 0;
 
+    switch (uMsg)
+    {
+    case WM_SETCURSOR:
+        if (nylon::imgui::GetNylonMenuActive())
+            SetCursor(LoadCursor(nullptr, IDC_ARROW));
+        else
+            SetCursor(NULL);
+        return 0;
+    default:
+        break;
+    }
+
     if (!nylon::imgui::GetNylonMenuActive())
     {
-        if ((uMsg == WM_SETCURSOR) && ((short)lParam == HTCLIENT))
-        {
-            SetCursor(NULL);
-            return true;
-        }
-
         if (windProcResult = Kbd_KeyboardStringHandler_sUpdate(hWnd, uMsg, wParam, lParam))
             return windProcResult;
     }
 
-    if (windProcResult = (*AspyrDefWindowProcA)(hWnd, uMsg, wParam, lParam))
-        return windProcResult;
+    //if (windProcResult = (*AspyrDefWindowProcA)(hWnd, uMsg, wParam, lParam))
+    //    return windProcResult;
+
+    return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
-
-
 
 #pragma endregion
 
@@ -318,6 +324,12 @@ void detour__CRC_CreateKeyNameAssociate(GH3::CRCKey key, char* string)
     CRC_CreateKeyNameAssociation::Orig(key, string);
 }
 
+ATOM detour__RegisterClassA(WNDCLASSA* lpWndClass)
+{
+    lpWndClass->lpfnWndProc = WindowProc;
+    return RegisterClassA(lpWndClass);
+}
+
 void nylon::internal::SetupDefaultHooks()
 {
     Log.Info("Setting up default hooks...");
@@ -333,24 +345,28 @@ void nylon::internal::SetupDefaultHooks()
         nylon::WriteMemory(FUNC_INITIALIZEDEVICE + 0x1C7, buffer, sizeof(buffer)); // 0x0057BB07 : dword ptr [D3DPresentParams.SwapEffect],EDI
         nylon::WriteMemory(FUNC_INITIALIZEDEVICE + 0x239, buffer, sizeof(buffer)); // 0x0057bb79 : dword ptr [D3DPresentParams.PresentationInterval],EDI
     }
-    
+
+
     nylon::hook::CreateHook<1, nylon::hook::cconv::STDCall>(
         reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "CreateWindowExA")),
         detourCreateWindowExA
     );
 
-    nylon::hook::CreateHook<1600, nylon::hook::cconv::STDCall>(
+    nylon::hook::CreateHook<1002, nylon::hook::cconv::STDCall>(
         reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "DispatchMessageA")),
         detourDispatchMessageA
     );
 
+    nylon::hook::CreateHook<1003, nylon::hook::cconv::STDCall>(
+        reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "RegisterClassA")),
+        detour__RegisterClassA
+    );
 
     nylon::internal::CreateCFuncHooks();
 
     nylon::hook::CreateHook<DebugLog>(detourDebugLog);
     nylon::hook::CreateHook<Video_InitializeDevice>(detourVideo_InitializeDevice);
     
-    nylon::hook::CreateHook<WindowProc>(detourWindowProc);
 
     nylon::hook::CreateHook<CreateHighwayDrawRect>(deoutCreateHighwayDrawRect);
     nylon::hook::CreateHook<Nx_DirectInput_InitMouse>(detourNx_DirectInput_InitMouse);
