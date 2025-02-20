@@ -26,7 +26,62 @@ void nylon::imgui::EndFrame()
 }
 float* whammyMultipliers = new float[9];
 
-bool nylon::imgui::NylonMenuActive = false;
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+
+bool nylon::imgui::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	static bool waitForTabRelease = false;
+
+	switch (uMsg)
+	{
+	case WM_KEYDOWN:
+		switch (LOWORD(wParam))
+		{
+		case VK_OEM_3:
+
+			if (!waitForTabRelease)
+				SetNylonMenuActive(!GetNylonMenuActive());
+
+			waitForTabRelease = true;
+			break;
+		default:
+			break;
+		}
+		break;
+	case WM_KEYUP:
+		switch (LOWORD(wParam))
+		{
+		case VK_OEM_3:
+			waitForTabRelease = false;
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
+
+	if (!GetNylonMenuActive())
+		return false;
+
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+		return true;
+
+	return false;
+}
+
+bool _nylonMenuActive = false;
+void nylon::imgui::SetNylonMenuActive(bool state)
+{
+	_nylonMenuActive = state;
+}
+
+bool nylon::imgui::GetNylonMenuActive()
+{
+	return _nylonMenuActive;
+}
 
 void nylon::imgui::NylonMenu()
 {
@@ -39,13 +94,15 @@ void nylon::imgui::NylonMenu()
 		whammyMAde = true;
 	}
 
-	if (!NylonMenuActive)
+	if (!GetNylonMenuActive())
 		return;
 
 	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar;
 	std::string title = "Nylon Menu " + std::string(nylon::VersionString);
 	
-	if (ImGui::Begin(title.c_str(), &NylonMenuActive, window_flags))
+	bool active = GetNylonMenuActive();
+
+	if (ImGui::Begin(title.c_str(), &active, window_flags))
 	{
 		if (ImGui::BeginMenuBar())
 		{
@@ -91,4 +148,6 @@ void nylon::imgui::NylonMenu()
 
 	_console.Draw();
 
+	if (!active && GetNylonMenuActive ())
+		SetNylonMenuActive(false);
 }

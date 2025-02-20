@@ -35,7 +35,6 @@ HRESULT Reset(void* self, D3DPRESENT_PARAMETERS* pPresentationParameters)
 
 HRESULT Present(void* self, const RECT* pSourceRect, const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)
 {
-
 	static float conduitTapTimer = 0;
 	static int conduitFrame = 0;
 

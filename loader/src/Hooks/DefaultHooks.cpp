@@ -77,12 +77,19 @@ HWND detourCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowN
 
     return WindowHandle;
 }
+
+LRESULT detourDispatchMessageA(MSG* lmMsg)
+{
+    ::TranslateMessage(lmMsg);
+    return ::DispatchMessage(lmMsg);
+}
+
 constexpr int KeyboardSetCooperativeLevelID = 4;
 
 HRESULT KeyboardSetCooperativeLevel(void* self, HWND hwnd, DWORD dwFlags)
 {
     nylon::internal::Log.Info("KeyboardSetCooperativeLevel -> {:X}", dwFlags);
-    auto ret = nylon::hook::Orig<KeyboardSetCooperativeLevelID, nylon::hook::cconv::STDCall, HRESULT>(self, hwnd, DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
+    auto ret = nylon::hook::Orig<KeyboardSetCooperativeLevelID, nylon::hook::cconv::STDCall, HRESULT>(self, hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
     (*gh3::KeyboardDevice)->Unacquire();
 
     return ret;
@@ -92,7 +99,7 @@ constexpr int MouseSetCooperativeLevelID = 5;
 HRESULT MouseSetCooperativeLevel(void* self, HWND hwnd, DWORD dwFlags)
 {
     nylon::internal::Log.Info("MouseSetCooperativeLevel -> {:X}", dwFlags);
-    auto ret = nylon::hook::Orig<MouseSetCooperativeLevelID, nylon::hook::cconv::STDCall, HRESULT>(self, hwnd, DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
+    auto ret = nylon::hook::Orig<MouseSetCooperativeLevelID, nylon::hook::cconv::STDCall, HRESULT>(self, hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
     (*gh3::MouseDevice)->Unacquire();
 
     return ret;
@@ -153,61 +160,28 @@ void detourVideo_InitializeDevice(void* engineParams)
 }
 
 using WindowProc = nylon::hook::Binding<0x00578880, nylon::hook::cconv::STDCall, LRESULT, HWND, UINT, WPARAM, LPARAM>;
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 LRESULT(__cdecl** AspyrDefWindowProcA)(HWND, UINT, WPARAM, LPARAM) = reinterpret_cast<LRESULT(__cdecl**)(HWND, UINT, WPARAM, LPARAM)>(0x00898020);
+bool(__cdecl* Kbd_KeyboardStringHandler_sUpdate)(HWND, uint32_t, WPARAM, LPARAM) = reinterpret_cast<bool(__cdecl*)(HWND, uint32_t, WPARAM, LPARAM)>(0x00554850);
 
-
-void textBufferWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    if ((((uMsg != WM_KEYDOWN) && (uMsg != WM_KEYUP)) && (uMsg != WM_SYSKEYDOWN)) && (uMsg != WM_SYSKEYUP))
-    {
-        return;
-    }
-
-}
 
 LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    static bool waitForTabRelease = false;
+    nylon::imgui::WindowProc(hWnd, uMsg, wParam, lParam);
 
-    if (WindowProc::Orig(hWnd, uMsg, wParam, lParam))
-        return true;
+#pragma region GH3 Wind Proc
+    LRESULT windProcResult = false;
 
-    switch (uMsg)
-    {
-    case WM_KEYDOWN:
-        switch (LOWORD(wParam))
-        {
-        case VK_OEM_3:
+    if (Kbd_KeyboardStringHandler_sUpdate(hWnd, uMsg, wParam, lParam))
+        return 0;
 
-            if (!waitForTabRelease)
-                nylon::imgui::NylonMenuActive = !nylon::imgui::NylonMenuActive;
 
-            waitForTabRelease = true;
-            break;
-        default:
-            break;
-        }
-        break;
-    case WM_KEYUP:
-        switch (LOWORD(wParam))
-        {
-        case VK_OEM_3:
-            waitForTabRelease = false;
-            break;
-        default:
-            break;
-        }
-        break;
-    default:
-        break;
-    }
+    windProcResult = (*AspyrDefWindowProcA)(hWnd, uMsg, wParam, lParam);
+    if (windProcResult)
+        return windProcResult;
 
-    if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-        return true;
+#pragma endregion
 
-    return false;
+    return 0;
 }
 
 
@@ -334,28 +308,32 @@ void detour__CRC_CreateKeyNameAssociate(GH3::CRCKey key, char* string)
     CRC_CreateKeyNameAssociation::Orig(key, string);
 }
 
-
 void nylon::internal::SetupDefaultHooks()
 {
     Log.Info("Setting up default hooks...");
 
+    // Vultu: I really don't feel like rewriting the entire function for right now
+// so I'm going NOP where some global variables are set
+    uint8_t buffer[6];
+    memset(buffer, INST_NOP, sizeof(buffer));
 
     if (nylon::Config::UnlockFPS())
     {
-        // Vultu: I really don't feel like rewriting the entire function for right now
-        // so I'm going NOP where some global variables are set
-        uint8_t buffer[6];
-        memset(buffer, INST_NOP, sizeof(buffer));
 
         nylon::WriteMemory(FUNC_INITIALIZEDEVICE + 0x1C7, buffer, sizeof(buffer)); // 0x0057BB07 : dword ptr [D3DPresentParams.SwapEffect],EDI
         nylon::WriteMemory(FUNC_INITIALIZEDEVICE + 0x239, buffer, sizeof(buffer)); // 0x0057bb79 : dword ptr [D3DPresentParams.PresentationInterval],EDI
     }
     
-
     nylon::hook::CreateHook<1, nylon::hook::cconv::STDCall>(
         reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "CreateWindowExA")),
         detourCreateWindowExA
     );
+
+    nylon::hook::CreateHook<6, nylon::hook::cconv::STDCall>(
+        reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "DispatchMessageA")),
+        detourDispatchMessageA
+    );
+
 
     nylon::internal::CreateCFuncHooks();
 

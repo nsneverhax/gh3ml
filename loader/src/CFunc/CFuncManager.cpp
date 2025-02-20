@@ -26,7 +26,7 @@ void nylon::CFuncManager::Register()
 
 	GH3::CFuncDescriptor* funcs = new GH3::CFuncDescriptor[m_functions.size()];
 
-	std::ofstream myfile("example.txt");
+	//std::ofstream myfile("example.txt");
 
 	uint32_t i = 0;
 	for (auto kv : m_functions)
@@ -36,15 +36,16 @@ void nylon::CFuncManager::Register()
 		funcs[i].Name = kv.second.data();
 
 		std::uint8_t magic = *reinterpret_cast<std::uint8_t*>(kv.first + 2);
-
+		/*
 		if (magic == 0xC3)
 			myfile << "[S] ";
 		else
 			myfile << "[ ] ";
 		myfile << kv.second.data() << "\n";
+		*/
 		i++;
 	}
-	myfile.close();
+	// myfile.close();
 
 	NodeArray_SetCFuncInfo::Orig(funcs, m_functions.size());
 	delete[] funcs;

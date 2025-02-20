@@ -13,7 +13,10 @@ namespace nylon::imgui
 	void BeginFrame();
 	void EndFrame();
 
-	extern bool NylonMenuActive;
+	bool WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	void SetNylonMenuActive(bool state);
+	bool GetNylonMenuActive();
+
 	void NylonMenu();
 
 }
