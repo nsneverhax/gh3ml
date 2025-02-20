@@ -3,6 +3,7 @@
 
 #include <GH3/DirectX.hpp>
 #include <GH3/Addresses.hpp>
+#include <XInput.h>
 
 nylon::internal::ImGuiConsole _console = { };
 
@@ -26,12 +27,20 @@ void nylon::imgui::EndFrame()
 }
 float* whammyMultipliers = new float[9];
 
+bool _nylonMenuActive = true;
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+#include <iostream>
 
-bool nylon::imgui::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT nylon::imgui::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static bool waitForTabRelease = false;
+
+	LRESULT windProcResult = 0;
+
+	if (windProcResult = ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+		return windProcResult;
 
 	switch (uMsg)
 	{
@@ -44,7 +53,7 @@ bool nylon::imgui::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				SetNylonMenuActive(!GetNylonMenuActive());
 
 			waitForTabRelease = true;
-			break;
+			return 0;
 		default:
 			break;
 		}
@@ -54,7 +63,7 @@ bool nylon::imgui::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		{
 		case VK_OEM_3:
 			waitForTabRelease = false;
-			break;
+			return 0;
 		default:
 			break;
 		}
@@ -63,18 +72,28 @@ bool nylon::imgui::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		break;
 	}
 
-	if (!GetNylonMenuActive())
-		return false;
-
-	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-		return true;
-
-	return false;
+	return 0;
 }
 
-bool _nylonMenuActive = false;
 void nylon::imgui::SetNylonMenuActive(bool state)
 {
+	if (!_nylonMenuActive != state)
+		return;
+
+	// V: State change
+
+	if (_nylonMenuActive)
+	{
+		XInputEnable(false);
+		(*gh3::KeyboardDevice)->Unacquire();
+		(*gh3::MouseDevice)->Unacquire();
+	}
+	else
+	{
+		XInputEnable(true);
+		(*gh3::KeyboardDevice)->Acquire();
+		(*gh3::MouseDevice)->Acquire();
+	}
 	_nylonMenuActive = state;
 }
 

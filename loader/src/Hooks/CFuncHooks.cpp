@@ -132,7 +132,7 @@ bool PrintF(GH3::QbStruct* params, GH3::CScript* script)
             break;
     }
 
-    nylon::internal::LogGH3.Info(buffer);
+    // nylon::internal::LogGH3.Info(buffer);
 
     return true;
 }

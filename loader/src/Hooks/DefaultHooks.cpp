@@ -24,6 +24,8 @@
 #include <GH3/DirectX.hpp>
 #include <GH3/CRC.hpp>
 
+#include <XInput.h>
+
 namespace cfg = nylon::Config;
 constexpr int INST_NOP = 0x90;
 
@@ -80,8 +82,17 @@ HWND detourCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowN
 
 LRESULT detourDispatchMessageA(MSG* lmMsg)
 {
+    LRESULT windProcResult = 0;
+
+    // V: Aspyr in their infinite wisdom didn't translate the fucking messages
     ::TranslateMessage(lmMsg);
-    return ::DispatchMessage(lmMsg);
+
+    // V: For some reason WindProc isn't being called correctly, so this is moved here
+    // TODO: look into this??
+    if (windProcResult = nylon::imgui::WindowProc(lmMsg->hwnd, lmMsg->message, lmMsg->wParam, lmMsg->lParam))
+        return windProcResult;
+
+    return nylon::hook::Orig<1600, nylon::hook::cconv::STDCall, LRESULT, MSG*>(lmMsg);
 }
 
 constexpr int KeyboardSetCooperativeLevelID = 4;
@@ -90,7 +101,7 @@ HRESULT KeyboardSetCooperativeLevel(void* self, HWND hwnd, DWORD dwFlags)
 {
     nylon::internal::Log.Info("KeyboardSetCooperativeLevel -> {:X}", dwFlags);
     auto ret = nylon::hook::Orig<KeyboardSetCooperativeLevelID, nylon::hook::cconv::STDCall, HRESULT>(self, hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-    (*gh3::KeyboardDevice)->Unacquire();
+    //(*gh3::KeyboardDevice)->Unacquire();
 
     return ret;
 }
@@ -100,7 +111,7 @@ HRESULT MouseSetCooperativeLevel(void* self, HWND hwnd, DWORD dwFlags)
 {
     nylon::internal::Log.Info("MouseSetCooperativeLevel -> {:X}", dwFlags);
     auto ret = nylon::hook::Orig<MouseSetCooperativeLevelID, nylon::hook::cconv::STDCall, HRESULT>(self, hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-    (*gh3::MouseDevice)->Unacquire();
+    //(*gh3::MouseDevice)->Unacquire();
 
     return ret;
 }
@@ -163,25 +174,24 @@ using WindowProc = nylon::hook::Binding<0x00578880, nylon::hook::cconv::STDCall,
 LRESULT(__cdecl** AspyrDefWindowProcA)(HWND, UINT, WPARAM, LPARAM) = reinterpret_cast<LRESULT(__cdecl**)(HWND, UINT, WPARAM, LPARAM)>(0x00898020);
 bool(__cdecl* Kbd_KeyboardStringHandler_sUpdate)(HWND, uint32_t, WPARAM, LPARAM) = reinterpret_cast<bool(__cdecl*)(HWND, uint32_t, WPARAM, LPARAM)>(0x00554850);
 
-
 LRESULT detourWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    nylon::imgui::WindowProc(hWnd, uMsg, wParam, lParam);
+    LRESULT windProcResult = 0;
 
-#pragma region GH3 Wind Proc
-    LRESULT windProcResult = false;
+    if (!nylon::imgui::GetNylonMenuActive())
+    {
+        if ((uMsg == WM_SETCURSOR) && ((short)lParam == HTCLIENT))
+        {
+            SetCursor(NULL);
+            return true;
+        }
 
-    if (Kbd_KeyboardStringHandler_sUpdate(hWnd, uMsg, wParam, lParam))
-        return 0;
+        if (windProcResult = Kbd_KeyboardStringHandler_sUpdate(hWnd, uMsg, wParam, lParam))
+            return windProcResult;
+    }
 
-
-    windProcResult = (*AspyrDefWindowProcA)(hWnd, uMsg, wParam, lParam);
-    if (windProcResult)
+    if (windProcResult = (*AspyrDefWindowProcA)(hWnd, uMsg, wParam, lParam))
         return windProcResult;
-
-#pragma endregion
-
-    return 0;
 }
 
 
@@ -329,7 +339,7 @@ void nylon::internal::SetupDefaultHooks()
         detourCreateWindowExA
     );
 
-    nylon::hook::CreateHook<6, nylon::hook::cconv::STDCall>(
+    nylon::hook::CreateHook<1600, nylon::hook::cconv::STDCall>(
         reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "DispatchMessageA")),
         detourDispatchMessageA
     );

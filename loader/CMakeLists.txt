@@ -49,6 +49,8 @@ target_link_libraries(${PROJECT_NAME} nylon mat-json-impl)
 CPMAddPackage("gh:TsudaKageyu/minhook#master")
 target_link_libraries(${PROJECT_NAME} minhook)
 
+target_link_libraries(${PROJECT_NAME} "$ENV{DXSDK_DIR}Lib/x86/xinput.lib")
+
 target_link_libraries(${PROJECT_NAME} "$ENV{DXSDK_DIR}Lib/x86/d3dx9.lib")
 target_include_directories(${PROJECT_NAME} PUBLIC "$ENV{DXSDK_DIR}Include/")
 
