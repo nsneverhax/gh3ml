@@ -77,8 +77,10 @@ LRESULT nylon::imgui::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 void nylon::imgui::SetNylonMenuActive(bool state)
 {
-	if (!_nylonMenuActive != state)
+	if (_nylonMenuActive == state)
 		return;
+
+	_nylonMenuActive = state;
 
 	// V: State change
 
@@ -94,7 +96,6 @@ void nylon::imgui::SetNylonMenuActive(bool state)
 		(*gh3::KeyboardDevice)->Acquire();
 		(*gh3::MouseDevice)->Acquire();
 	}
-	_nylonMenuActive = state;
 }
 
 bool nylon::imgui::GetNylonMenuActive()
