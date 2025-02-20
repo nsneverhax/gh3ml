@@ -31,23 +31,22 @@ namespace nylon::hook
         auto& data = Hooks[id];
         size_t index = data.Hooks.size() - ++data.OrigIndex;
 
+        if (index == 0)
+            data.OrigIndex = 0;
+
         if constexpr (std::is_same_v<Ret, void>)
         {
             if (index == 0)
                 Cconv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
             else
                 reinterpret_cast<Ret(*)(Args...)>(data.Hooks[index])(args...);
-            data.OrigIndex = 0;
         }
         else
         {
-            Ret ret;
             if (index == 0)
-                ret = Cconv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
+                return Cconv::template Trampoline<Ret, Args...>(data.Hooks[index], args...);
             else
-                ret = reinterpret_cast<Ret(*)(Args...)>(data.Hooks[index])(args...);
-            data.OrigIndex = 0;
-            return ret;
+                return reinterpret_cast<Ret(*)(Args...)>(data.Hooks[index])(args...);
         }
     }
 
