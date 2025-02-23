@@ -92,8 +92,14 @@ nylon::CommandConsole::CommandConsole()
 	ZeroMemory(m_inputBuffer, sizeof(m_inputBuffer));
 	m_inputHistory.reserve(CommandConsole::DefaultHistorySize);
 	m_history.reserve(CommandConsole::DefaultHistorySize);
+
+	RegisterCommand(ConsoleCommand("help", "Displays help for a given command.", nullptr));
 }
 
+bool nylon::CommandConsole::RegisterCommand(const ConsoleCommand& command)
+{
+	return true;
+}
 const char* nylon::CommandConsole::GetInputBuffer() const
 {
 	return m_inputBuffer;
@@ -136,9 +142,7 @@ void nylon::CommandConsole::Draw()
 
 	if (ImGui::InputText("##Input", m_inputBuffer, sizeof(m_inputBuffer) - 1, inputTextFlags, TextInputCallback, this))
 	{
-		std::string input = { m_inputBuffer };
-
-		PushHistory("] " + input);
+		PushHistory(std::format("] {}", m_inputBuffer));
 
 
 		m_shouldScroll = true;
@@ -146,11 +150,10 @@ void nylon::CommandConsole::Draw()
 
 		reclaimFocus = true;
 
-		if (!m_conVars.contains(input))
-			PushHistory(std::format("Unrecognized Command: '{}'", input));
-		
-
+		if (!m_commands.contains(m_inputBuffer))
+			PushHistory(std::format("Unrecognized Command: '{}'", m_inputBuffer));
 	}
+
 	ImGui::PopItemWidth();
 
 	ImGui::SetItemDefaultFocus();

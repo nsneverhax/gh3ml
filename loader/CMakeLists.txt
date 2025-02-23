@@ -37,6 +37,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
     OUTPUT_NAME "nylon"
 )
+target_compile_definitions(${PROJECT_NAME} PRIVATE NYLON_PLATFORM_PC)
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     copyfile(${PROJECT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/nylon.pdb ${NYLON_OUT_PATH}/nylon.pdb)
