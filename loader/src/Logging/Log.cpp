@@ -22,16 +22,20 @@ nylon::Log::LogLevel _currentLogLevel = nylon::Log::LogLevel::INFO;
 
 void nylon::Log::AdjustConsoleBuffer(int16_t minLength)
 {
+#ifdef NYLON_PLATFORM_PC
     // Set the screen buffer to be big enough to scroll some text
     CONSOLE_SCREEN_BUFFER_INFO conInfo;
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &conInfo);
     if (conInfo.dwSize.Y < minLength)
         conInfo.dwSize.Y = minLength;
     SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), conInfo.dwSize);
+#endif
 }
 
 bool nylon::Log::RedirectConsoleIO()
 {
+#ifdef NYLON_PLATFORM_PC
+
     bool result = true;
     FILE* fp;
 
@@ -68,6 +72,9 @@ bool nylon::Log::RedirectConsoleIO()
     std::cin.clear();
 
     return result;
+#else
+    return false;
+#endif
 }
 
 
@@ -84,6 +91,8 @@ void nylon::Log::SetLogLevel(LogLevel level)
 	
 bool nylon::Log::CreateConsole()
 {
+#ifdef NYLON_CONSOLE_PC
+
     bool result = false;
 
     // Release any current console and redirect IO to NUL
@@ -97,10 +106,14 @@ bool nylon::Log::CreateConsole()
     }
 
     return result;
+#else
+    return false;
+#endif
 }
 
 bool nylon::Log::ReleaseConsole()
 {
+#ifdef NYLON_PLATFORM_PC
     bool result = true;
     FILE* fp;
 
@@ -129,6 +142,9 @@ bool nylon::Log::ReleaseConsole()
         result = false;
 
     return result;
+#else
+return false;
+#endif
 }
 
 void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const char* message, uint32_t indentLevel)
@@ -136,6 +152,7 @@ void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const cha
     if (level < GetLogLevel())
         return;
 
+#ifdef NYLON_PLATFORM_PC
     auto const now = std::chrono::current_zone()->to_local(std::chrono::system_clock::now());
 
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -179,4 +196,5 @@ void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const cha
 
     std::cout << prefix << message << std::endl;
     nylon::internal::LogStream() << prefix << message << std::endl;
+#endif
 }
