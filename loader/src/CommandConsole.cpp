@@ -19,6 +19,17 @@ extern nylon::CommandConsole nylon::Console = { };
 //	}
 //}
 
+bool HelpCommandCallback(nylon::CommandConsole& caller, std::vector<std::string> arguments)
+{
+	return true;
+}
+
+bool ColonThreeCallback(nylon::CommandConsole& caller, std::vector<std::string> arguments)
+{
+	caller.PushHistory(":3");
+
+	return true;
+}
 
 int TextInputCallback_CallbackHistory(nylon::CommandConsole* console, ImGuiInputTextCallbackData* data)
 {
@@ -94,10 +105,16 @@ nylon::CommandConsole::CommandConsole()
 	m_history.reserve(CommandConsole::DefaultHistorySize);
 
 	RegisterCommand(ConsoleCommand("help", "Displays help for a given command.", nullptr));
+	RegisterCommand(ConsoleCommand(":3", ":3", ColonThreeCallback));
 }
 
 bool nylon::CommandConsole::RegisterCommand(const ConsoleCommand& command)
 {
+	if (m_commands.contains(command.Name))
+		return false;
+
+	m_commands.insert({ std::string(command.Name), ConsoleCommand(command) });
+
 	return true;
 }
 const char* nylon::CommandConsole::GetInputBuffer() const
@@ -119,7 +136,9 @@ const nylon::ConsoleHistory& nylon::CommandConsole::GetHistory() const
 }
 void nylon::CommandConsole::ClearHistory()
 {
+	m_history.clear();
 }
+
 void nylon::CommandConsole::Draw()
 {
 	if (!ImGui::Begin("Nylon Console"))
@@ -142,16 +161,30 @@ void nylon::CommandConsole::Draw()
 
 	if (ImGui::InputText("##Input", m_inputBuffer, sizeof(m_inputBuffer) - 1, inputTextFlags, TextInputCallback, this))
 	{
-		PushHistory(std::format("] {}", m_inputBuffer));
+		if (m_inputBuffer[0] != '\0')
+		{
+			PushHistory(std::format("] {}", m_inputBuffer));
 
 
-		m_shouldScroll = true;
+			m_shouldScroll = true;
+
+			reclaimFocus = true;
+
+			if (!m_commands.contains(m_inputBuffer))
+				PushHistory(std::format("Unrecognized Command: '{}'", m_inputBuffer));
+			else
+			{
+				ConsoleCommandCallback callback = m_commands[m_inputBuffer].Callback;
+
+				if (callback == nullptr)
+					PushHistory(std::format("Command: '{}' had a null callback!", m_inputBuffer));
+				else
+				{
+					callback(*this, std::vector<std::string>());
+				}
+			}
+		}
 		ZeroMemory(m_inputBuffer, sizeof(m_inputBuffer));
-
-		reclaimFocus = true;
-
-		if (!m_commands.contains(m_inputBuffer))
-			PushHistory(std::format("Unrecognized Command: '{}'", m_inputBuffer));
 	}
 
 	ImGui::PopItemWidth();

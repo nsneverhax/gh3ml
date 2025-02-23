@@ -9,10 +9,14 @@ namespace nylon
 {
 	class CommandConsole;
 
-	typedef void(*ConsoleCommandCallback)(CommandConsole&, std::vector<std::string>);
+	typedef bool(*ConsoleCommandCallback)(CommandConsole&, std::vector<std::string>);
 
 	struct ConsoleCommand
 	{
+		ConsoleCommand()
+		{
+
+		}
 		ConsoleCommand(std::string_view name, std::string_view description, ConsoleCommandCallback callback)
 		{
 			Name = std::string(name);
@@ -23,6 +27,7 @@ namespace nylon
 		{
 			Name = source.Name;
 			Description = source.Description;
+			Callback = source.Callback;
 		}
 
 		std::string Name = { };
@@ -49,15 +54,15 @@ namespace nylon
 
 		CommandConsole();
 		bool RegisterCommand(const ConsoleCommand& command);
+
 		const char* GetInputBuffer() const;
 
 
 		void SetHistorySize(uint32_t size);
 		uint32_t GetHistorySize() const;
-		const ConsoleHistory& GetHistory() const;
 		void PushHistory(std::string_view text);
+		const ConsoleHistory& GetHistory() const;
 		void ClearHistory();
-
 
 		void Draw();
 	};
