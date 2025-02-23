@@ -335,7 +335,7 @@ void nylon::internal::SetupDefaultHooks()
     Log.Info("Setting up default hooks...");
 
     // Vultu: I really don't feel like rewriting the entire function for right now
-// so I'm going NOP where some global variables are set
+    // so I'm going NOP where some global variables are set
     uint8_t buffer[6];
     memset(buffer, INST_NOP, sizeof(buffer));
 

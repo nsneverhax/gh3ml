@@ -22,11 +22,11 @@ add_library(${PROJECT_NAME} SHARED
     "src/CFunc/CFuncManager.cpp"
     "src/Logging/LogFile.cpp"
     "src/Logging/LogSource.cpp"
+    "src/CommandConsole.cpp"
 
     "src/Hooks/CFuncHooks.cpp"
 
     "src/Imgui/ImGui.cpp"
-    "src/Imgui/ImguiConsole.cpp"
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

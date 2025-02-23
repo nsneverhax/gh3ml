@@ -1,11 +1,9 @@
 #include "Imgui.hpp"
-#include "ImGuiConsole.hpp"
+#include <Nylon/CommandConsole.hpp>
 
 #include <GH3/DirectX.hpp>
 #include <GH3/Addresses.hpp>
 #include <XInput.h>
-
-nylon::internal::ImGuiConsole _console = { };
 
 void nylon::imgui::BeginFrame()
 {
@@ -37,7 +35,10 @@ LRESULT nylon::imgui::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 {
 	static bool waitForTabRelease = false;
 
-	LRESULT windProcResult = 0;
+	if (!_nylonMenuActive)
+		XInputEnable(true);
+
+	LRESULT windProcResult = ERROR_SUCCESS;
 
 	if (windProcResult = ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 		return windProcResult;
@@ -53,7 +54,7 @@ LRESULT nylon::imgui::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 				SetNylonMenuActive(!GetNylonMenuActive());
 
 			waitForTabRelease = true;
-			return 0;
+			return ERROR_SUCCESS;
 		default:
 			break;
 		}
@@ -63,7 +64,7 @@ LRESULT nylon::imgui::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		{
 		case VK_OEM_3:
 			waitForTabRelease = false;
-			return 0;
+			return ERROR_SUCCESS;
 		default:
 			break;
 		}
@@ -72,7 +73,7 @@ LRESULT nylon::imgui::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		break;
 	}
 
-	return 0;
+	return ERROR_SUCCESS;
 }
 
 void nylon::imgui::SetNylonMenuActive(bool state)
@@ -121,6 +122,7 @@ void nylon::imgui::NylonMenu()
 	std::string title = "Nylon Menu " + std::string(nylon::VersionString);
 	
 	bool active = GetNylonMenuActive();
+	//ImGui::SetWindowFontScale(2);
 
 	if (ImGui::Begin(title.c_str(), &active, window_flags))
 	{
@@ -166,8 +168,8 @@ void nylon::imgui::NylonMenu()
 		ImGui::End();
 	}
 
-	_console.Draw();
+	Console.Draw();
 
-	if (!active && GetNylonMenuActive ())
+	if (!active && GetNylonMenuActive())
 		SetNylonMenuActive(false);
 }
