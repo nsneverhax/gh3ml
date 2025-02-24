@@ -15,19 +15,19 @@ namespace GH3
 	public:
 		Script::CComponent* ComponentList;
 
-		bool GetKey(uint32_t key, uint32_t& outKey, int param_3 = 1);
-		bool GetFloat(uint32_t key, float& out, int param_3 = 1);
-		bool GetQbArrayItem(uint32_t key, void* out, int param_3 = 1);
+		bool GetKey(CRCKey key, CRCKey& outKey, int param_3 = 1);
+		bool GetFloat(CRCKey key, float& out, int param_3 = 1);
+		bool GetQbArrayItem(CRCKey key, void* out, int param_3 = 1);
 
-		bool GetInt(uint32_t key, int32_t& value, int param_3 = 1);
-		bool GetUInt(uint32_t key, uint32_t& value, int param_3 = 1);
+		bool GetInt(CRCKey key, int32_t& value, int param_3 = 1);
+		bool GetUInt(CRCKey key, uint32_t& value, int param_3 = 1);
 
-		bool GetString(uint32_t key, char** out, int param_3 = 1);
+		bool GetString(CRCKey key, char** out, int param_3 = 1);
 		//bool GetWString(uint32_t key, const& out, int param_3 = 1);
 		//bool GetPair(uint32_t key, float& out, int param_3 = 1);
 		//bool GetVector(uint32_t key, float& out, int param_3 = 1);
-		bool GetStruct(uint32_t key, float& out, int param_3 = 1);
-		bool HasKey(uint32_t key);
+		bool GetStruct(CRCKey key, float& out, int param_3 = 1);
+		bool HasKey(CRCKey key);
 	};
 
 	namespace Functions

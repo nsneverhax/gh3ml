@@ -17,21 +17,24 @@ namespace nylon
 		{
 
 		}
-		ConsoleCommand(std::string_view name, std::string_view description, ConsoleCommandCallback callback)
+		ConsoleCommand(std::string_view name, std::string_view description, std::string_view exampleUsage, ConsoleCommandCallback callback)
 		{
 			Name = std::string(name);
 			Description = std::string(description);
+			ExampleUsage = std::string(exampleUsage);
 			Callback = callback;
 		}
 		ConsoleCommand(const ConsoleCommand& source)
 		{
 			Name = source.Name;
 			Description = source.Description;
+			ExampleUsage = source.ExampleUsage;
 			Callback = source.Callback;
 		}
 
 		std::string Name = { };
 		std::string Description = { };
+		std::string ExampleUsage = { };
 		ConsoleCommandCallback Callback = nullptr;
 	};
 
@@ -45,6 +48,8 @@ namespace nylon
 		ConsoleHistory m_inputHistory = { };
 		ConsoleHistory m_history = { };
 		std::map<std::string, ConsoleCommand> m_commands = { };
+
+		std::vector<std::string> ParseArguments();
 
 		void DrawLog();
 		
@@ -63,6 +68,9 @@ namespace nylon
 		void PushHistory(std::string_view text);
 		const ConsoleHistory& GetHistory() const;
 		void ClearHistory();
+
+		bool HasConsoleCommand(const std::string& name) const;
+		const ConsoleCommand& GetConsoleCommand(const std::string& name);
 
 		void Draw();
 	};

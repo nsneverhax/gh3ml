@@ -19,12 +19,34 @@ extern nylon::CommandConsole nylon::Console = { };
 //	}
 //}
 
+#pragma region Callbacks
 bool HelpCommandCallback(nylon::CommandConsole& caller, std::vector<std::string> arguments)
 {
+	if (arguments.size() == 1)
+		caller.PushHistory(caller.GetConsoleCommand("help").Description);
+	else if (arguments.size() == 2)
+	{
+		if (caller.HasConsoleCommand(arguments[1]))
+		{
+			auto command = caller.GetConsoleCommand(arguments[1]);
+			if (command.Description.size() == 0)
+				caller.PushHistory(std::format("Command: '{}' has no help.", command.Name));
+			else
+				caller.PushHistory(command.Description);
+
+			if (command.ExampleUsage.size() != 0)
+				caller.PushHistory(std::format("Example Usage: {}", command.ExampleUsage));
+		}
+		else
+			caller.PushHistory(std::format("Unrecognized Command: '{}'", arguments[1]));
+	}
+	else
+		caller.PushHistory("Invalid argument count.");
+
 	return true;
 }
 
-bool ColonThreeCallback(nylon::CommandConsole& caller, std::vector<std::string> arguments)
+bool ColonThreeCommandCallback(nylon::CommandConsole& caller, std::vector<std::string> arguments)
 {
 	caller.PushHistory(":3");
 
@@ -60,16 +82,23 @@ int TextInputCallback(ImGuiInputTextCallbackData* data)
 	}
 	return 0;
 }
-void nylon::CommandConsole::PushHistory(std::string_view text)
+#pragma endregion
+
+std::vector<std::string> nylon::CommandConsole::ParseArguments()
 {
-	m_history.insert(m_history.begin(), std::string(text));
+	std::vector<std::string> tokens;
+	size_t pos = 0;
+	std::string token;
+	std::string s = { m_inputBuffer };
+	while ((pos = s.find(' ')) != std::string::npos) {
+		token = s.substr(0, pos);
+		tokens.push_back(token);
+		s.erase(0, pos + 1);
+	}
+	tokens.push_back(s);
 
-	if (m_history.size() >= CommandConsole::DefaultHistorySize)
-		m_history.pop_back();
-
-	m_shouldScroll = true;
+	return tokens;
 }
-
 void nylon::CommandConsole::DrawLog()
 {
 	const float footerHeightToReserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
@@ -104,8 +133,10 @@ nylon::CommandConsole::CommandConsole()
 	m_inputHistory.reserve(CommandConsole::DefaultHistorySize);
 	m_history.reserve(CommandConsole::DefaultHistorySize);
 
-	RegisterCommand(ConsoleCommand("help", "Displays help for a given command.", nullptr));
-	RegisterCommand(ConsoleCommand(":3", ":3", ColonThreeCallback));
+	RegisterCommand(ConsoleCommand("help", "Displays help for a given command.", "help <command>", HelpCommandCallback));
+	RegisterCommand(ConsoleCommand(":3", ":3", ":3", ColonThreeCommandCallback));
+	RegisterCommand(ConsoleCommand("monitorvar", "", "", nullptr));
+
 }
 
 bool nylon::CommandConsole::RegisterCommand(const ConsoleCommand& command)
@@ -130,6 +161,15 @@ uint32_t nylon::CommandConsole::GetHistorySize() const
 {
 	return m_history.size();
 }
+void nylon::CommandConsole::PushHistory(std::string_view text)
+{
+	m_history.insert(m_history.begin(), std::string(text));
+
+	if (m_history.size() >= CommandConsole::DefaultHistorySize)
+		m_history.pop_back();
+
+	m_shouldScroll = true;
+}
 const nylon::ConsoleHistory& nylon::CommandConsole::GetHistory() const
 {
 	return m_history;
@@ -137,6 +177,14 @@ const nylon::ConsoleHistory& nylon::CommandConsole::GetHistory() const
 void nylon::CommandConsole::ClearHistory()
 {
 	m_history.clear();
+}
+bool nylon::CommandConsole::HasConsoleCommand(const std::string& name) const
+{
+	return m_commands.contains(name);
+}
+const nylon::ConsoleCommand& nylon::CommandConsole::GetConsoleCommand(const std::string& name)
+{
+	return m_commands[name];
 }
 
 void nylon::CommandConsole::Draw()
@@ -165,22 +213,25 @@ void nylon::CommandConsole::Draw()
 		{
 			PushHistory(std::format("] {}", m_inputBuffer));
 
+			
+			auto arguments = ParseArguments();
 
 			m_shouldScroll = true;
 
 			reclaimFocus = true;
 
-			if (!m_commands.contains(m_inputBuffer))
-				PushHistory(std::format("Unrecognized Command: '{}'", m_inputBuffer));
+			if (!m_commands.contains(arguments[0]))
+				PushHistory(std::format("Unrecognized Command: '{}'", arguments[0]));
 			else
 			{
-				ConsoleCommandCallback callback = m_commands[m_inputBuffer].Callback;
+				ConsoleCommandCallback callback = m_commands[arguments[0]].Callback;
 
 				if (callback == nullptr)
-					PushHistory(std::format("Command: '{}' had a null callback!", m_inputBuffer));
+					PushHistory(std::format("Command: '{}' had a null callback!", arguments[0]));
 				else
 				{
-					callback(*this, std::vector<std::string>());
+
+					callback(*this, arguments);
 				}
 			}
 		}

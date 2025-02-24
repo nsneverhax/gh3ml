@@ -181,7 +181,7 @@ LRESULT __stdcall WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
     case WM_SETCURSOR:
-        if (nylon::imgui::GetNylonMenuActive())
+        if (nylon::imgui::GetNylonMenuActive() && GetCursor() == NULL)
             SetCursor(LoadCursor(nullptr, IDC_ARROW));
         else
             SetCursor(NULL);
@@ -196,10 +196,7 @@ LRESULT __stdcall WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             return windProcResult;
     }
 
-    //if (windProcResult = (*AspyrDefWindowProcA)(hWnd, uMsg, wParam, lParam))
-    //    return windProcResult;
-
-    return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
+    return (*AspyrDefWindowProcA)(hWnd, uMsg, wParam, lParam);
 }
 
 #pragma endregion
