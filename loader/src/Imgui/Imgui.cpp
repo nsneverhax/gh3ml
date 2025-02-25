@@ -127,7 +127,7 @@ void nylon::imgui::NylonMenu()
 	bool active = GetNylonMenuActive();
 	//ImGui::SetWindowFontScale(2);
 
-	if (ImGui::Begin(title.c_str(), &active, window_flags))
+	/*if (ImGui::Begin(title.c_str(), &active, window_flags))
 	{
 		if (ImGui::BeginMenuBar())
 		{
@@ -177,10 +177,10 @@ void nylon::imgui::NylonMenu()
 		}
 	}
 	ImGui::End();
-
+	*/
 	Console.Draw();
 
-	nylon::imgui::TextureViewer();
+	// nylon::imgui::TextureViewer();
 
 	if (!active && GetNylonMenuActive())
 		SetNylonMenuActive(false);

@@ -1,6 +1,7 @@
 #include <Nylon/CommandConsole.hpp>
+#include <Nylon/VersionInfo.hpp>
 #include "Main.hpp"
-
+#include <format>
 #include "Imgui/ImGui.hpp"
 
 extern nylon::CommandConsole nylon::Console = { };
@@ -293,7 +294,13 @@ const nylon::ConsoleCommand& nylon::CommandConsole::GetConsoleCommand(const std:
 
 void nylon::CommandConsole::Draw()
 {
-	if (!ImGui::Begin("Nylon Console"))
+	static std::string consoleTitleString = "";
+	if (consoleTitleString.empty())
+	{
+		consoleTitleString = std::format("Nylon Console - v{}", to_string(nylon::Version()));
+	}
+
+	if (!ImGui::Begin(consoleTitleString.c_str()))
 	{
 		ImGui::End();
 		return;
