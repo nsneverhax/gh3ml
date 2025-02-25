@@ -21,6 +21,7 @@ namespace nylon::internal
 	extern void LoadMods();
 	
 	void ReadConfig();
-	
+	void WriteConfig();
+
 	extern std::map<GH3::CRCKey, char*> KeyAssociations;
 }

@@ -1,5 +1,6 @@
 #include "Imgui.hpp"
 #include <Nylon/CommandConsole.hpp>
+#include <Nylon/VersionInfo.hpp>
 
 #include <GH3/DirectX.hpp>
 #include <GH3/Addresses.hpp>
@@ -104,6 +105,8 @@ bool nylon::imgui::GetNylonMenuActive()
 	return _nylonMenuActive;
 }
 
+bool showTextureViewer = false;
+
 void nylon::imgui::NylonMenu()
 {
 	static bool whammyMAde = false;
@@ -119,7 +122,7 @@ void nylon::imgui::NylonMenu()
 		return;
 
 	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar;
-	std::string title = "Nylon Menu " + std::string(nylon::VersionString);
+	std::string title = "Nylon Menu " + to_string(nylon::Version());
 	
 	bool active = GetNylonMenuActive();
 	//ImGui::SetWindowFontScale(2);
@@ -133,6 +136,10 @@ void nylon::imgui::NylonMenu()
 				if (ImGui::MenuItem("Hash Map Browser"))
 				{
 
+				}
+				if (ImGui::MenuItem("Texture Viewer"))
+				{
+					showTextureViewer = true;
 				}
 				ImGui::EndMenu();
 			}
@@ -150,26 +157,77 @@ void nylon::imgui::NylonMenu()
 			ImGui::EndMenuBar();
 		}
 
-		D3DSURFACE_DESC surfaceDesc;
+		//D3DSURFACE_DESC surfaceDesc;
 		//conduitTapTextures[conduitFrame]->GetLevelDesc(0, &surfaceDesc);
 	
 	
 		//ImGui::Image((ImTextureID)(intptr_t)conduitTapTextures[conduitFrame], ImVec2(surfaceDesc.Width, surfaceDesc.Height));
-	
+
+		// ImGui::Text(nylon::CompileDate);
+		ImGui::Text(nylon::CompileDateTime.data());
+
 		ImGui::InputDouble("FrameTime?", GH3::Time::DOUBLE_00b544b8);
 
 		for (auto i = 0; i < 9; i++)
 		{
-			std::string str = "Param";
+			std::string str = "Whammy Param";
 			str.append(std::to_string(i));
 
-			ImGui::SliderFloat(str.data(), &whammyMultipliers[i], 0.0, 10.0f);
+			ImGui::SliderFloat(str.data(), &whammyMultipliers[i], 0.0, 1.0f);
 		}
-		ImGui::End();
 	}
+	ImGui::End();
 
 	Console.Draw();
 
+	nylon::imgui::TextureViewer();
+
 	if (!active && GetNylonMenuActive())
 		SetNylonMenuActive(false);
+}
+
+void nylon::imgui::TextureViewer()
+{
+	LPDIRECT3DTEXTURE9* textures = reinterpret_cast<LPDIRECT3DTEXTURE9*>(0x00c5e788);
+
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar;
+	if (ImGui::Begin("Texture Viewer", &showTextureViewer, window_flags))
+	{
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("Windows"))
+			{
+				if (ImGui::MenuItem("Hash Map Browser"))
+				{
+
+				}
+				if (ImGui::MenuItem("Texture Viewer"))
+				{
+					showTextureViewer = true;
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Chart"))
+			{
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Debug"))
+			{
+
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMenuBar();
+		}
+
+		ImGui::Text("ID: 0");
+		if (textures != nullptr && textures[0] != nullptr)
+		{
+			D3DSURFACE_DESC surfaceDesc;
+			textures[0]->GetLevelDesc(0, &surfaceDesc);
+			ImGui::Image((ImTextureID)(intptr_t)textures[0], ImVec2(surfaceDesc.Width, surfaceDesc.Height));
+		}
+	}
+	ImGui::End();
 }

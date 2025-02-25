@@ -19,6 +19,8 @@ add_library(${PROJECT_NAME} SHARED
     "src/Hooks/Hook.cpp"
     "src/Hooks/DirectXHooks.cpp"
     "src/ModInfo.cpp"
+    "src/VersionInfo.cpp"
+
     "src/CFunc/CFuncManager.cpp"
     "src/CFunc/DefaultCFuncs.cpp"
     "src/Logging/LogFile.cpp"

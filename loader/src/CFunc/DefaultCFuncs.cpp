@@ -32,3 +32,32 @@ bool cf::RegisterConVar(GH3::QbStruct* params, GH3::CScript* script)
 {
 	return true;
 }
+extern bool cf::PrintStructReportType = true;
+
+bool cf::SetPrintStructReportType(GH3::QbStruct * params, GH3::CScript * script)
+{
+	if (params->HasKey(KEY_TRUE))
+		PrintStructReportType = true;
+	else if (params->HasKey(KEY_FALSE))
+		PrintStructReportType = false;
+	return true;
+}
+bool cf::GetPrintStructReportType(GH3::QbStruct* params, GH3::CScript* script)
+{
+	return PrintStructReportType;
+}
+
+extern bool cf::PrintStructReportName = true;
+
+bool cf::SetPrintStructReportName(GH3::QbStruct* params, GH3::CScript* script)
+{
+	if (params->HasKey(KEY_TRUE))
+		PrintStructReportType = true;
+	else if (params->HasKey(KEY_FALSE))
+		PrintStructReportType = false;
+	return true;
+}
+bool cf::GetPrintStructReportName(GH3::QbStruct* params, GH3::CScript* script)
+{
+	return PrintStructReportType;
+}

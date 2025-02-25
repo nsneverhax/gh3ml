@@ -5,21 +5,16 @@
 #include <string>
 #include <filesystem>
 
+#include <chrono>
+#include <type_traits>
+
 namespace nylon
 {
-	// Vultu: VERSIONING RULES:
-	// Major : a change resulting in API differences that are not backwards compatible
-	// Minor : a change resulting in API differences that are backwards compatible
-	// Patch : backwards compatible bug fixes
+	constexpr std::string_view CompileDate = __DATE__;
+	constexpr std::string_view CompileTime = __TIME__;
+	constexpr std::string_view CompileDateTime = __DATE__ " " __TIME__;
 
-	constexpr uint32_t VersionMajor = 1;
-	constexpr uint32_t VersionMinor = 3;
-	constexpr uint32_t VersionPatch = 0;
-
-	constexpr std::string_view VersionType = "alpha";
-
-	constexpr std::string_view VersionString = "1.3.0-alpha";
-
+	
 	/// <summary>
 	/// The current directory of the Guitar Hero III executable
 	/// </summary>
@@ -45,8 +40,15 @@ namespace nylon
 
 	const HANDLE GH3Handle();
 
-	bool ReadMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size, size_t* actualSize = nullptr);
-	bool WriteMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size, size_t* actualSize = nullptr);
+	bool ReadMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size, size_t* actualWritten = nullptr);
+
+	bool WriteMemory(uintptr_t baseAddress, uint8_t* buffer, size_t size, size_t* actualWritten = nullptr);
+
+	template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+	inline bool WriteMemory(uintptr_t baseAddress, T value, size_t* actualWritten = nullptr)
+	{
+		return WriteMemory(baseAddress, reinterpret_cast<uint8_t*>(&value), sizeof(value), actualWritten);
+	}
 
 	/// <summary>
 	/// not yet functional! 

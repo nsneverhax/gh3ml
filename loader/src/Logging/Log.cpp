@@ -91,7 +91,7 @@ void nylon::Log::SetLogLevel(LogLevel level)
 	
 bool nylon::Log::CreateConsole()
 {
-#ifdef NYLON_CONSOLE_PC
+#ifdef NYLON_PLATFORM_PC
 
     bool result = false;
 

@@ -9,29 +9,69 @@
 
 namespace fs = std::filesystem;
 namespace in = nylon::internal;
-namespace cfg = nylon::Config;
+namespace cfg = nylon::config;
 
-uint32_t _versionMajor = 0;
-uint32_t _versionMinor = 0;
-uint32_t _versionPatch = 0;
-uint32_t _versionType = 0;
+nylon::VersionInfo _versionInfo = { };
 
 bool _unlockFPS = false;
 bool _openConsole = false;
 bool _allowScriptPrintf = false;
 cfg::WindowStyle _windowStyle = cfg::WindowStyle::Fullscreen;
 
+bool _configMalformed = false;
 
-void nylon::internal::ReadConfig()
+void UnwrapValue(matjson::Value& value, std::string_view name, bool* outValue, bool defaultValue)
 {
-	bool malformed = false;
+	if (outValue == nullptr)
+		return;
+
+	*outValue = defaultValue;
+	try
+	{
+		if (!value.contains(name.data()))
+			return;
+
+		*outValue = value[name.data()].asBool().unwrap();
+
+		return;
+	}
+	catch (...)
+	{
+		_configMalformed = true;
+		return;
+	}
+}
+void UnwrapValue(matjson::Value& value, std::string_view name, uint32_t* outValue, uint32_t defaultValue)
+{
+	if (outValue == nullptr)
+		return;
+
+	*outValue = defaultValue;
+	try
+	{
+		if (!value.contains(name.data()))
+			return;
+
+		*outValue = value[name.data()].asUInt().unwrap();
+
+		return;
+	}
+	catch (...)
+	{
+		_configMalformed = true;
+		return;
+	}
+}
+
+void in::ReadConfig()
+{
+	_configMalformed = true;
 
 	if (!fs::exists(cfg::ConfigFilepath()))
 	{
 		in::Log.Warn("Unable to find \"{}\" so it will be remade.", cfg::ConfigFilepath().string());
 
 	}
-
 
 	std::ifstream t(cfg::ConfigFilepath().c_str());
 	std::stringstream buffer;
@@ -51,38 +91,62 @@ void nylon::internal::ReadConfig()
 
 	if (object.contains("versionInfo"))
 	{
-		_versionMajor = object["versionInfo"]["major"].asUInt().unwrap();
-		_versionMinor = object["versionInfo"]["minor"].asUInt().unwrap();
-		_versionPatch = object["versionInfo"]["revision"].asUInt().unwrap();
-		_versionType = object["versionInfo"]["type"].asUInt().unwrap();
+		auto versionValue = object["versionInfo"];
+		UnwrapValue(versionValue, "major", &_versionInfo.Major, nylon::Version().Major);
+		UnwrapValue(versionValue, "minor", &_versionInfo.Minor, nylon::Version().Minor);
+		UnwrapValue(versionValue, "revision", &_versionInfo.Revision, nylon::Version().Revision);
+		UnwrapValue(versionValue, "type", reinterpret_cast<uint32_t*>(&_versionInfo.Type), (uint32_t)nylon::Version().Type);
+
+		if (_versionInfo != nylon::Version())
+			_configMalformed = true;
 	}
 	else
-		malformed = true;
+		_configMalformed = true;
 
-	if (object.contains("unlockfps"))
-		_unlockFPS = object["unlockfps"].asBool().unwrap();
-	else
-		malformed = true;
+	UnwrapValue(object, "unlockfps", &_unlockFPS, false);
+	UnwrapValue(object, "openGH3Console", &_openConsole, true);
+	UnwrapValue(object, "allowQScriptPrintf", &_allowScriptPrintf, true);
 
-	if (object.contains("openGH3Console"))
-		_openConsole = object["openGH3Console"].asBool().unwrap();
-	else
-		malformed = true;
+	UnwrapValue(object, "windowStyle", reinterpret_cast<uint32_t*>(&_windowStyle), (uint32_t)cfg::WindowStyle::Windowed);
 
-	if (object.contains("allowQScriptPrintf"))
-		_allowScriptPrintf = object["allowQScriptPrintf"].asBool().unwrap();
-	else
-		malformed = true;
-
-	if (object.contains("windowStyle"))
-		_windowStyle = static_cast<cfg::WindowStyle>(object["windowStyle"].asUInt().unwrap());
-	else
-		malformed = true;
-
-	if (malformed)
+	if (_configMalformed)
 	{
-		in::Log.Warn("\"{}\" was malformed, so it will be remade using known values.", cfg::ConfigFilepath().string());
+		in::Log.Warn("\"{}\" was malformed or the version didn't match, so it will be remade using known values.", cfg::ConfigFilepath().string());
+		WriteConfig();
+	}
+}
 
+void in::WriteConfig()
+{
+	try
+	{
+		auto obj = matjson::makeObject(
+			{
+				{ "openGH3Console", true },
+				{ "allowQScriptPrintf", true },
+				{ "windowStyle", 1 },
+				{ "pluginLogType", 1 },
+				{ "unlockfps", false },
+				{ "versionInfo", matjson::makeObject({
+					{ "major", nylon::Version().Major},
+					{ "minor", nylon::Version().Minor },
+					{ "revision", nylon::Version().Revision },
+					{ "type", (uint32_t)nylon::Version().Type },
+					}),
+
+				}
+			}
+		);
+
+		auto dumped = obj.dump();
+		std::ofstream dumpFile(nylon::NylonDirectory() / "config.json");
+
+		dumpFile << dumped.c_str();
+		dumpFile.close();
+	}
+	catch (...)
+	{
+		Log.Error("There was an unknown error writing the config file!");
 	}
 }
 
@@ -91,22 +155,11 @@ std::filesystem::path cfg::ConfigFilepath()
 	return nylon::NylonDirectory() / "config.json";
 }
 
-uint32_t cfg::VersionMajor()
+const nylon::VersionInfo& cfg::Version()
 {
-	return _versionMajor;
+	return _versionInfo;
 }
-uint32_t cfg::VersionMinor()
-{
-	return _versionMinor;
-}
-uint32_t cfg::VersionPatch()
-{
-	return _versionPatch;
-}
-uint32_t cfg::VersionType()
-{
-	return _versionType;
-}
+
 bool cfg::UnlockFPS()
 {
 	return _unlockFPS;

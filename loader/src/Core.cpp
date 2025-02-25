@@ -3,6 +3,7 @@
 
 #include <filesystem>
 
+
 std::filesystem::path nylon::GameDirectory()
 {
 	return std::filesystem::current_path();

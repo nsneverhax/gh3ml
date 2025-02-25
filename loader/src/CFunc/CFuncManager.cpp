@@ -1,5 +1,5 @@
 #include <Nylon/CFuncManager.hpp>
-
+#include <Nylon/DefaultCFuncs.hpp>
 #include <Nylon/Hook.hpp>
 
 
@@ -11,6 +11,12 @@ nylon::CFuncManager::CFuncManager()
 
 		m_functions.emplace(reinterpret_cast<uintptr_t>(descriptor.Function), std::string(descriptor.Name));
 	}
+
+	m_functions.emplace(reinterpret_cast<uintptr_t>(CFuncs::SetPrintStructReportType), "SetPrintStructReportType");
+	m_functions.emplace(reinterpret_cast<uintptr_t>(CFuncs::GetPrintStructReportType), "GetPrintStructReportType");
+
+	m_functions.emplace(reinterpret_cast<uintptr_t>(CFuncs::SetPrintStructReportName), "SetPrintStructReportName");
+	m_functions.emplace(reinterpret_cast<uintptr_t>(CFuncs::GetPrintStructReportName), "GetPrintStructReportName");
 }
 
 #include <iostream>

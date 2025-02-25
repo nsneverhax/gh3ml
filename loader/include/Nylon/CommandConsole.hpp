@@ -59,6 +59,7 @@ namespace nylon
 
 		CommandConsole();
 		bool RegisterCommand(const ConsoleCommand& command);
+		const std::map<std::string, ConsoleCommand>& GetCommands() const;
 
 		const char* GetInputBuffer() const;
 

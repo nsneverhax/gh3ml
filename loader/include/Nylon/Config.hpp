@@ -1,10 +1,11 @@
 #pragma once
 
 #include <Nylon/Core.hpp>
+#include <Nylon/VersionInfo.hpp>
 
 #include <filesystem>
 
-namespace nylon::Config
+namespace nylon::config
 {
 	enum class WindowStyle
 	{
@@ -13,13 +14,10 @@ namespace nylon::Config
 		BorderlessWindowed,
 		BorderlessFullscreen
 	};
-	
+
 	std::filesystem::path ConfigFilepath();
 
-	uint32_t VersionMajor();
-	uint32_t VersionMinor();
-	uint32_t VersionPatch();
-	uint32_t VersionType();
+	const VersionInfo& Version();
 	bool UnlockFPS();
 	bool OpenConsole();
 	bool AllowQScriptPrintf();

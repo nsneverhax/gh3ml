@@ -18,5 +18,5 @@ namespace nylon::imgui
 	bool GetNylonMenuActive();
 
 	void NylonMenu();
-
+	void TextureViewer();
 }

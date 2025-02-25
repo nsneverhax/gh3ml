@@ -26,7 +26,7 @@
 
 #include <XInput.h>
 
-namespace cfg = nylon::Config;
+namespace cfg = nylon::config;
 constexpr int INST_NOP = 0x90;
 
 constexpr int FUNC_INITIALIZEDEVICE = 0x0057B940;
@@ -121,7 +121,7 @@ using Video_InitializeDevice = nylon::hook::Binding<0x0057b940, nylon::hook::cco
 
 void detourVideo_InitializeDevice(void* engineParams)
 {
-    if (nylon::Config::UnlockFPS())
+    if (nylon::config::UnlockFPS())
     {
       // Vultu: We need to set the values we NOP'd out before
       union
@@ -212,7 +212,7 @@ bool detourSetNewWhammyValue(GH3::QbStruct* self)
 
 using CreateHighwayDrawRect = nylon::hook::Binding<0x00601d30, nylon::hook::cconv::CDecl, int, double*, float, float, float, float, float, float, float, float, float, float>;
 
-int deoutCreateHighwayDrawRect(double * array, float param_2, float param_3, float whammyTopWidth, float param_5, float whammyWidthOffset , float param_7, float param_8, float param_9, float param_10, float param_11)
+int deoutCreateHighwayDrawRect(double * array, float param_2, float param_3, float whammyTopWidth, float param_5, float whammyWidthOffset , float param_7, float param_8, float param_9, float whammyTailEnd, float whammyTailBegin)
 {
     // Vultu: I am not sure of the perf implications of calling this every call, but this will do until resizable windows get implemented i guess
     static int backBufferWidth = 0;
@@ -228,19 +228,19 @@ int deoutCreateHighwayDrawRect(double * array, float param_2, float param_3, flo
         pSurface->Release();
     }
     
-    float whammySizeMultiplier = ((float)backBufferWidth / 1280.0f) * 1.25f;
+    float whammySizeMultiplier = ((float)backBufferWidth / 1280.0f);
     return CreateHighwayDrawRect::Orig(
         array, 
         param_2 * whammyMultipliers[1],
-        param_3 * whammyMultipliers[2],
+        param_3 * whammyMultipliers[2], // Whammy Tail Lower ??
         whammyTopWidth * whammySizeMultiplier, 
-        param_5 * whammyMultipliers[3],
+        param_5 * whammyMultipliers[3] * whammySizeMultiplier,
         whammyWidthOffset * whammySizeMultiplier,
         param_7 * whammySizeMultiplier, 
         param_8 * whammyMultipliers[5],
         param_9 * whammyMultipliers[6],
-        param_10 * whammyMultipliers[7], // Whammy Tail End
-        param_11 * whammyMultipliers[8] // Whammy Tail Begin
+        whammyTailEnd * whammyMultipliers[7], // Whammy Glow ??
+        whammyTailBegin * whammyMultipliers[8] // Whammy Tail Begin
     );
 }
 
@@ -327,6 +327,16 @@ ATOM detour__RegisterClassA(WNDCLASSA* lpWndClass)
     return RegisterClassA(lpWndClass);
 }
 
+
+using ControllerUpdate = nylon::hook::Binding<0x0047e5b0, nylon::hook::cconv::CDecl, void, void*>;
+void detour__ControllerUpdate(void* manager) 
+{
+    if (nylon::imgui::GetNylonMenuActive())
+        return;
+
+    ControllerUpdate::Orig(manager);
+}
+
 void nylon::internal::SetupDefaultHooks()
 {
     Log.Info("Setting up default hooks...");
@@ -336,7 +346,7 @@ void nylon::internal::SetupDefaultHooks()
     uint8_t buffer[6];
     memset(buffer, INST_NOP, sizeof(buffer));
 
-    if (nylon::Config::UnlockFPS())
+    if (nylon::config::UnlockFPS())
     {
 
         nylon::WriteMemory(FUNC_INITIALIZEDEVICE + 0x1C7, buffer, sizeof(buffer)); // 0x0057BB07 : dword ptr [D3DPresentParams.SwapEffect],EDI
@@ -370,6 +380,8 @@ void nylon::internal::SetupDefaultHooks()
     nylon::hook::CreateHook<D3DDeviceLostFUN_0057ae20>(detourD3DDeviceLostFUN_0057ae20);
     nylon::hook::CreateHook<nylon::NodeArray_SetCFuncInfo>(detourNodeArray_SetCFuncInfo);
     nylon::hook::CreateHook<CRC_CreateKeyNameAssociation>(detour__CRC_CreateKeyNameAssociate);
+
+    nylon::hook::CreateHook<ControllerUpdate>(detour__ControllerUpdate);
 
     // nylon::hook::CreateHook<Time_UpdateTime>(detourTimeUpdateTime);
 

@@ -23,7 +23,20 @@ extern nylon::CommandConsole nylon::Console = { };
 bool HelpCommandCallback(nylon::CommandConsole& caller, std::vector<std::string> arguments)
 {
 	if (arguments.size() == 1)
-		caller.PushHistory(caller.GetConsoleCommand("help").Description);
+	{
+		std::string funcList = { };
+		int i = 0;
+		auto commands = caller.GetCommands();
+		for (auto kv : commands)
+		{
+			if (i != 0 && i != commands.size())
+				funcList.append(", ");
+
+			funcList.append(kv.first);
+			i++;
+		}
+		caller.PushHistory(funcList);
+	}
 	else if (arguments.size() == 2)
 	{
 		if (caller.HasConsoleCommand(arguments[1]))
@@ -50,6 +63,93 @@ bool ColonThreeCommandCallback(nylon::CommandConsole& caller, std::vector<std::s
 {
 	caller.PushHistory(":3");
 
+	return true;
+}
+bool WriteMemoryCommandCallback(nylon::CommandConsole& caller, std::vector<std::string> arguments)
+{
+	if (arguments.size() != 4)
+	{
+		caller.PushHistory("Invalid argument count.");
+		return false;
+	}
+
+	int address = 0;
+	try
+	{
+		address = std::stoi(arguments[1]);
+	}
+	catch (std::invalid_argument const& ex)
+	{
+		caller.PushHistory(std::format("Address was invalid: '{}'", arguments[1]));
+		return false;
+	}
+	catch (std::out_of_range const& ex)
+	{
+		caller.PushHistory(std::format("Address was out of range: '{}'", arguments[1]));
+		return false;
+	}
+
+	if (arguments[2] != "float")
+	{
+		int value = 0;
+		try
+		{
+			address = std::stoi(arguments[3]);
+		}
+		catch (std::invalid_argument const& ex)
+		{
+			caller.PushHistory(std::format("Value was invalid: '{}'", arguments[3]));
+			return false;
+		}
+		catch (std::out_of_range const& ex)
+		{
+			caller.PushHistory(std::format("Value was out of range: '{}'", arguments[3]));
+			return false;
+		}
+
+		bool success = false;
+
+		if (arguments[2] == "uint8")
+			success = nylon::WriteMemory(address, static_cast<uint8_t>(value));
+		else if (arguments[2] == "int8")
+			success = nylon::WriteMemory(address, static_cast<int8_t>(value));
+		else if (arguments[2] == "uint16")
+			success = nylon::WriteMemory(address, static_cast<uint16_t>(value));
+		else if (arguments[2] == "int16")
+			success = nylon::WriteMemory(address, static_cast<int16_t>(value));
+		else if (arguments[2] == "uint32")
+			success = nylon::WriteMemory(address, static_cast<uint32_t>(value));
+		else if (arguments[2] == "int32")
+			success = nylon::WriteMemory(address, static_cast<int32_t>(value));
+
+		if (success)
+			caller.PushHistory(std::format("Wrote '{0}' as {1} to 0x{2:6X}", value, arguments[2], address));
+		else
+			caller.PushHistory(std::format("An unknown error occured when writing '{0}' as {1} to 0x{2:6X}", value, arguments[2], address));
+	}
+	else
+	{
+		float value = 0;
+		try
+		{
+			address = std::stof(arguments[3]);
+		}
+		catch (std::invalid_argument const& ex)
+		{
+			caller.PushHistory(std::format("Value was invalid: '{}'", arguments[3]));
+			return false;
+		}
+		catch (std::out_of_range const& ex)
+		{
+			caller.PushHistory(std::format("Value was out of range: '{}'", arguments[3]));
+			return false;
+		}
+
+		if (nylon::WriteMemory(address, static_cast<float>(value)))
+			caller.PushHistory(std::format("Wrote '{0}' as {1} to 0x{2:6X}", value, arguments[2], address));
+		else
+			caller.PushHistory(std::format("An unknown error occured when writing '{0}' as {1} to 0x{2:6X}", value, arguments[2], address));
+	}
 	return true;
 }
 
@@ -136,7 +236,7 @@ nylon::CommandConsole::CommandConsole()
 	RegisterCommand(ConsoleCommand("help", "Displays help for a given command.", "help <command>", HelpCommandCallback));
 	RegisterCommand(ConsoleCommand(":3", ":3", ":3", ColonThreeCommandCallback));
 	RegisterCommand(ConsoleCommand("monitorvar", "", "", nullptr));
-
+	RegisterCommand(ConsoleCommand("writemem", "Write a value at a given memory address", "writemem <address> <uint8|int8|uint16|int16|uint32|int32|float> <value>", WriteMemoryCommandCallback));
 }
 
 bool nylon::CommandConsole::RegisterCommand(const ConsoleCommand& command)
@@ -147,6 +247,10 @@ bool nylon::CommandConsole::RegisterCommand(const ConsoleCommand& command)
 	m_commands.insert({ std::string(command.Name), ConsoleCommand(command) });
 
 	return true;
+}
+const std::map<std::string, nylon::ConsoleCommand>& nylon::CommandConsole::GetCommands() const
+{
+	return m_commands;
 }
 const char* nylon::CommandConsole::GetInputBuffer() const
 {

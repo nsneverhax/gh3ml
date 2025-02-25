@@ -121,7 +121,7 @@ bool GH3::SetNewWhammyValue(QbStruct* qbStruct)
 	for (; pvVar1 = whammyNodeKey2, (int)magicVar < (int)whammyNodeKey2; magicVar = (float)((int)magicVar + 1))
 	{
 		whammyNodeKey2 = highwayRatio;
-		SetArrayValue(whammyNode, (int)magicVar, 1.0);
+		SetArrayValue(whammyNode, (int)magicVar, 1.0f);
 		highwayRatio = whammyNodeKey2;
 		whammyNodeKey2 = pvVar1;
 	}

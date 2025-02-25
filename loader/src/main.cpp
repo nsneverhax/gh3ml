@@ -75,6 +75,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
     fs::path filePath = { };
 
+    // nylon::WriteMemory(0x0060372f + 1, (uint8_t)0x5);
+
     // Perform actions based on the reason for calling.
     switch (fdwReason)
     {
@@ -87,7 +89,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
         in::ReadConfig();
 
-        if (nylon::Config::OpenConsole())
+        if (nylon::config::OpenConsole())
             nylon::Log::CreateConsole();
 
         if (MH_Initialize() != MH_OK)
