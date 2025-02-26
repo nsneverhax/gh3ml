@@ -117,6 +117,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
                 nylon::WriteMemory((uintptr_t)(0x0057bb54 + 6), (uint8_t)0x1); // V: set 1 buffer for wine
             }
         }
+
         std::cout << "Nylon PreInit: Finished. Disabling Thread Library Calls..." << std::endl;
 
         DisableThreadLibraryCalls(hinstDLL);
