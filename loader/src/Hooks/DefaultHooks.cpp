@@ -180,6 +180,20 @@ LRESULT __stdcall WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     switch (uMsg)
     {
+    case WM_CLOSE:
+        PostQuitMessage(0);
+        return 0;
+    case WM_ENDSESSION:
+        if (wParam != 0)
+        {
+            ExitProcess(0);
+            return 0;
+        }
+        break;
+    case WM_SYSCOMMAND:
+        if ((wParam & 0xFFF0) == SC_SCREENSAVE || (wParam & 0xFFF0) == SC_MONITORPOWER)
+            return 0;
+        break;
     case WM_SETCURSOR:
         if (nylon::imgui::GetNylonMenuActive() && GetCursor() == NULL)
             SetCursor(LoadCursor(nullptr, IDC_ARROW));
@@ -196,7 +210,8 @@ LRESULT __stdcall WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             return windProcResult;
     }
 
-    return (*AspyrDefWindowProcA)(hWnd, uMsg, wParam, lParam);
+    return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
+    //return (*AspyrDefWindowProcA)(hWnd, uMsg, wParam, lParam);
 }
 
 #pragma endregion

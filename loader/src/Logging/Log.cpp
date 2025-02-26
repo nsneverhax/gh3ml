@@ -3,8 +3,8 @@
 #include <Nylon/Core.hpp>
 
 #include <Nylon/Log.hpp>
+#include <Nylon/TimePoint.hpp>
 #include "LogFile.hpp"
-
 #include <Windows.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -190,14 +190,10 @@ void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const cha
     for (auto i = 0; i < indentLevel; i++)
         indentString.append("\t");
 
-    std::string prefix = { };
-    if (nylon::IsWine())
-        prefix = std::format("{} [{}]: {}", levelStr, sourceName, indentString);
-    else
-    {
-        auto const now = std::chrono::current_zone()->to_local(std::chrono::system_clock::now());
-        prefix = std::format("{:%H:%M:%OS} {} [{}]: {}", now, levelStr, sourceName, indentString);
-    }
+    auto now = nylon::TimePoint::LocalNow();
+
+    std::string prefix = std::format("{}:{}:{} {} [{}]: {}", now.Hour, now.Minute, now.Second, levelStr, sourceName, indentString);
+    
 
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 

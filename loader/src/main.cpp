@@ -103,7 +103,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
         if (!fs::exists("no_wine"))
         {
-            std::cout << "Nylon PreInit: Searching for \"wine_get_version\" in \"ntdll.dll\"..." << std::endl;
             hntdll = GetModuleHandle("ntdll.dll");
 
             pwine_get_version = reinterpret_cast<const char* (__cdecl*)(void)>(GetProcAddress(hntdll, "wine_get_version"));
@@ -118,47 +117,28 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             }
         }
 
-        std::cout << "Nylon PreInit: Finished. Disabling Thread Library Calls..." << std::endl;
-
         DisableThreadLibraryCalls(hinstDLL);
 
-        std::cout << "Nylon PreInit: Finished. Creating Log File..." << std::endl;
-
-        if (!in::CreateLogFile())
-            std::cout << "Nylon PreInit: Finished unsucessfully. Reading config..." << std::endl;
-        else
-            std::cout << "Nylon PreInit: Finished sucessfully. Reading config..." << std::endl;
+        in::CreateLogFile();
 
         in::ReadConfig();
 
-        std::cout << "Nylon PreInit: Finished. Allocating console if needed..." << std::endl;
-
         if (nylon::config::OpenConsole())
             nylon::Log::CreateConsole();
-
-        std::cout << "Nylon PreInit: Finished. Publishing Wine version (if applicable)..." << std::endl;
 
         if (nylon::IsWine())
             nylon::internal::Log.Info("Wine {} detected.", nylon::WineVersion());
         else
             nylon::internal::Log.Info("Wine was not detected. Assuming we are running on a Windows NT OS Please report this if this detection is an error.");
 
-        std::cout << "Nylon PreInit: Finished. Initializing MinHook..." << std::endl;
-
         if (MH_Initialize() != MH_OK)
             in::Log.Error("Minhook failed to initialize!");
         else
             in::Log.Info("Minhook initialized!");
 
-        std::cout << "Nylon PreInit: Finished. Setting up default hooks..." << std::endl;
-
         in::SetupDefaultHooks();
 
-        std::cout << "Nylon PreInit: Finished. Loading mods..." << std::endl;
-
         in::LoadMods();
-
-        std::cout << "Nylon PreInit: Finished. Giving program control back to GH3" << std::endl;
 
         in::Log.Info("Finished Core Initialization!");
         break;
