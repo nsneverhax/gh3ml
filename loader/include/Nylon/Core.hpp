@@ -14,7 +14,6 @@ namespace nylon
 	constexpr std::string_view CompileTime = __TIME__;
 	constexpr std::string_view CompileDateTime = __DATE__ " " __TIME__;
 
-	
 	/// <summary>
 	/// The current directory of the Guitar Hero III executable
 	/// </summary>
@@ -37,6 +36,8 @@ namespace nylon
 	std::filesystem::path LogDirectory();
 
 
+	bool IsWine();
+	std::string_view WineVersion();
 
 	const HANDLE GH3Handle();
 

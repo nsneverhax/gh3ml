@@ -37,6 +37,7 @@ void UnwrapValue(matjson::Value& value, std::string_view name, bool* outValue, b
 	}
 	catch (...)
 	{
+		in::Log.Warn("Config Variable: {} was malformed.", name);
 		_configMalformed = true;
 		return;
 	}
@@ -58,6 +59,7 @@ void UnwrapValue(matjson::Value& value, std::string_view name, uint32_t* outValu
 	}
 	catch (...)
 	{
+		in::Log.Warn("Config Variable: {} was malformed.", name);
 		_configMalformed = true;
 		return;
 	}
@@ -65,12 +67,13 @@ void UnwrapValue(matjson::Value& value, std::string_view name, uint32_t* outValu
 
 void in::ReadConfig()
 {
-	_configMalformed = true;
+	_configMalformed = false;
 
 	if (!fs::exists(cfg::ConfigFilepath()))
 	{
 		in::Log.Warn("Unable to find \"{}\" so it will be remade.", cfg::ConfigFilepath().string());
-
+		in::WriteConfig();
+		return;
 	}
 
 	std::ifstream t(cfg::ConfigFilepath().c_str());
@@ -83,7 +86,7 @@ void in::ReadConfig()
 	if (!result)
 	{
 		in::Log.Warn("Unable to parse \"{}\" so it will be remade.", cfg::ConfigFilepath().string());
-
+		in::WriteConfig();
 		return;
 	}
 

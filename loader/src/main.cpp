@@ -62,18 +62,37 @@ void in::LoadMods()
     Log.Info("Finished loading mods.");
 }
 
-HANDLE _gh3Handle = nullptr;
+bool _isWine = false;
+std::string _wineVersion = { };
 
+bool nylon::IsWine()
+{
+    return _isWine;
+}
+std::string_view nylon::WineVersion()
+{
+    return _wineVersion;
+}
+
+HANDLE _gh3Handle = nullptr;
 const HANDLE nylon::GH3Handle()
 {
     return _gh3Handle;
 }
 
+constexpr int INST_NOP = 0x90;
+
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
+
+    // V: code stolen from https://gist.github.com/klange/282e62fdd1c2cae6a210443ccbc5b12f
+    // will clean it up later
+    static const char* (CDECL * pwine_get_version)(void);
+    HMODULE hntdll = nullptr;
+
     _gh3Handle = GetCurrentProcess();
 
-    fs::path filePath = { };
+    // memset(reinterpret_cast<void*>(0x00401588), INST_NOP, 20);
 
     // nylon::WriteMemory(0x0060372f + 1, (uint8_t)0x5);
 
@@ -81,25 +100,64 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     switch (fdwReason)
     {
     case DLL_PROCESS_ATTACH:
+
+        if (!fs::exists("no_wine"))
+        {
+            std::cout << "Nylon PreInit: Searching for \"wine_get_version\" in \"ntdll.dll\"..." << std::endl;
+            hntdll = GetModuleHandle("ntdll.dll");
+
+            pwine_get_version = reinterpret_cast<const char* (__cdecl*)(void)>(GetProcAddress(hntdll, "wine_get_version"));
+
+            _isWine = pwine_get_version != nullptr;
+            if (pwine_get_version != nullptr)
+                _wineVersion = { pwine_get_version() };
+
+            if (_isWine)
+            {
+                nylon::WriteMemory((uintptr_t)(0x0057bb54 + 6), (uint8_t)0x1); // V: set 1 buffer for wine
+            }
+        }
+        std::cout << "Nylon PreInit: Finished. Disabling Thread Library Calls..." << std::endl;
+
         DisableThreadLibraryCalls(hinstDLL);
 
-        in::CreateLogFile();
+        std::cout << "Nylon PreInit: Finished. Creating Log File..." << std::endl;
 
-        filePath = in::LogFilePath();
+        if (!in::CreateLogFile())
+            std::cout << "Nylon PreInit: Finished unsucessfully. Reading config..." << std::endl;
+        else
+            std::cout << "Nylon PreInit: Finished sucessfully. Reading config..." << std::endl;
 
         in::ReadConfig();
 
+        std::cout << "Nylon PreInit: Finished. Allocating console if needed..." << std::endl;
+
         if (nylon::config::OpenConsole())
             nylon::Log::CreateConsole();
+
+        std::cout << "Nylon PreInit: Finished. Publishing Wine version (if applicable)..." << std::endl;
+
+        if (nylon::IsWine())
+            nylon::internal::Log.Info("Wine {} detected.", nylon::WineVersion());
+        else
+            nylon::internal::Log.Info("Wine was not detected. Assuming we are running on a Windows NT OS Please report this if this detection is an error.");
+
+        std::cout << "Nylon PreInit: Finished. Initializing MinHook..." << std::endl;
 
         if (MH_Initialize() != MH_OK)
             in::Log.Error("Minhook failed to initialize!");
         else
             in::Log.Info("Minhook initialized!");
 
+        std::cout << "Nylon PreInit: Finished. Setting up default hooks..." << std::endl;
 
         in::SetupDefaultHooks();
+
+        std::cout << "Nylon PreInit: Finished. Loading mods..." << std::endl;
+
         in::LoadMods();
+
+        std::cout << "Nylon PreInit: Finished. Giving program control back to GH3" << std::endl;
 
         in::Log.Info("Finished Core Initialization!");
         break;

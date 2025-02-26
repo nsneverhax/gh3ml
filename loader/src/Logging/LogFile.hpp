@@ -8,6 +8,6 @@
 namespace nylon::internal
 {
 	std::filesystem::path LogFilePath();
-	void CreateLogFile();
+	bool CreateLogFile();
 	std::ofstream& LogStream();
 }

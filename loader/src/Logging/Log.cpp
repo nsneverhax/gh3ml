@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <cstdarg>
+#include <Nylon/Core.hpp>
 
 #include <Nylon/Log.hpp>
 #include "LogFile.hpp"
@@ -153,7 +154,6 @@ void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const cha
         return;
 
 #ifdef NYLON_PLATFORM_PC
-    auto const now = std::chrono::current_zone()->to_local(std::chrono::system_clock::now());
 
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     int consoleColorAttribute = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
@@ -189,12 +189,20 @@ void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const cha
 
     for (auto i = 0; i < indentLevel; i++)
         indentString.append("\t");
-    
-    std::string prefix = std::format("{:%H:%M:%OS} {} [{}]: {}", now, levelStr, sourceName, indentString);
+
+    std::string prefix = { };
+    if (nylon::IsWine())
+        prefix = std::format("{} [{}]: {}", levelStr, sourceName, indentString);
+    else
+    {
+        auto const now = std::chrono::current_zone()->to_local(std::chrono::system_clock::now());
+        prefix = std::format("{:%H:%M:%OS} {} [{}]: {}", now, levelStr, sourceName, indentString);
+    }
 
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 
     std::cout << prefix << message << std::endl;
-    nylon::internal::LogStream() << prefix << message << std::endl;
+    if (nylon::internal::LogStream().good() && nylon::internal::LogStream().is_open())
+        nylon::internal::LogStream() << prefix << message << std::endl;
 #endif
 }
