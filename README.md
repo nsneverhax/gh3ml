@@ -22,3 +22,8 @@ For right now, the GUI is still being worked on, until then follow these steps:
 4) The "name" variable here, refers to the unique identifier to your mod. I would recommend something like.. ``vultumast.mymod``
 5) Place the pak you wish to load into the "pak" folder, which is in the same directory as ``modinfo.json`` (create it if it's not)
 6) Rename the pak file to be ``<yourmodname>.pak.xen`` ex: ``vultumast.mymod.pak.xen``
+
+## Special Thanks
+- WINE Testing 
+  - MetricCepheid
+  - xorshift32/kernaltrap8
