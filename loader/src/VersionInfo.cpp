@@ -1,7 +1,7 @@
 #include <Nylon/VersionInfo.hpp>
 #include <format>
 
-nylon::VersionInfo _currentVersion = { 1, 3, 1, nylon::VersionType::Alpha };
+nylon::VersionInfo _currentVersion = { 1, 4, 0, nylon::VersionType::Alpha };
 
 const nylon::VersionInfo& nylon::Version()
 {
