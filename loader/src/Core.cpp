@@ -1,5 +1,5 @@
 #include <Nylon/Core.hpp>
-#include "Main.hpp"
+#include <Nylon/Internal/Main.hpp>
 
 #include <filesystem>
 
@@ -20,7 +20,10 @@ std::filesystem::path nylon::LogDirectory()
 {
 	return NylonDirectory() / "Logs";
 }
-
+std::filesystem::path nylon::ResourcesDirectory()
+{
+	return NylonDirectory() / "Resources";
+}
 bool nylon::ReadMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size, size_t* actualSize)
 {
 	return ReadProcessMemory(GH3Handle(), reinterpret_cast<void*>(baseAddress), buffer, size, reinterpret_cast<SIZE_T*>(actualSize));

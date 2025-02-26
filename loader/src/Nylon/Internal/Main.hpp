@@ -1,12 +1,12 @@
 #pragma once
 
-#include <Nylon/LogSource.hpp>
-
+#include <filesystem>
 #include <map>
 
-#include <Nylon/ModInfo.hpp>
-
 #include <GH3/Keys.hpp>
+
+#include <Nylon/LogSource.hpp>
+#include <Nylon/ModInfo.hpp>
 
 namespace nylon::internal
 {
@@ -15,13 +15,15 @@ namespace nylon::internal
 	
 	extern std::map<std::string, ModInfo> LoadedMods;
 	
-	extern void SetupDefaultHooks();
+	void SetupDefaultHooks();
 	void SetupCFuncRedirection();
 
-	extern void LoadMods();
+	void LoadMods();
 	
 	void ReadConfig();
 	void WriteConfig();
 
-	extern std::map<GH3::CRCKey, char*> KeyAssociations;
+	void ReadKeyAssociations(std::filesystem::path path);
+
+	extern std::map<GH3::CRCKey, std::string> KeyAssociations;
 }

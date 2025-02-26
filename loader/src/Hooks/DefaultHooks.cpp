@@ -1,4 +1,4 @@
-#include "../Main.hpp"
+#include <Nylon/Internal/Main.hpp>
 #include "../Imgui/Imgui.hpp"
 #include "DirectXHooks.hpp"
 #include "CFuncHooks.hpp"
@@ -352,6 +352,15 @@ void detour__ControllerUpdate(void* manager)
     ControllerUpdate::Orig(manager);
 }
 
+using CRC_FindChecksumeName = nylon::hook::Binding<0x004A69A0, nylon::hook::cconv::CDecl, char*, GH3::CRCKey>;
+char* detour__CRC_FindChecksumeName(GH3::CRCKey key)
+{
+    if (nylon::internal::KeyAssociations.contains(key))
+        return nylon::internal::KeyAssociations[key].data();
+
+    return CRC_FindChecksumeName::Orig(key);
+}
+
 void nylon::internal::SetupDefaultHooks()
 {
     Log.Info("Setting up default hooks...");
@@ -397,6 +406,7 @@ void nylon::internal::SetupDefaultHooks()
     nylon::hook::CreateHook<CRC_CreateKeyNameAssociation>(detour__CRC_CreateKeyNameAssociate);
 
     nylon::hook::CreateHook<ControllerUpdate>(detour__ControllerUpdate);
+    nylon::hook::CreateHook<CRC_FindChecksumeName>(detour__CRC_FindChecksumeName);
 
     // nylon::hook::CreateHook<Time_UpdateTime>(detourTimeUpdateTime);
 

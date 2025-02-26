@@ -1,6 +1,7 @@
 #include <Nylon/CommandConsole.hpp>
 #include <Nylon/VersionInfo.hpp>
-#include "Main.hpp"
+#include <Nylon/Internal/Main.hpp>
+
 #include <format>
 #include "Imgui/ImGui.hpp"
 

@@ -4,7 +4,9 @@
 
 #include <Nylon/Log.hpp>
 #include <Nylon/TimePoint.hpp>
-#include "LogFile.hpp"
+#include <Nylon/Internal/Logging/LogFile.hpp>
+
+
 #include <Windows.h>
 #include <stdio.h>
 #include <fcntl.h>

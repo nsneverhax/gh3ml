@@ -1,5 +1,6 @@
+#include <Nylon/Internal/Main.hpp>
+
 #include <Nylon/Config.hpp>
-#include "Main.hpp"
 
 #include <matjson.hpp>
 #include <iostream>
@@ -151,6 +152,121 @@ void in::WriteConfig()
 	{
 		Log.Error("There was an unknown error writing the config file!");
 	}
+}
+
+std::map<GH3::CRCKey, std::string> in::KeyAssociations = { };
+
+void in::ReadKeyAssociations(std::filesystem::path path)
+{
+	in::Log.Info("Checking \"{}\" for keys...", path.string());
+
+	auto filepath = path / "QBKeys.txt";
+
+	if (!std::filesystem::exists(filepath))
+	{
+		in::Log.Info("Did not find \"{}\"", filepath.string());
+		return;
+	}
+
+	if (std::filesystem::is_directory(filepath))
+	{
+		in::Log.Warn("Found \"{}\" but it was a directory.", filepath.string());
+		return;
+	}
+	in::Log.Warn("Found \"{}\" ", filepath.string());
+
+	std::ifstream file = { };
+
+	std::string checksumBuffer = { };
+	std::string nameBuffer = { };
+	bool readingChecksum = false;
+
+	try
+	{
+		file.open(filepath);
+
+		if (file.fail() || file.bad())
+		{
+			in::Log.Warn("Failed to open \"{}\" failbit: 0x{:X04} badbit: 0x{:X04}", filepath.string(), file.failbit, file.badbit);
+			file.close();
+			return;
+		}
+
+		uint32_t lineNumber = 0;
+		for (std::string line = { }; std::getline(file, line); lineNumber++)
+		{
+			checksumBuffer = { };
+			nameBuffer = { };
+			readingChecksum = true;
+
+			for (std::string::iterator it = line.begin(); it != line.end(); it++)
+			{
+				bool whiteSpace = *it == ' ' || *it == '\t';
+
+				if (whiteSpace)
+				{
+					if (checksumBuffer.empty())
+						continue; // V: probably just padding. probably.
+					else
+						readingChecksum = false;
+				}
+				else
+				{
+					if (readingChecksum)
+						checksumBuffer += *it;
+					else
+						nameBuffer += *it;
+				}
+			}
+
+			if (checksumBuffer.empty() || nameBuffer.empty())
+			{
+				in::Log.Warn("Unable to convert line {} to a key/value pair. Checksum: \"{}\" Name: \"{}\"", lineNumber + 1, checksumBuffer, nameBuffer);
+				continue;
+			}
+			std::size_t pos = 0;
+			uint32_t checksum = 0;
+
+			// V: There is no good "try convert" like C# :<
+			try
+			{
+				checksum = std::stoul(checksumBuffer, &pos, (checksumBuffer.starts_with("0x") || checksumBuffer.starts_with("0X")) ? 16 : 10);
+			}
+			catch (std::invalid_argument const& ex)
+			{
+				in::Log.Warn("Unable to convert \"{}\" on line {} to a valid checksum: Invalid Argument", checksumBuffer, lineNumber + 1);
+				continue;
+			}
+			catch (std::out_of_range const& ex)
+			{
+				in::Log.Warn("Unable to convert \"{}\" on line {} to a valid checksum: Out of Range", checksumBuffer, lineNumber + 1);
+				continue;
+			}
+
+			if (checksum == 0)
+			{
+				in::Log.Warn("An unknown error resulted in a null checksum (\"{}\") on line {}", checksumBuffer, lineNumber + 1);
+				continue;
+			}
+
+			if (!in::KeyAssociations.contains(checksum))
+				in::KeyAssociations.insert({ static_cast<GH3::CRCKey>(checksum), nameBuffer });
+		}
+
+		file.close();
+
+		in::Log.Info("Successfully parsed \"{}\"", path.string());
+		return;
+	}
+	catch (...)
+	{
+		in::Log.Error("An unknown error occured when parsing \"{}\" Open: {}", filepath.string(), file.is_open());
+
+		if (file.is_open())
+			file.close();
+		return;
+	}
+
 }
 
 std::filesystem::path cfg::ConfigFilepath()

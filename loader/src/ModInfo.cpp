@@ -5,7 +5,7 @@
 
 #include <filesystem>
 
-bool nylon::ModInfo::TryRead(const std::string& filepath, ModInfo& modInfo)
+bool nylon::ModInfo::TryRead(const std::filesystem::path& filepath, ModInfo& modInfo)
 {
 	modInfo.m_directory = std::filesystem::path(filepath).parent_path().filename().string();
 

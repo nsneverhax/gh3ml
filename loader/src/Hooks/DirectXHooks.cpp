@@ -1,4 +1,4 @@
-#include "../Main.hpp"
+#include <Nylon/Internal/Main.hpp>
 #include "DirectXHooks.hpp"
 #include <Nylon/Hook.hpp>
 #include <GH3/DirectX.hpp>

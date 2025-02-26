@@ -12,7 +12,6 @@ namespace nylon
 {
 	constexpr std::string_view CompileDate = __DATE__;
 	constexpr std::string_view CompileTime = __TIME__;
-	constexpr std::string_view CompileDateTime = __DATE__ " " __TIME__;
 
 	/// <summary>
 	/// The current directory of the Guitar Hero III executable
@@ -34,7 +33,11 @@ namespace nylon
 	/// </summary>
 	/// <returns></returns>
 	std::filesystem::path LogDirectory();
-
+	/// <summary>
+	/// The current directory where Nylon will look for resources
+	/// </summary>
+	/// <returns></returns>
+	std::filesystem::path ResourcesDirectory();
 
 	bool IsWine();
 	std::string_view WineVersion();

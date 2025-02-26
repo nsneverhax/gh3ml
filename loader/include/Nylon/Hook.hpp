@@ -8,7 +8,7 @@
 #include <MinHook.h>
 
 // TODO: this is dumb!
-#include "../src/Main.hpp"
+#include <Nylon/Internal/Main.hpp>
 
 #include <format>
 

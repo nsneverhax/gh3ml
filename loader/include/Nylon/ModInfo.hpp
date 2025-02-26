@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <filesystem>
 
 namespace nylon
 {
@@ -31,7 +32,7 @@ namespace nylon
 
 		ModTag m_tags = ModTag::Unspecified;
 	public:
-		static bool TryRead(const std::string& filepath, ModInfo& info);
+		static bool TryRead(const std::filesystem::path& path, ModInfo& info);
 
 		/// <summary>
 		/// Gets the name of the mod, it's unique identifer

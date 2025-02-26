@@ -3,7 +3,6 @@
 
 #include <iostream>
 
-#include "Main.hpp"
 #include <MinHook.h>
 #include <Nylon/Hook.hpp>
 #include <Nylon/Log.hpp>
@@ -11,7 +10,9 @@
 #include <Nylon/Config.hpp>
 #include <d3d9.h>
 
-#include "Logging/LogFile.hpp"
+#include <Nylon/Internal/Main.hpp>
+#include <Nylon/Internal/Logging/LogFile.hpp>
+
 
 #include <imgui.h>
 #include <imgui_impl_dx9.h>
@@ -27,7 +28,6 @@ nylon::LogSource in::Log = nylon::LogSource("Nylon");
 nylon::LogSource in::LogGH3 = nylon::LogSource("GH3");
 std::map<std::string, nylon::ModInfo> in::LoadedMods = { };
 
-std::map<GH3::CRCKey, char*> in::KeyAssociations = { };
 
 void in::LoadMods()
 {
@@ -37,15 +37,15 @@ void in::LoadMods()
 
     for (const auto& dir : fs::directory_iterator(ModsDirectory()))
     {
-        auto infoPath = dir.path().string() + "\\modinfo.json";
+        auto infoPath = dir.path() / "modinfo.json";
 
-        Log.Info("Checking for: \"{}\"...", infoPath);
+        Log.Info("Checking for: \"{}\"...", infoPath.string());
         if (fs::exists(infoPath))
         {
             Log.Info("Loading...");
             ModInfo info = { };
 
-            if (!ModInfo::TryRead(infoPath, info))
+            if (!ModInfo::TryRead(infoPath.string(), info))
             {
                 Log.Error("Unable read load modinfo.json");
                 continue;
@@ -54,6 +54,7 @@ void in::LoadMods()
             {
                 LoadedMods.emplace(info.GetName(), info);
                 Log.Info("Found mod: {}", info.GetName());
+                in::ReadKeyAssociations(dir);
             }
         }
 
@@ -121,15 +122,18 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
         in::CreateLogFile();
 
-        in::ReadConfig();
-
-        if (nylon::config::OpenConsole())
-            nylon::Log::CreateConsole();
-
         if (nylon::IsWine())
             nylon::internal::Log.Info("Wine {} detected.", nylon::WineVersion());
         else
             nylon::internal::Log.Info("Wine was not detected. Assuming we are running on a Windows NT OS Please report this if this detection is an error.");
+
+        in::ReadConfig();
+
+        if (nylon::config::OpenConsole())
+            nylon::Log::CreateConsole();
+        
+        in::ReadKeyAssociations(nylon::ResourcesDirectory());
+        
 
         if (MH_Initialize() != MH_OK)
             in::Log.Error("Minhook failed to initialize!");
@@ -137,6 +141,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             in::Log.Info("Minhook initialized!");
 
         in::SetupDefaultHooks();
+
+       
 
         in::LoadMods();
 
