@@ -22,7 +22,7 @@ extern nylon::CommandConsole nylon::Console = { };
 //}
 
 #pragma region Callbacks
-bool HelpCommandCallback(nylon::CommandConsole& caller, std::vector<std::string> arguments)
+bool command_Help(nylon::CommandConsole& caller, std::vector<std::string> arguments)
 {
 	if (arguments.size() == 1)
 	{
@@ -61,13 +61,13 @@ bool HelpCommandCallback(nylon::CommandConsole& caller, std::vector<std::string>
 	return true;
 }
 
-bool ColonThreeCommandCallback(nylon::CommandConsole& caller, std::vector<std::string> arguments)
+bool command_ColonThree(nylon::CommandConsole& caller, std::vector<std::string> arguments)
 {
 	caller.PushHistory(":3");
 
 	return true;
 }
-bool WriteMemoryCommandCallback(nylon::CommandConsole& caller, std::vector<std::string> arguments)
+bool command_WriteMemory(nylon::CommandConsole& caller, std::vector<std::string> arguments)
 {
 	if (arguments.size() != 4)
 	{
@@ -235,10 +235,10 @@ nylon::CommandConsole::CommandConsole()
 	m_inputHistory.reserve(CommandConsole::DefaultHistorySize);
 	m_history.reserve(CommandConsole::DefaultHistorySize);
 
-	RegisterCommand(ConsoleCommand("help", "Displays help for a given command.", "help <command>", HelpCommandCallback));
-	RegisterCommand(ConsoleCommand(":3", ":3", ":3", ColonThreeCommandCallback));
-	RegisterCommand(ConsoleCommand("monitorvar", "", "", nullptr));
-	RegisterCommand(ConsoleCommand("writemem", "Write a value at a given memory address", "writemem <address> <uint8|int8|uint16|int16|uint32|int32|float> <value>", WriteMemoryCommandCallback));
+	RegisterCommand(ConsoleCommand("help", "Displays help for a given command.", "help <command>", command_Help));
+	RegisterCommand(ConsoleCommand(":3", ":3", ":3", command_ColonThree));
+	RegisterCommand(ConsoleCommand("monitorvar", "(not yet implemented)", "(not yet implemented)", nullptr));
+	RegisterCommand(ConsoleCommand("writemem", "Write a value at a given memory address", "writemem <address> <uint8|int8|uint16|int16|uint32|int32|float> <value>", command_WriteMemory));
 }
 
 bool nylon::CommandConsole::RegisterCommand(const ConsoleCommand& command)

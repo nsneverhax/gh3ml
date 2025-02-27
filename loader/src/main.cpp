@@ -21,6 +21,9 @@
 #include <Nylon/CommandConsole.hpp>
 
 
+#include <GH3/Spt/Singleton.hpp>
+
+
 namespace fs = std::filesystem;
 namespace in = nylon::internal;
 

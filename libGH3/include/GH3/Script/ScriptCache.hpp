@@ -2,8 +2,6 @@
 
 #include <GH3/Common.hpp>
 
-#include <GH3/SingletonPtr.hpp>
-
 #include <GH3/Mdl/Module.hpp>
 
 namespace GH3
@@ -22,6 +20,5 @@ namespace GH3
 		static_assert(sizeof(ScriptCache) == 0x24);
 	}
 
-	SingletonPtr<GH3::Script::ScriptCache> Script_Cache;
 
 }
