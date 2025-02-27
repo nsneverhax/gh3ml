@@ -23,6 +23,7 @@ namespace GH3::Mdl
 			vSTOP,
 			vRESTART
 		};
+		uint32_t unknown;
 
 		State State;
 		Command Command;

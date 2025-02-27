@@ -16,7 +16,7 @@ namespace GH3::Spt
 		void Forbid();
 		void Permit();
 		void Enable();
-		void HaveAccess();
+		bool HaveAccess();
 	};
 
 

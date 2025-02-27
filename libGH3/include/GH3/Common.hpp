@@ -1,6 +1,12 @@
 #pragma once
 
+#ifdef NO_SIZE_ASSERT
+#define SIZE_ASSERT(x, s)
+#else
 #define SIZE_ASSERT(x, s) static_assert(sizeof(x) == s)
+#endif // NO_SIZE_ASSERT
+
+
 #define GH3_API __declspec(dllexport)
 
 #include <GH3/Keys.hpp>

@@ -6,11 +6,7 @@ namespace GH3::Spt
 {
 	class Class
 	{
-	private:
-
-		
 	public:
-
 
 	};
 }

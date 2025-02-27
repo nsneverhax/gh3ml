@@ -7,5 +7,14 @@
 
 #include <GH3/Script/ScriptCache.hpp>
 #include <GH3/Mdl/Module.hpp>
+#include <GH3/Mdl/Manager.hpp>
+
 
 #include <GH3/Script/CPair.hpp>
+
+#include <GH3/Lst/Head.hpp>
+#include <GH3/Lst/Node.hpp>
+
+#include <GH3/Tsk/List.hpp>
+#include <GH3/Tsk/BaseTask.hpp>
+#include <GH3/Tsk/Task.hpp>

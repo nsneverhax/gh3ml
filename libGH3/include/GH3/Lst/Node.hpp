@@ -8,7 +8,7 @@ namespace GH3::Lst
 {
 	typedef int32_t Priority;
 
-	enum class NodePriority
+	enum class NodePriority : uint16_t
 	{
 		vNORMAL_PRIROITY = 0,
 		VHEAD_NODE = UINT32_MAX
@@ -20,7 +20,6 @@ namespace GH3::Lst
 		PRIORITY_FLUSH_DEAD_OBJECTS = 1000
 	};
 
-
 	template<class T>
 	class Node : public Spt::Class
 	{
@@ -28,7 +27,7 @@ namespace GH3::Lst
 		T* m_data = nullptr;
 		Priority m_priority = 0;
 		Node<T>* m_next;
-		Node<T>* m_prev;
+		Node<T>* m_previous;
 	public:
 
 		Node(T* data, Priority priority = NodePriority::vNORMAL_PRIROITY);
@@ -51,6 +50,8 @@ namespace GH3::Lst
 
 	};
 
+	SIZE_ASSERT(Node<void*>, 0x14);
+
 	template<class T>
 	Node<T>::Node(T* data, Priority priority)
 	{
@@ -60,17 +61,17 @@ namespace GH3::Lst
 
 
 	template<class T>
-	void Node<T>::SetPriority(Priority priority)
+	inline void Node<T>::SetPriority(Priority priority)
 	{
 		m_priority = priority;
 	}
 	template<class T>
-	void Node<T>::SetNext(Node<T>* node)
+	inline void Node<T>::SetNext(Node<T>* node)
 	{
 		m_next = node;
 	}
 	template<class T>
-	void Node<T>::SetPrevious(Node<T>* node)
+	inline void Node<T>::SetPrevious(Node<T>* node)
 	{
 		m_previous = node;
 	}
@@ -89,7 +90,7 @@ namespace GH3::Lst
 	template<class T>
 	Node<T> Node<T>::GetPrevious() const
 	{
-		return m_prev->IsHead() ? nullptr : m_prev;
+		return m_previous->IsHead() ? nullptr : m_previous;
 	}
 	template <class T>
 	T* Node<T>::GetData() const
@@ -101,7 +102,7 @@ namespace GH3::Lst
 	template <class T>
 	bool Node<T>::IsInList() const
 	{
-		return prev != this;
+		return m_previous != this;
 	}
 	template <class T>
 	bool Node<T>::IsHead() const
