@@ -94,16 +94,16 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     static const char* (CDECL * pwine_get_version)(void);
     HMODULE hntdll = nullptr;
 
-    _gh3Handle = GetCurrentProcess();
-
-    // memset(reinterpret_cast<void*>(0x00401588), INST_NOP, 20);
-
-    // nylon::WriteMemory(0x0060372f + 1, (uint8_t)0x5);
+    // TODO: this !!
+    // int numArgs;
+    // LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &numArgs);
 
     // Perform actions based on the reason for calling.
     switch (fdwReason)
     {
     case DLL_PROCESS_ATTACH:
+
+        _gh3Handle = GetCurrentProcess();
 
         if (!fs::exists("no_wine"))
         {
@@ -134,7 +134,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
         if (nylon::config::OpenConsole())
             nylon::Log::CreateConsole();
-        
+       
+
         in::ReadKeyAssociations(nylon::ResourcesDirectory());
         
 

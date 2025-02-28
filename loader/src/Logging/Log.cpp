@@ -186,7 +186,6 @@ void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const cha
     }
     levelStr[5] = '\0';
 
-    SetConsoleTextAttribute(hConsole, consoleColorAttribute);
     std::string indentString = "";
 
     for (auto i = 0; i < indentLevel; i++)
@@ -194,13 +193,20 @@ void nylon::Log::WriteToOutput(LogLevel level, const char* sourceName, const cha
 
     auto now = nylon::TimePoint::LocalNow();
 
-    std::string prefix = std::format("{}:{}:{} {} [{}]: {}", now.Hour, now.Minute, now.Second, levelStr, sourceName, indentString);
-    
+    SetConsoleTextAttribute(hConsole, consoleColorAttribute);
+    std::string prefix = std::format("{:02}:{:02}:{:02} {}", now.Hour, now.Minute, now.Second, levelStr);
+    std::cout << prefix;
 
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+    std::string output = std::format("[{}]: {}{}", sourceName, indentString, message);
+    std::cout << output << std::endl;
 
-    std::cout << prefix << message << std::endl;
+    output = prefix + output;
+
     if (nylon::internal::LogStream().good() && nylon::internal::LogStream().is_open())
-        nylon::internal::LogStream() << prefix << message << std::endl;
+        nylon::internal::LogStream() << output << std::endl;
+
+    if (IsDebuggerPresent())
+        OutputDebugString(output.c_str());
 #endif
 }
