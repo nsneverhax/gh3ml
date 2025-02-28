@@ -10,8 +10,8 @@
 
 namespace nylon
 {
-	constexpr std::string_view CompileDate = __DATE__;
-	constexpr std::string_view CompileTime = __TIME__;
+	std::string_view CompileDate();
+	std::string_view CompileTime();
 
 	/// <summary>
 	/// The current directory of the Guitar Hero III executable
