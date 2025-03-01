@@ -363,6 +363,9 @@ char* detour__CRC_FindChecksumeName(GH3::CRCKey key)
     return origName;
 }
 
+
+
+
 void nylon::internal::SetupDefaultHooks()
 {
     Log.Info("Setting up default hooks...");

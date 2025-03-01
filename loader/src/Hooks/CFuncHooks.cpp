@@ -45,76 +45,76 @@ bool PrintStruct(GH3::QbStruct* params, GH3::CScript* script)
         switch (type)
         {
         case GH3::Script::CComponentType::QFlagNone:
-            in::LogGH3.Info("  {}(Unmoved Type: {:X}) ((report this to vultu!!!)", key, ((uint8_t)component->Flags));
+            in::LogGH3.Info("\t{}(Unmoved Type: {:X}) ((report this to vultu!!!)", key, ((uint8_t)component->Flags));
             break;
         case GH3::Script::CComponentType::QFlagStructItem:
-            in::LogGH3.Info("  {}(not implemented, please report this to Vultu with your code!)", key);
+            in::LogGH3.Info("\t{}(not implemented, please report this to Vultu with your code!)", key);
             break;
         case GH3::Script::CComponentType::QTypeInt:
-            in::LogGH3.Info("  {}{}", key, component->IntegerValue);
+            in::LogGH3.Info("\t{}{}", key, component->IntegerValue);
             break;
         case GH3::Script::CComponentType::QTypeFloat:
-            in::LogGH3.Info("  {}{}", key, component->FloatValue);
+            in::LogGH3.Info("\t{}{}", key, component->FloatValue);
             break;
         case GH3::Script::CComponentType::QTypeCString:
-            in::LogGH3.Info("  {}\"{}\"", key, component->CStringValue);
+            in::LogGH3.Info("\t{}\"{}\"", key, component->CStringValue);
             break;
         case GH3::Script::CComponentType::QTypeWString:
             //in::LogGH3.Debug("(QTypeWString are converted to UTF-8 strings and may yield incorrect results, please report this)");
-            in::LogGH3.Info("  {}\"{}\"", key,
+            in::LogGH3.Info("\t{}\"{}\"", key,
                 std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(std::wstring(component->WStringValue))
             );
             break;
         case GH3::Script::CComponentType::QTypePair:
-            in::LogGH3.Info("  {0}({1}, {2})", key, component->PairValue->X, component->PairValue->Y);
+            in::LogGH3.Info("\t{0}({1}, {2})", key, component->PairValue->X, component->PairValue->Y);
             break;
         case GH3::Script::CComponentType::QTypeVector:
-            in::LogGH3.Info("  {0}({1}, {2}, {3}, {4})", key, component->VectorPair->X, component->VectorPair->Y, component->VectorPair->Z, component->VectorPair->W);
+            in::LogGH3.Info("\t{0}({1}, {2}, {3}, {4})", key, component->VectorPair->X, component->VectorPair->Y, component->VectorPair->Z, component->VectorPair->W);
             break;
         case GH3::Script::CComponentType::QTypeScript:
-            in::LogGH3.Info("  {}(not implemented, please report this to Vultu with your code!)", key);
+            in::LogGH3.Info("\t{}(not implemented, please report this to Vultu with your code!)", key);
             break;
         case GH3::Script::CComponentType::QTypeCFunc:
-            in::LogGH3.Info("  {}(not implemented, please report this to Vultu with your code!)", key);
+            in::LogGH3.Info("\t{}(not implemented, please report this to Vultu with your code!)", key);
             break;
         case GH3::Script::CComponentType::QTypeUnk9:
-            in::LogGH3.Info("  {}(not implemented, please report this to Vultu with your code!)", key);
+            in::LogGH3.Info("\t{}(not implemented, please report this to Vultu with your code!)", key);
             break;
         case GH3::Script::CComponentType::QTypeQbStruct:
-            in::LogGH3.Info("  {}", key);
+            in::LogGH3.Info("\t{}", key);
             in::LogGH3.SetIndentLevel(in::LogGH3.GetIndentLevel() + 1);
             PrintStruct(component->StructValue, script);
             in::LogGH3.SetIndentLevel(in::LogGH3.GetIndentLevel() - 1);
             break;
         case GH3::Script::CComponentType::QTypeQbArray:
-            in::LogGH3.Info("  {0}Type:\"{1}\" Size:{2}", key, GH3::Script::to_string(component->GetType()), component->ArrayValue->size);
+            in::LogGH3.Info("\t{0}Type:\"{1}\" Size:{2}", key, GH3::Script::to_string(component->GetType()), component->ArrayValue->size);
             break;
         case GH3::Script::CComponentType::QTypeQbKey:
-            in::LogGH3.Info("  {}{:#06x}", key, component->KeyValue);
+            in::LogGH3.Info("\t{}", GH3::CRC::FindChecksumName(component->KeyValue));
             break;
         case GH3::Script::CComponentType::QTypeQbKeyRef:
-            in::LogGH3.Info("  {}(not implemented, please report this to Vultu with your code!)", key);
+            in::LogGH3.Info("\t{}(not implemented, please report this to Vultu with your code!)", key);
             break;
         case GH3::Script::CComponentType::QTypeUnk20:
-            in::LogGH3.Info("  {}(not implemented, please report this to Vultu with your code!)", key);
+            in::LogGH3.Info("\t{}(not implemented, please report this to Vultu with your code!)", key);
             break;
         case GH3::Script::CComponentType::QTypeUnk21:
-            in::LogGH3.Info("  {}(not implemented, please report this to Vultu with your code!)", key);
+            in::LogGH3.Info("\t{}(not implemented, please report this to Vultu with your code!)", key);
             break;
         case GH3::Script::CComponentType::QTypeBinaryTree1:
-            in::LogGH3.Info("  {}(not implemented, please report this to Vultu with your code!)", key);
+            in::LogGH3.Info("\t{}(not implemented, please report this to Vultu with your code!)", key);
             break;
         case GH3::Script::CComponentType::QTypeBinaryTree2:
-            in::LogGH3.Info("  {}(not implemented, please report this to Vultu with your code!)", key);
+            in::LogGH3.Info("\t{}(not implemented, please report this to Vultu with your code!)", key);
             break;
         case GH3::Script::CComponentType::QTypeStringPointer:
-            in::LogGH3.Info("  {}(not implemented, please report this to Vultu with your code!)", key);
+            in::LogGH3.Info("\t{}(not implemented, please report this to Vultu with your code!)", key);
             break;
         case GH3::Script::CComponentType::QTypeMap:
-            in::LogGH3.Info("  {}(not implemented, please report this to Vultu with your code!)", key);
+            in::LogGH3.Info("\t{}(not implemented, please report this to Vultu with your code!)", key);
             break;
         default:
-            in::LogGH3.Info("  {0}UNKNOWN TYPE: {:X}", key, (uint8_t)component->GetType());
+            in::LogGH3.Info("\t{0}UNKNOWN TYPE: {:X}", key, (uint8_t)component->GetType());
             break;
         }
         component = component->Next;
@@ -163,6 +163,8 @@ bool LoadPak(GH3::QbStruct* params, GH3::CScript* script)
 
     params->GetString(0, &pakNameBuffer, 0);
 
+    in::Log.Info("Loading Pak: \"{}\"", pakNameBuffer);
+
     if (strcmp("pak/qb.pak", pakNameBuffer) == 0)
     {
         for (const auto pair : nylon::internal::LoadedMods)
@@ -194,10 +196,25 @@ bool LoadPak(GH3::QbStruct* params, GH3::CScript* script)
     return ret;
 }
 
+bool LoadTexture(GH3::QbStruct* params, GH3::CScript* script)
+{
+    char* nameBuffer;
+
+    params->GetString(0, &nameBuffer, 0);
+
+    in::Log.Info("Loading Texture: \"{}\"", nameBuffer);
+
+    return binding::CFunc_LoadTexture::Orig(params, script);
+}
 
 void nylon::internal::CreateCFuncHooks()
 {
+    in::Log.Info("Creating CFunc Hooks...");
+
 	hook::CreateHook<binding::CFunc_PrintStruct>(PrintStruct);
     hook::CreateHook<binding::CFunc_PrintF>(PrintF);
     hook::CreateHook<binding::CFunc_LoadPak>(LoadPak);
+    hook::CreateHook<binding::CFunc_LoadTexture>(LoadTexture);
+
+    in::Log.Info("Finished creating CFunc Hooks");
 }
