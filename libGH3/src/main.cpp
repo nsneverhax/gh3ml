@@ -21,3 +21,4 @@
 
 #include <GH3/Mem/Allocator.hpp>
 #include <GH3/Mem/Heap.hpp>
+#include <GH3/Mem/CCompactPool.hpp>
