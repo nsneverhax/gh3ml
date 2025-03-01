@@ -365,6 +365,16 @@ char* detour__CRC_FindChecksumeName(GH3::CRCKey key)
 
 
 
+using WhammyRelatedFUN_0041b760 = nylon::hook::Binding<0x0041b760, nylon::hook::cconv::STDCall, void, int, int, float, void*>;
+
+void detour__WhammyRelatedFUN_0041b760(int param_1_00, int param_2_00, float param3, void* whammyShortenMultiplier)
+{
+    float* WhammyShorten = reinterpret_cast<float*>(0x00A12BD0);
+    float* WhammyUnitsPerSecond = reinterpret_cast<float*>(0x00A12BCC);
+        
+    //*WhammyShorten = 0.5f;
+    WhammyRelatedFUN_0041b760::Orig(param_1_00, param_2_00, param3, whammyShortenMultiplier);
+}
 
 void nylon::internal::SetupDefaultHooks()
 {
@@ -412,6 +422,8 @@ void nylon::internal::SetupDefaultHooks()
 
     nylon::hook::CreateHook<ControllerUpdate>(detour__ControllerUpdate);
     nylon::hook::CreateHook<CRC_FindChecksumeName>(detour__CRC_FindChecksumeName);
+
+    nylon::hook::CreateHook<WhammyRelatedFUN_0041b760>(detour__WhammyRelatedFUN_0041b760);
 
     // nylon::hook::CreateHook<Time_UpdateTime>(detourTimeUpdateTime);
 

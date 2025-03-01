@@ -115,6 +115,27 @@ namespace nylon::hook
 					return reinterpret_cast<Ret(__thiscall*)(Args...)>(address)(args...);
 			}
 		};
+
+		struct FastCall
+		{
+			template<uintptr_t id, typename Ret, typename... Args>
+			static Ret __fastcall Handler(Args... args)
+			{
+				if constexpr (std::is_same_v<Ret, void>)
+					Orig<id, FastCall, Ret, Args...>(args...);
+				else
+					return Orig<id, FastCall, Ret, Args...>(args...);
+			}
+
+			template<typename Ret, typename... Args>
+			static Ret Trampoline(uintptr_t address, Args... args)
+			{
+				if constexpr (std::is_same_v<Ret, void>)
+					reinterpret_cast<Ret(__fastcall*)(Args...)>(address)(args...);
+				else
+					return reinterpret_cast<Ret(__fastcall*)(Args...)>(address)(args...);
+			}
+		};
 	}
 
 	template<uintptr_t id, typename Cconv, typename Ret, typename... Args>

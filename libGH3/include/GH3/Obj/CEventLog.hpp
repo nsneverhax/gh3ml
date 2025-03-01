@@ -38,5 +38,5 @@ namespace GH3::Obj
 		int32_t NewEntries;
 	};
 
-	SIZE_ASSERT(CEventLog, 0x19);
+	SIZE_ASSERT(CEventLog, 28);
 }

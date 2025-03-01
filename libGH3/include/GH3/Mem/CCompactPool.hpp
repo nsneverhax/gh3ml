@@ -20,5 +20,5 @@ namespace GH3::Mem
 		undefined2 field0x68;
 	};
 
-	SIZE_ASSERT(CCompactPool, 0x6a);
+	SIZE_ASSERT(CCompactPool, 0x6c);
 }
