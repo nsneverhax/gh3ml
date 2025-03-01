@@ -134,10 +134,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
         if (nylon::config::OpenConsole())
             nylon::Log::CreateConsole();
-       
 
         in::ReadKeyAssociations(nylon::ResourcesDirectory());
-        
 
         if (MH_Initialize() != MH_OK)
             in::Log.Error("Minhook failed to initialize!");
@@ -145,8 +143,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             in::Log.Info("Minhook initialized!");
 
         in::SetupDefaultHooks();
-
-       
 
         in::LoadMods();
 

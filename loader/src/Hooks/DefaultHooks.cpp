@@ -355,10 +355,12 @@ void detour__ControllerUpdate(void* manager)
 using CRC_FindChecksumeName = nylon::hook::Binding<0x004A69A0, nylon::hook::cconv::CDecl, char*, GH3::CRCKey>;
 char* detour__CRC_FindChecksumeName(GH3::CRCKey key)
 {
+    char* origName = CRC_FindChecksumeName::Orig(key);
+
     if (nylon::internal::KeyAssociations.contains(key))
         return nylon::internal::KeyAssociations[key].data();
 
-    return CRC_FindChecksumeName::Orig(key);
+    return origName;
 }
 
 void nylon::internal::SetupDefaultHooks()

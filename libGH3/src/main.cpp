@@ -18,3 +18,6 @@
 #include <GH3/Tsk/List.hpp>
 #include <GH3/Tsk/BaseTask.hpp>
 #include <GH3/Tsk/Task.hpp>
+
+#include <GH3/Mem/Allocator.hpp>
+#include <GH3/Mem/Heap.hpp>

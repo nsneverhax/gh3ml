@@ -250,12 +250,15 @@ void in::ReadKeyAssociations(std::filesystem::path path)
 			}
 
 			if (!in::KeyAssociations.contains(checksum))
+			{
+				// in::Log.Info("Added: {} with checksum: {:#08}", nameBuffer, checksum);
 				in::KeyAssociations.insert({ static_cast<GH3::CRCKey>(checksum), nameBuffer });
+			}
 		}
 
 		file.close();
 
-		in::Log.Info("Successfully parsed \"{}\"", path.string());
+		in::Log.Info("Successfully parsed \"{}\"", filepath.string());
 		return;
 	}
 	catch (...)
