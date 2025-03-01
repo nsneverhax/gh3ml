@@ -7,6 +7,8 @@
 #include <GH3/Obj/CEventReceiverList.hpp>
 #include <GH3/Obj/CEventLog.hpp>
 
+#include <GH3/Spt/Singleton.hpp>
+
 namespace GH3::Obj
 {
 	class CTracker : public Spt::Class
@@ -26,5 +28,10 @@ namespace GH3::Obj
 		bool Debug;
 	};
 
-	SIZE_ASSERT(CTracker, 0x20D);
+	SIZE_ASSERT(CTracker, 0x20C);
+}
+
+namespace GH3
+{
+	extern Spt::SingletonPtr<Obj::CTracker> Obj_CTracker;
 }

@@ -12,6 +12,6 @@ namespace GH3::Lst
 		T* Value;
 
 		HashItem<T>* Next;
-		friend class HashTable<T>;
+		// friend class HashTable<T>;
 	};
 }

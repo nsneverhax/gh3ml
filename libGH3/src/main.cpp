@@ -23,3 +23,7 @@
 #include <GH3/Mem/Heap.hpp>
 #include <GH3/Mem/CCompactPool.hpp>
 #include <GH3/Ass/CAssMan.hpp>
+
+#include <GH3/Obj/CTracker.hpp>
+
+GH3::Spt::SingletonPtr<GH3::Obj::CTracker> GH3::Obj_CTracker = { reinterpret_cast<GH3::Obj::CTracker*>(0x00b4f360) };
