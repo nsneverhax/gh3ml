@@ -3,6 +3,7 @@
 #include <GH3/Common.hpp>
 #include <GH3/Mdl/Module.hpp>
 #include <GH3/Obj/CTracker.hpp>
+#include <GH3/Tsk/Task.hpp>
 
 
 namespace GH3::Ass
@@ -12,47 +13,20 @@ namespace GH3::Ass
 	public:
 		undefined4 field0x14;
 		void* field0x18;
-		undefined4 field0x1C;
+		undefined4 unknownFields[32];
 
-		undefined4 field0x20;
-		undefined4 field0x24;
-		undefined4 field0x28;
-		undefined4 field0x2C;
+		Obj::CTracker* Tracker;
 
-		undefined4 field0x30;
-		undefined4 field0x34;
-		undefined4 field0x38;
-		undefined4 field0x3C;
-
-		undefined4 field0x40;
-		undefined4 field0x44;
-		undefined4 field0x48;
-		undefined4 field0x4C;
-
-		undefined4 field0x50;
-		undefined4 field0x54;
-		undefined4 field0x58;
-		undefined4 field0x5C;
-
-		undefined4 field0x60;
-		undefined4 field0x64;
-		undefined4 field0x68;
-		undefined4 field0x6C;
-
-		undefined4 field0x70;
-		undefined4 field0x74;
-		undefined4 field0x78;
-		undefined4 field0x7C;
-
-		undefined4 field0x80;
-		undefined4 field0x84;
-		undefined4 field0x88;
-		undefined4 field0x8C;
-
-		undefined4 field0x90;
-		undefined4 field0x94;
-		undefined4 field0x98;
-
-		undefined4 Tracker;
+		void* field0xA0;
+		undefined4 field0xA4;
+		void* field0xA8;
+		void* field0xAC;
+		undefined4 field0xB0;
+		undefined4 field0xB4;
+		undefined4 field0xB8;
+		undefined4 field0xBC;
+		Tsk::Task<Ass::CAssMan>* Task;
 	};
+
+	SIZE_ASSERT(CAssMan, 0xC4);
 }
