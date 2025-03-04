@@ -103,6 +103,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     {
     case DLL_PROCESS_ATTACH:
 
+        DisableThreadLibraryCalls(hinstDLL);
+
         _gh3Handle = GetCurrentProcess();
 
         if (!fs::exists("no_wine"))
@@ -121,7 +123,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             }
         }
 
-        DisableThreadLibraryCalls(hinstDLL);
+        // V: We need to create the log as quickly as possible.
 
         in::CreateLogFile();
 

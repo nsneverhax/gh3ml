@@ -4,7 +4,6 @@
 #define SIZE_ASSERT(x, s)
 #else
 #define SIZE_ASSERT(x, s) static_assert(sizeof(x) == s)
-//#define SIZE_ASSERT(x, s) static_assert(sizeof(x) == ((s / 4) * 4) + (((s % 4) != 0) * 4))
 #define SIZE_ASSERT_ALIGN(x, s, a) static_assert(sizeof(x) == ((s / a) * a) + (((s % a) != 0) * a))
 #endif // NO_SIZE_ASSERT
 

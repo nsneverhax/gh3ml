@@ -20,6 +20,7 @@ add_library(${PROJECT_NAME} SHARED
     "src/Hooks/DirectXHooks.cpp"
     "src/ModInfo.cpp"
     "src/VersionInfo.cpp"
+    "src/Hooks/AspyrHooks.cpp"
 
     "src/CFunc/CFuncManager.cpp"
     "src/CFunc/DefaultCFuncs.cpp"

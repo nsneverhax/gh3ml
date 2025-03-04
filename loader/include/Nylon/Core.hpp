@@ -39,6 +39,18 @@ namespace nylon
 	/// <returns></returns>
 	std::filesystem::path ResourcesDirectory();
 
+	/// <summary>
+	/// The current directory where Nylon will look for portable resources
+	/// </summary>
+	/// <returns></returns>
+	std::filesystem::path PortableDirectory();
+
+	/// <summary>
+	/// Is Nylon in portable mode?
+	/// </summary>
+	/// <returns></returns>
+	bool IsPortableMode();
+
 	bool IsWine();
 	std::string_view WineVersion();
 

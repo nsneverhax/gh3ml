@@ -18,6 +18,7 @@ bool _unlockFPS = false;
 bool _openConsole = false;
 bool _allowScriptPrintf = false;
 cfg::WindowStyle _windowStyle = cfg::WindowStyle::Fullscreen;
+double _sustainTailSizeMultiplier = 1;
 
 bool _configMalformed = false;
 
@@ -55,6 +56,28 @@ void UnwrapValue(matjson::Value& value, std::string_view name, uint32_t* outValu
 			return;
 
 		*outValue = value[name.data()].asUInt().unwrap();
+
+		return;
+	}
+	catch (...)
+	{
+		in::Log.Warn("Config Variable: {} was malformed.", name);
+		_configMalformed = true;
+		return;
+	}
+}
+void UnwrapValue(matjson::Value& value, std::string_view name, double* outValue, double defaultValue)
+{
+	if (outValue == nullptr)
+		return;
+
+	*outValue = defaultValue;
+	try
+	{
+		if (!value.contains(name.data()))
+			return;
+
+		*outValue = value[name.data()].asDouble().unwrap();
 
 		return;
 	}
@@ -113,6 +136,8 @@ void in::ReadConfig()
 
 	UnwrapValue(object, "windowStyle", reinterpret_cast<uint32_t*>(&_windowStyle), (uint32_t)cfg::WindowStyle::Windowed);
 
+	UnwrapValue(object, "sustainTailSizeMultiplier", &_sustainTailSizeMultiplier, 1.0f);
+
 	if (_configMalformed)
 	{
 		in::Log.Warn("\"{}\" was malformed or the version didn't match, so it will be remade using known values.", cfg::ConfigFilepath().string());
@@ -131,6 +156,7 @@ void in::WriteConfig()
 				{ "windowStyle", 1 },
 				{ "pluginLogType", 1 },
 				{ "unlockfps", false },
+				{ "sustainTailSizeMultiplier", 1.0f },
 				{ "versionInfo", matjson::makeObject({
 					{ "major", nylon::Version().Major},
 					{ "minor", nylon::Version().Minor },
@@ -298,4 +324,8 @@ bool cfg::AllowQScriptPrintf()
 cfg::WindowStyle cfg::GameWindowStyle()
 {
 	return _windowStyle;
+}
+double cfg::SustainTailSizeMultiplier()
+{
+	return _sustainTailSizeMultiplier;
 }

@@ -79,6 +79,16 @@ std::filesystem::path nylon::ResourcesDirectory()
 {
 	return NylonDirectory() / "Resources";
 }
+std::filesystem::path nylon::PortableDirectory()
+{
+	return NylonDirectory() / "Portable";
+}
+
+bool nylon::IsPortableMode()
+{
+	return false;
+}
+
 bool nylon::ReadMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size, size_t* actualSize)
 {
 	return ReadProcessMemory(GH3Handle(), reinterpret_cast<void*>(baseAddress), buffer, size, reinterpret_cast<SIZE_T*>(actualSize));

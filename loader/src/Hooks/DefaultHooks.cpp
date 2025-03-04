@@ -26,6 +26,9 @@
 
 #include <XInput.h>
 
+
+#include "Hooks.hpp"
+
 namespace cfg = nylon::config;
 constexpr int INST_NOP = 0x90;
 
@@ -74,10 +77,39 @@ HWND detourCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowN
     default:
         break;
     }
-    WindowHandle = nylon::hook::Orig<1, nylon::hook::cconv::STDCall, HWND>(dwExStyle, lpClassName, lpWindowName, WS_TILEDWINDOW, 0, 0, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+    WindowHandle = nylon::hook::Orig<1, nylon::hook::cconv::STDCall, HWND>(dwExStyle, lpClassName, lpWindowName, style, 0, 0, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 
 
     return WindowHandle;
+}
+
+#include <shlobj_core.h>
+
+
+std::filesystem::path documentsPath = nylon::PortableDirectory() / "Documents";
+
+HRESULT detour__SHGetFolderPathW(_Reserved_ HWND hwnd, _In_ int csidl, _In_ HANDLE hToken, _In_ DWORD dwFlags, _Out_writes_(MAX_PATH) LPWSTR pszPath)
+{
+    auto result = nylon::hook::Orig<1006, nylon::hook::cconv::STDCall, HRESULT>(hwnd, csidl, hToken, dwFlags, pszPath);
+    std::filesystem::path path = nylon::PortableDirectory();
+    // 0x1C
+    switch (csidl)
+    {
+    case CSIDL_MYDOCUMENTS: // 0x5
+        path /= "Documents";
+        ZeroMemory(pszPath, MAX_PATH);
+        memcpy(pszPath, path.wstring().data(), path.wstring().size() * sizeof(wchar_t));
+        break;
+    }
+
+    return result;
+}
+
+int detour__SHCreateDirectoryExW(HWND hwnd, LPCWSTR pszPath, const SECURITY_ATTRIBUTES* psa)
+{
+    int result = nylon::hook::Orig<1007, nylon::hook::cconv::STDCall, int>(hwnd, pszPath, psa);
+
+    return result;
 }
 
 LRESULT detourDispatchMessageA(MSG* lmMsg)
@@ -243,7 +275,8 @@ int deoutCreateHighwayDrawRect(double * array, float param_2, float param_3, flo
         pSurface->Release();
     }
     
-    float whammySizeMultiplier = ((float)backBufferWidth / 1280.0f);
+    float whammySizeMultiplier = ((float)backBufferWidth / 1280.0f) * nylon::config::SustainTailSizeMultiplier();
+
     return CreateHighwayDrawRect::Orig(
         array, 
         param_2 * whammyMultipliers[1],
@@ -365,7 +398,8 @@ char* detour__CRC_FindChecksumeName(GH3::CRCKey key)
 
 
 
-using WhammyRelatedFUN_0041b760 = nylon::hook::Binding<0x0041b760, nylon::hook::cconv::STDCall, void, int, int, float, void*>;
+//I have no idea why this won't work and it's pissing me off
+using WhammyRelatedFUN_0041b760 = nylon::hook::Binding<0x0041b760, nylon::hook::cconv::FastCall, void, int, int, float, void*>;
 
 void detour__WhammyRelatedFUN_0041b760(int param_1_00, int param_2_00, float param3, void* whammyShortenMultiplier)
 {
@@ -376,8 +410,11 @@ void detour__WhammyRelatedFUN_0041b760(int param_1_00, int param_2_00, float par
     WhammyRelatedFUN_0041b760::Orig(param_1_00, param_2_00, param3, whammyShortenMultiplier);
 }
 
+
+
 void nylon::internal::SetupDefaultHooks()
 {
+
     Log.Info("Setting up default hooks...");
 
     // Vultu: I really don't feel like rewriting the entire function for right now
@@ -407,7 +444,14 @@ void nylon::internal::SetupDefaultHooks()
         reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "RegisterClassA")),
         detour__RegisterClassA
     );
-
+    //nylon::hook::CreateHook<1006, nylon::hook::cconv::STDCall>(
+    //    reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("shell32.dll"), "SHGetFolderPathW")),
+    //    detour__SHGetFolderPathW
+    //);
+    //nylon::hook::CreateHook<1007, nylon::hook::cconv::STDCall>(
+    //    reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("shell32.dll"), "SHCreateDirectoryExW")),
+    //    detour__SHCreateDirectoryExW
+    //);
     nylon::internal::CreateCFuncHooks();
 
     nylon::hook::CreateHook<DebugLog>(detourDebugLog);
@@ -423,12 +467,14 @@ void nylon::internal::SetupDefaultHooks()
     nylon::hook::CreateHook<ControllerUpdate>(detour__ControllerUpdate);
     nylon::hook::CreateHook<CRC_FindChecksumeName>(detour__CRC_FindChecksumeName);
 
-    nylon::hook::CreateHook<WhammyRelatedFUN_0041b760>(detour__WhammyRelatedFUN_0041b760);
+    // nylon::hook::CreateHook<WhammyRelatedFUN_0041b760>(detour__WhammyRelatedFUN_0041b760);
 
     // nylon::hook::CreateHook<Time_UpdateTime>(detourTimeUpdateTime);
 
     // nylon::hook::CreateHook<CFuncWait>(detourCFuncWait);
 
+
+    nylon::internal::SetupAspyrHooks();
 
     _CFuncManager = { };
 

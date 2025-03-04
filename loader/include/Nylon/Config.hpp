@@ -22,4 +22,5 @@ namespace nylon::config
 	bool OpenConsole();
 	bool AllowQScriptPrintf();
 	WindowStyle GameWindowStyle();
+	double SustainTailSizeMultiplier();
 }
