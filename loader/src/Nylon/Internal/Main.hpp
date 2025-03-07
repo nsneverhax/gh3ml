@@ -8,6 +8,10 @@
 #include <Nylon/LogSource.hpp>
 #include <Nylon/ModInfo.hpp>
 
+#define _STR(x) #x
+#define STR(x) _STR(x)
+#define TODO(x) __pragma(message("TODO: " _STR(x) " :: " __FILE__ "@" STR(__LINE__)))
+
 namespace nylon::internal
 {
 	extern LogSource Log;

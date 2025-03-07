@@ -24,6 +24,7 @@
 #include <GH3/Spt/Singleton.hpp>
 
 #include "Hooks/Hooks.hpp"
+#include <Nylon/Checksum.hpp>
 
 
 namespace fs = std::filesystem;
