@@ -1,6 +1,5 @@
 #include <Nylon/Internal/Main.hpp>
 #include "../Imgui/Imgui.hpp"
-#include "DirectXHooks.hpp"
 #include "CFuncHooks.hpp"
 
 #include <Nylon/Hook.hpp>

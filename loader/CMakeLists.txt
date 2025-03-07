@@ -17,10 +17,8 @@ add_library(${PROJECT_NAME} SHARED
     "src/Config.cpp"
     "src/Hooks/DefaultHooks.cpp"
     "src/Hooks/Hook.cpp"
-    "src/Hooks/DirectXHooks.cpp"
     "src/ModInfo.cpp"
     "src/VersionInfo.cpp"
-    "src/Hooks/AspyrHooks.cpp"
 
     "src/CFunc/CFuncManager.cpp"
     "src/CFunc/DefaultCFuncs.cpp"
@@ -32,6 +30,8 @@ add_library(${PROJECT_NAME} SHARED
 
     "src/Imgui/ImGui.cpp"
 )
+
+add_subdirectory(src/hooks)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "include/"

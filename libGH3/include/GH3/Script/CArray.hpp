@@ -22,5 +22,5 @@ namespace GH3::Script
 		void* data;*/
 	};
 
-	SIZE_ASSERT(CArray, 0xC);
+	//SIZE_ASSERT(CArray, 0xC);
 }

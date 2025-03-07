@@ -15,7 +15,6 @@ namespace nylon::internal
 	
 	extern std::map<std::string, ModInfo> LoadedMods;
 	
-	void SetupDefaultHooks();
 	void SetupCFuncRedirection();
 
 	void LoadMods();

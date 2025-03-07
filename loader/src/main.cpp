@@ -23,6 +23,8 @@
 
 #include <GH3/Spt/Singleton.hpp>
 
+#include "Hooks/Hooks.hpp"
+
 
 namespace fs = std::filesystem;
 namespace in = nylon::internal;
@@ -145,6 +147,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             in::Log.Info("Minhook initialized!");
 
         in::SetupDefaultHooks();
+        in::SetupCEngineHooks();
+        in::SetupGuitarFuncsHooks();
 
         in::LoadMods();
 

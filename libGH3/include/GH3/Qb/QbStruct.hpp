@@ -29,7 +29,6 @@ namespace GH3
 		bool GetStruct(CRCKey key, float& out, int param_3 = 1);
 		bool HasKey(CRCKey key);
 	};
-
 	namespace Functions
 	{
 		typedef bool(__thiscall* func__QbStruct_GetTypedValue)(QbStruct* self, uint32_t key, QbValueType valueType, void* value);
@@ -43,4 +42,10 @@ namespace GH3
 		static func_InsertQbKeyItem InsertQbKeyItem = reinterpret_cast<func_InsertQbKeyItem>(0x00479c80);
 	}
 
+}
+
+namespace GH3::Script
+{
+	// TEMP
+	typedef QbStruct CStruct;
 }

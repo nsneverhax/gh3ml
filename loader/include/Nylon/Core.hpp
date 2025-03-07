@@ -46,6 +46,12 @@ namespace nylon
 	std::filesystem::path PortableDirectory();
 
 	/// <summary>
+	/// The current directory where Nylon will emulate MemoryCard functions
+	/// </summary>
+	/// <returns></returns>
+	//std::filesystem::path MemorycardDirectory();
+
+	/// <summary>
 	/// Is Nylon in portable mode?
 	/// </summary>
 	/// <returns></returns>

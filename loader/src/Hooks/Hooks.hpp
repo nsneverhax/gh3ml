@@ -2,6 +2,10 @@
 
 #include <Nylon/Hook.hpp>
 
+#include <cstdint>
+#include <windows.h>
+#include <d3d9.h>
+
 namespace nylon::internal
 {
 	enum
@@ -11,6 +15,12 @@ namespace nylon::internal
 		KEY_ASPYR_GET_CONFIG_NUMBER = 0xEBBF1149, // ?GetConfigNumber@Win@Aspyr@@YANPBDN@Z
 	};
 
+	using D3D9DevicePresent = HRESULT(__stdcall*)(void* self, const RECT* pSourceRect, const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion);
 
+	void SetupDefaultHooks();
+	bool CreateDirectXHooks();
 	void SetupAspyrHooks();
+
+	void SetupCEngineHooks();
+	void SetupGuitarFuncsHooks();
 }
