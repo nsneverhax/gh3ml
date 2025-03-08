@@ -15,7 +15,7 @@ namespace in = nylon::internal;
 
 using namespace GH3::Script;
 
-bool PrintStruct(GH3::QbStruct* params, GH3::Script::CScript* script)
+bool detour__CFunc_PrintStruct(GH3::QbStruct* params, GH3::Script::CScript* script)
 {
     if (params->ComponentList == nullptr)
         nylon::internal::LogGH3.Warn("Struct had a null component list!!");
@@ -85,7 +85,7 @@ bool PrintStruct(GH3::QbStruct* params, GH3::Script::CScript* script)
         case GH3::Script::CComponentType::QTypeQbStruct:
             in::LogGH3.Info("\t{}", key);
             in::LogGH3.SetIndentLevel(in::LogGH3.GetIndentLevel() + 1);
-            PrintStruct(component->StructValue, script);
+            detour__CFunc_PrintStruct(component->StructValue, script);
             in::LogGH3.SetIndentLevel(in::LogGH3.GetIndentLevel() - 1);
             break;
         case GH3::Script::CComponentType::QTypeQbArray:
@@ -126,7 +126,7 @@ bool PrintStruct(GH3::QbStruct* params, GH3::Script::CScript* script)
 	return true;
 }
 
-bool PrintF(GH3::QbStruct* params, CScript* script)
+bool detour__CFunc_PrintF(GH3::QbStruct* params, CScript* script)
 {
     if (!nylon::config::AllowQScriptPrintf())
         return true;
@@ -152,7 +152,7 @@ bool PrintF(GH3::QbStruct* params, CScript* script)
     return true;
 }
 
-bool LoadPak(GH3::QbStruct* params, CScript* script)
+bool detour__CFunc_LoadPak(GH3::QbStruct* params, CScript* script)
 {
     static bool _doPakCheck = true;
 
@@ -198,7 +198,7 @@ bool LoadPak(GH3::QbStruct* params, CScript* script)
     return ret;
 }
 
-bool LoadTexture(GH3::QbStruct* params, CScript* script)
+bool detour__CFunc_LoadTexture(GH3::QbStruct* params, CScript* script)
 {
     char* nameBuffer;
 
@@ -209,14 +209,21 @@ bool LoadTexture(GH3::QbStruct* params, CScript* script)
     return binding::CFunc_LoadTexture::Orig(params, script);
 }
 
+bool detour__CFunc_MemCardSystemInitialize(GH3::QbStruct* params, CScript* script)
+{
+
+    return binding::CFunc_MemCardSystemInitialize::Orig(params, script);
+}
+
 void nylon::internal::CreateCFuncHooks()
 {
     PushLogTask("Creating CFunc hooks");
 
-	hook::CreateHook<binding::CFunc_PrintStruct>(PrintStruct);
-    hook::CreateHook<binding::CFunc_PrintF>(PrintF);
-    hook::CreateHook<binding::CFunc_LoadPak>(LoadPak);
-    hook::CreateHook<binding::CFunc_LoadTexture>(LoadTexture);
+	hook::CreateHook<binding::CFunc_PrintStruct>(detour__CFunc_PrintStruct);
+    hook::CreateHook<binding::CFunc_PrintF>(detour__CFunc_PrintF);
+    hook::CreateHook<binding::CFunc_LoadPak>(detour__CFunc_LoadPak);
+    hook::CreateHook<binding::CFunc_LoadTexture>(detour__CFunc_LoadTexture);
+    hook::CreateHook<binding::CFunc_MemCardSystemInitialize>(detour__CFunc_MemCardSystemInitialize);
 
     PopLogTask();
 }

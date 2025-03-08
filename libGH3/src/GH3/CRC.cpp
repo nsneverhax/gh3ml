@@ -145,6 +145,8 @@ namespace GH3
         for (int i = 0; i < size; i++)
         {
             char c = std::tolower(string[i]);
+            if (c == '/')
+                c = '\\';
             key = CRCTable[(key ^ c) & 0xFF] ^ ((key >> 8) & 0x00FFFFFF);
         }
         return key;
@@ -158,6 +160,8 @@ namespace GH3
         for (int i = 0; string[i] != '\0'; i++)
         {
             char c = std::tolower(string[i]);
+            if (c == '/')
+                c = '\\';
             key = CRCTable[(key ^ c) & 0xFF] ^ ((key >> 8) & 0x00FFFFFF);
         }
         return key;
