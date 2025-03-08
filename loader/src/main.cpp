@@ -25,7 +25,7 @@
 
 #include "Hooks/Hooks.hpp"
 #include <Nylon/Checksum.hpp>
-
+#include <stack>
 
 namespace fs = std::filesystem;
 namespace in = nylon::internal;
@@ -34,10 +34,21 @@ nylon::LogSource in::Log = nylon::LogSource("Nylon");
 nylon::LogSource in::LogGH3 = nylon::LogSource("GH3");
 std::map<std::string, nylon::ModInfo> in::LoadedMods = { };
 
+std::stack<std::string_view> _logTaskStack = { };
+void in::PushLogTask(std::string_view name)
+{
+    in::Log.Info("Starting Task: {}", name);
+    _logTaskStack.push(name);
+}
+void in::PopLogTask()
+{
+    in::Log.Info("Finished Task: {}", _logTaskStack.top()); // mmff,. top..
+    _logTaskStack.pop();
+}
 
 void in::LoadMods()
 {
-    Log.Info("Loading mods...");
+    PushLogTask("Loading Mods");
 
     Log.Info("Loading mods from: \"{}\"", ModsDirectory().string());
 
@@ -66,7 +77,7 @@ void in::LoadMods()
 
     }
 
-    Log.Info("Finished loading mods.");
+    PopLogTask();
 }
 
 bool _isWine = false;

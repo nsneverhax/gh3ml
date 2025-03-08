@@ -9,7 +9,8 @@ namespace nylon
 {
 	class CommandConsole;
 
-	typedef bool(*ConsoleCommandCallback)(CommandConsole&, std::vector<std::string>);
+	using ConsoleCommandCallback = bool(*)(CommandConsole&, std::vector<std::string>);
+	using ConsoleHistory = std::vector<std::string>;
 
 	struct ConsoleCommand
 	{
@@ -38,7 +39,6 @@ namespace nylon
 		ConsoleCommandCallback Callback = nullptr;
 	};
 
-	typedef std::vector<std::string> ConsoleHistory;
 
 	class CommandConsole
 	{

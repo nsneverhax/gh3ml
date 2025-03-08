@@ -10,7 +10,15 @@
 
 namespace nylon
 {
+	/// <summary>
+	/// The date when this version of Nylon was compiled
+	/// </summary>
+	/// <returns></returns>
 	std::string_view CompileDate();
+	/// <summary>
+	/// The time when this version of Nylon was compiled
+	/// </summary>
+	/// <returns></returns>
 	std::string_view CompileTime();
 
 	/// <summary>
@@ -32,12 +40,23 @@ namespace nylon
 	/// The current directory where Nylon will create log files
 	/// </summary>
 	/// <returns></returns>
-	std::filesystem::path LogDirectory();
+	std::filesystem::path LogsDirectory();
 	/// <summary>
 	/// The current directory where Nylon will look for resources
 	/// </summary>
 	/// <returns></returns>
 	std::filesystem::path ResourcesDirectory();
+	/// <summary>
+	/// The current directory where Nylon will look for profiles
+	/// </summary>
+	/// <returns></returns>
+	std::filesystem::path ProfilesDirectory();
+
+	/// <summary>
+	/// Is Nylon in portable mode?
+	/// </summary>
+	/// <returns></returns>
+	bool IsPortableMode();
 
 	/// <summary>
 	/// The current directory where Nylon will look for portable resources
@@ -51,11 +70,6 @@ namespace nylon
 	/// <returns></returns>
 	//std::filesystem::path MemorycardDirectory();
 
-	/// <summary>
-	/// Is Nylon in portable mode?
-	/// </summary>
-	/// <returns></returns>
-	bool IsPortableMode();
 
 	bool IsWine();
 	std::string_view WineVersion();

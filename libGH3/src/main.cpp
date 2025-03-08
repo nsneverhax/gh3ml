@@ -11,9 +11,11 @@
 
 
 #include <GH3/Script/CPair.hpp>
+#include <GH3/Script/CSymbolTableEntry.hpp>
 
 #include <GH3/Lst/Head.hpp>
 #include <GH3/Lst/Node.hpp>
+#include <GH3/Lst/StringHashTable.hpp>
 
 #include <GH3/Tsk/List.hpp>
 #include <GH3/Tsk/BaseTask.hpp>
@@ -26,5 +28,6 @@
 
 #include <GH3/Obj/CTracker.hpp>
 #include <GH3/Qb/CArray.hpp>
+
 
 GH3::Spt::SingletonPtr<GH3::Obj::CTracker> GH3::Obj_CTracker = { reinterpret_cast<GH3::Obj::CTracker*>(0x00b4f360) };

@@ -1,9 +1,10 @@
 #pragma once
 
-#include <GH3/Common.hpp>
+#include <GH3/Keys.hpp>
 
 namespace GH3::CRC
 {
+	// V: Experimental
 	struct ChecksumName
 	{
 		GH3::CRCKey Checksum;
@@ -21,5 +22,12 @@ namespace GH3::CRC
 	void CreateKeyNameAssociation(CRCKey key, char* name);
 
 	char* FindChecksumName(CRCKey key);
+
+
+	// V: Actual proven stuff
+
+
+	CRCKey GenerateCRC(const char* string, int size);
+	CRCKey GenerateCRCFromString(const char* string);
 
 }

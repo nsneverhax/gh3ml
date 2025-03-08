@@ -71,7 +71,7 @@ std::filesystem::path nylon::ModsDirectory()
 {
 	return NylonDirectory() / "Mods";
 }
-std::filesystem::path nylon::LogDirectory()
+std::filesystem::path nylon::LogsDirectory()
 {
 	return NylonDirectory() / "Logs";
 }
@@ -79,15 +79,20 @@ std::filesystem::path nylon::ResourcesDirectory()
 {
 	return NylonDirectory() / "Resources";
 }
-std::filesystem::path nylon::PortableDirectory()
+std::filesystem::path nylon::ProfilesDirectory()
 {
-	return NylonDirectory() / "Portable";
+	return NylonDirectory() / "Profiles";
 }
 
 bool nylon::IsPortableMode()
 {
 	return false;
 }
+std::filesystem::path nylon::PortableDirectory()
+{
+	return NylonDirectory() / "Portable";
+}
+
 
 bool nylon::ReadMemory(uintptr_t baseAddress, std::uint8_t* buffer, size_t size, size_t* actualSize)
 {

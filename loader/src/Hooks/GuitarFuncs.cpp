@@ -1,7 +1,9 @@
 #include "hooks/Hooks.hpp"
+#include <Nylon/Checksum.hpp>
 
 #include <GH3/Qb/QbStruct.hpp>
 
+#include <GH3/Script/CSymbolTableEntry.hpp>
 
 uint32_t mat_green = 0x46036C66;
 uint32_t mat_red = 0xD803362A;
@@ -33,6 +35,9 @@ GH3::CRCKey keyList[] = {
 	0xD3541622
 };
 
+
+float* GemStarScale = reinterpret_cast<float*>(0x00a130d0);
+
 void detour__GuitarFuncs_Create2DGem(GH3::Script::CStruct* playerStatus, int32_t player, GH3::CRCKey colorKey, int32_t marker, float time, int32_t entry, int32_t gemCount, void* songArray)
 {
 	//NormalGemMaterialArray[0] = 0xD803362A;
@@ -52,6 +57,8 @@ void detour__GuitarFuncs_Create2DGem(GH3::Script::CStruct* playerStatus, int32_t
 	//}
 
 	GuitarFuncs_Create2DGem::Orig(playerStatus, player, colorKey, marker, time, entry, gemCount, songArray);
+
+	float myGemStarScale = GH3::Script::GetFloat(nylon::Hash("gem_star_scale"));
 }
 
 

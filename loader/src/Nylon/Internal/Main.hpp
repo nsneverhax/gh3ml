@@ -19,6 +19,10 @@ namespace nylon::internal
 	
 	extern std::map<std::string, ModInfo> LoadedMods;
 	
+	void PushLogTask(std::string_view name);
+	void PopLogTask();
+
+
 	void SetupCFuncRedirection();
 
 	void LoadMods();

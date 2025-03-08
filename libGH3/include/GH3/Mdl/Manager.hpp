@@ -10,9 +10,14 @@ namespace GH3::Mdl
 {
 	class Manager : public Spt::Class
 	{
+	public:
 		Tsk::Task<Mdl::Manager> ProcessModulesTask;
 		Lst::Head<Mdl::Module> ModuleList;
 		bool ControlChange;
+
+		void RegisterModule(Module* mdl);
+		void StartModule(Module* mdl);
+
 	};
 
 	// SIZE_ASSERT(Manager, 0x18);

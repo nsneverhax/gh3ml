@@ -4,7 +4,9 @@
 
 namespace cf = nylon::CFuncs;
 
-bool cf::SetConVar(GH3::QbStruct* params, GH3::CScript* script)
+using namespace GH3::Script;
+
+bool cf::SetConVar(GH3::QbStruct* params, CScript* script)
 {
 	std::string name = { };
 	std::string desc = { };
@@ -16,11 +18,11 @@ bool cf::SetConVar(GH3::QbStruct* params, GH3::CScript* script)
 	params->GetString(KEY_DESC, &descData);
 	return true;
 }
-bool cf::GetConVar(GH3::QbStruct* params, GH3::CScript* script)
+bool cf::GetConVar(GH3::QbStruct* params, CScript* script)
 {
 	return true;
 }
-bool cf::HasConVar(GH3::QbStruct* params, GH3::CScript* script)
+bool cf::HasConVar(GH3::QbStruct* params, CScript* script)
 {
 	std::string name = { };
 
@@ -28,13 +30,13 @@ bool cf::HasConVar(GH3::QbStruct* params, GH3::CScript* script)
 
 	return Console.HasConsoleCommand(name);
 }
-bool cf::RegisterConVar(GH3::QbStruct* params, GH3::CScript* script)
+bool cf::RegisterConVar(GH3::QbStruct* params, CScript* script)
 {
 	return true;
 }
 extern bool cf::PrintStructReportType = true;
 
-bool cf::SetPrintStructReportType(GH3::QbStruct * params, GH3::CScript * script)
+bool cf::SetPrintStructReportType(GH3::QbStruct * params, CScript * script)
 {
 	if (params->HasKey(KEY_TRUE))
 		PrintStructReportType = true;
@@ -42,14 +44,14 @@ bool cf::SetPrintStructReportType(GH3::QbStruct * params, GH3::CScript * script)
 		PrintStructReportType = false;
 	return true;
 }
-bool cf::GetPrintStructReportType(GH3::QbStruct* params, GH3::CScript* script)
+bool cf::GetPrintStructReportType(GH3::QbStruct* params, CScript* script)
 {
 	return PrintStructReportType;
 }
 
 extern bool cf::PrintStructReportName = true;
 
-bool cf::SetPrintStructReportName(GH3::QbStruct* params, GH3::CScript* script)
+bool cf::SetPrintStructReportName(GH3::QbStruct* params, CScript* script)
 {
 	if (params->HasKey(KEY_TRUE))
 		PrintStructReportType = true;
@@ -57,7 +59,7 @@ bool cf::SetPrintStructReportName(GH3::QbStruct* params, GH3::CScript* script)
 		PrintStructReportType = false;
 	return true;
 }
-bool cf::GetPrintStructReportName(GH3::QbStruct* params, GH3::CScript* script)
+bool cf::GetPrintStructReportName(GH3::QbStruct* params, CScript* script)
 {
 	return PrintStructReportType;
 }

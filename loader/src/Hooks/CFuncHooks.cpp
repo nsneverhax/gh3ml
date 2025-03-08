@@ -13,7 +13,9 @@ namespace binding = nylon::internal::binding;
 
 namespace in = nylon::internal;
 
-bool PrintStruct(GH3::QbStruct* params, GH3::CScript* script)
+using namespace GH3::Script;
+
+bool PrintStruct(GH3::QbStruct* params, GH3::Script::CScript* script)
 {
     if (params->ComponentList == nullptr)
         nylon::internal::LogGH3.Warn("Struct had a null component list!!");
@@ -33,7 +35,7 @@ bool PrintStruct(GH3::QbStruct* params, GH3::CScript* script)
         bool reportName = nylon::CFuncs::PrintStructReportName;
         bool reportType = nylon::CFuncs::PrintStructReportType;
 
-        if (!reportName && !reportName)
+        if (!reportName && !reportType)
             key = "";
         else if (reportName && !reportType)
             key = std::format("{} : ", GH3::CRC::FindChecksumName(component->Key));
@@ -124,7 +126,7 @@ bool PrintStruct(GH3::QbStruct* params, GH3::CScript* script)
 	return true;
 }
 
-bool PrintF(GH3::QbStruct* params, GH3::CScript* script)
+bool PrintF(GH3::QbStruct* params, CScript* script)
 {
     if (!nylon::config::AllowQScriptPrintf())
         return true;
@@ -150,7 +152,7 @@ bool PrintF(GH3::QbStruct* params, GH3::CScript* script)
     return true;
 }
 
-bool LoadPak(GH3::QbStruct* params, GH3::CScript* script)
+bool LoadPak(GH3::QbStruct* params, CScript* script)
 {
     static bool _doPakCheck = true;
 
@@ -196,7 +198,7 @@ bool LoadPak(GH3::QbStruct* params, GH3::CScript* script)
     return ret;
 }
 
-bool LoadTexture(GH3::QbStruct* params, GH3::CScript* script)
+bool LoadTexture(GH3::QbStruct* params, CScript* script)
 {
     char* nameBuffer;
 
@@ -209,12 +211,12 @@ bool LoadTexture(GH3::QbStruct* params, GH3::CScript* script)
 
 void nylon::internal::CreateCFuncHooks()
 {
-    in::Log.Info("Creating CFunc Hooks...");
+    PushLogTask("Creating CFunc hooks");
 
 	hook::CreateHook<binding::CFunc_PrintStruct>(PrintStruct);
     hook::CreateHook<binding::CFunc_PrintF>(PrintF);
     hook::CreateHook<binding::CFunc_LoadPak>(LoadPak);
     hook::CreateHook<binding::CFunc_LoadTexture>(LoadTexture);
 
-    in::Log.Info("Finished creating CFunc Hooks");
+    PopLogTask();
 }

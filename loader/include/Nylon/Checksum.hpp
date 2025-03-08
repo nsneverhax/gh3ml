@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef butts
+#define butts
+
 namespace nylon
 {
     constexpr std::uint32_t CRC32Table[] = {
@@ -69,16 +72,38 @@ namespace nylon
         0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
     };
 
-    consteval char FixChar(char c)
+    constexpr char FixChar(char c)
     {
-        return (c >= 'A' && c <= 'Z') ? (c + 32) : (c == '/') ? '\\' : c;
+        if (c >= 'A' && c <= 'Z')
+            return c + 32;
+        if (c == '/')
+            return '\\';
+
+        return c;
     }
-    consteval std::uint32_t HashChar(char c, std::uint32_t crc)
+    constexpr std::uint32_t HashChar(char c, std::uint32_t crc)
     {
-        return CRC32Table[crc ^ FixChar(c) & 0xFF] ^ (crc >> 8);
+        return CRC32Table[(crc ^ FixChar(c)) & 0xFF] ^ ((crc >> 8) & 0x00FFFFFF);
     }
-    consteval std::uint32_t Hash(const char* key, uint32_t previousKey = 0xFFFFFFFF)
+
+    constexpr std::uint32_t Hash(const char* string, uint32_t previousKey = 0xffffffff)
     {
-        return (!key) ? 0 : (*key == '\0') ? previousKey : (Hash(key + 1, HashChar(*key, previousKey)));
+        if (string == nullptr)
+            return 0;
+        std::uint32_t key = 0xffffffff;
+        const char* ch = string;
+
+        while (true)
+        {
+            char c = *ch++;
+
+            if (c == '\0')
+                break;
+
+            key = CRC32Table[(key ^ c) & 0xFF] ^ ((key >> 8) & 0x00FFFFFF);
+        }
+        return key;
+
     }
 }
+#endif

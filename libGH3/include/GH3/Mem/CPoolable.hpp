@@ -6,6 +6,7 @@
 
 namespace GH3::Mem
 {
+	// V: Are these static members?
 	class CPoolable
 	{
 		CCompactPool* Pools[2];

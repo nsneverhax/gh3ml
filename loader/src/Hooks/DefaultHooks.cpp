@@ -28,6 +28,8 @@
 
 #include "Hooks.hpp"
 
+#include<Nylon/Checksum.hpp>
+
 namespace cfg = nylon::config;
 constexpr int INST_NOP = 0x90;
 
@@ -54,7 +56,7 @@ HWND WindowHandle = nullptr;
 HWND detourCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
 {
     uint32_t* debugFullScreen = reinterpret_cast<uint32_t*>(0x00c4cbdc);
-
+    uint32_t CreateWindowExAHookID = (uint32_t)nylon::Hash("1234");
     uint32_t style = 0;
     switch (cfg::GameWindowStyle())
     {
@@ -76,7 +78,7 @@ HWND detourCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowN
     default:
         break;
     }
-    WindowHandle = nylon::hook::Orig<1, nylon::hook::cconv::STDCall, HWND>(dwExStyle, lpClassName, lpWindowName, style, 0, 0, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+    WindowHandle = nylon::hook::Orig<1000, nylon::hook::cconv::STDCall, HWND>(dwExStyle, lpClassName, lpWindowName, style, 0, 0, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 
 
     return WindowHandle;
@@ -413,8 +415,7 @@ void detour__WhammyRelatedFUN_0041b760(int param_1_00, int param_2_00, float par
 
 void nylon::internal::SetupDefaultHooks()
 {
-
-    Log.Info("Setting up default hooks...");
+    PushLogTask("Setting up default hooks");
 
     // Vultu: I really don't feel like rewriting the entire function for right now
     // so I'm going NOP where some global variables are set
@@ -429,7 +430,7 @@ void nylon::internal::SetupDefaultHooks()
     }
 
 
-    nylon::hook::CreateHook<1, nylon::hook::cconv::STDCall>(
+    nylon::hook::CreateHook<1000, nylon::hook::cconv::STDCall>(
         reinterpret_cast<uintptr_t>(GetProcAddress(LoadLibraryA("user32.dll"), "CreateWindowExA")),
         detourCreateWindowExA
     );
@@ -479,5 +480,5 @@ void nylon::internal::SetupDefaultHooks()
 
     _CFuncManager.Register();
 
-    Log.Info("Finished setting up default hooks.");
+    PopLogTask();
 }

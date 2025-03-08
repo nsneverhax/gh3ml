@@ -22,26 +22,26 @@ bool in::CreateLogFile()
 	in::Log.Debug("Creating log file...");
 	try
 	{
-		if (!fs::exists(LogDirectory()) || !fs::is_directory(LogDirectory()))
+		if (!fs::exists(LogsDirectory()) || !fs::is_directory(LogsDirectory()))
 		{
-			in::Log.Debug("Creating log directory: {}", LogDirectory().string());
-			fs::create_directory(LogDirectory());
+			in::Log.Debug("Creating log directory: {}", LogsDirectory().string());
+			fs::create_directory(LogsDirectory());
 		}
 
 
-		for (const auto& entry : fs::directory_iterator(LogDirectory()))
+		for (const auto& entry : fs::directory_iterator(LogsDirectory()))
 		{
 			if (entry.path().filename().string().starts_with("latest"))
 			{
 				std::string newName = entry.path().filename().string();
 				newName = newName.substr(newName.find_first_of('-') + 1);
-				fs::rename(entry.path(), LogDirectory() / newName);
+				fs::rename(entry.path(), LogsDirectory() / newName);
 			}
 		}
 
 		auto now = nylon::TimePoint::LocalNow();
 
-		logFilePath = LogDirectory() / std::format("latest-{}-{}-{} {}-{}-{}.log", now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+		logFilePath = LogsDirectory() / std::format("latest-{}-{}-{} {}-{}-{}.log", now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
 		
 		logStream.open(logFilePath.string());
 
