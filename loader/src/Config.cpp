@@ -190,7 +190,7 @@ void in::ReadKeyAssociations(std::filesystem::path path)
 
 	if (!std::filesystem::exists(filepath))
 	{
-		in::Log.Info("Did not find \"{}\"", filepath.string());
+		in::Log.Warn("Did not find \"{}\"", filepath.string());
 		return;
 	}
 
@@ -199,7 +199,7 @@ void in::ReadKeyAssociations(std::filesystem::path path)
 		in::Log.Warn("Found \"{}\" but it was a directory.", filepath.string());
 		return;
 	}
-	in::Log.Warn("Found \"{}\" ", filepath.string());
+	in::Log.Info("Found \"{}\" ", filepath.string());
 
 	std::ifstream file = { };
 
