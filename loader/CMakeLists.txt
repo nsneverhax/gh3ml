@@ -24,7 +24,7 @@ add_library(${PROJECT_NAME} SHARED
     "src/CFunc/DefaultCFuncs.cpp"
     "src/Logging/LogFile.cpp"
     "src/Logging/LogSource.cpp"
-    "src/CommandConsole.cpp"
+    "src/Nylon/CommandConsole.cpp"
 
     "src/Hooks/CFuncHooks.cpp"
 

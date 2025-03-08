@@ -137,7 +137,7 @@ namespace GH3
 
 
 
-    CRCKey GenerateCRC(const char* string, int size)
+    CRCKey CRC::GenerateCRC(const char* string, int size)
     {
         if (string == nullptr || size <= 0)
             return 0;
@@ -150,7 +150,7 @@ namespace GH3
         return key;
     }
 
-    CRCKey GenerateCRCFromString(const char* string)
+    CRCKey CRC::GenerateCRCFromString(const char* string)
     {
         if (string == nullptr)
             return 0;

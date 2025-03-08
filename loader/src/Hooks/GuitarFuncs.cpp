@@ -57,8 +57,6 @@ void detour__GuitarFuncs_Create2DGem(GH3::Script::CStruct* playerStatus, int32_t
 	//}
 
 	GuitarFuncs_Create2DGem::Orig(playerStatus, player, colorKey, marker, time, entry, gemCount, songArray);
-
-	float myGemStarScale = GH3::Script::GetFloat(nylon::Hash("gem_star_scale"));
 }
 
 

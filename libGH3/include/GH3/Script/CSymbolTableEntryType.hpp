@@ -21,4 +21,6 @@ namespace GH3::Script
 		ARRAY,
 		NAME
 	};
+
+	const char* GetTypeName(CSymbolTableEntryType type);
 }

@@ -1,6 +1,9 @@
 #include <Nylon/CommandConsole.hpp>
 #include <Nylon/VersionInfo.hpp>
 #include <Nylon/Internal/Main.hpp>
+#include <Nylon/Checksum.hpp>
+#include <GH3/CRC.hpp>
+#include <GH3/Script/CSymbolTableEntry.hpp>
 
 #include <format>
 #include "Imgui/ImGui.hpp"
@@ -155,6 +158,52 @@ bool command_WriteMemory(nylon::CommandConsole& caller, std::vector<std::string>
 	return true;
 }
 
+
+bool command_string_getfloat(nylon::CommandConsole& caller, std::vector<std::string> arguments)
+{
+	if (arguments.size() != 2)
+	{
+		caller.PushHistory("Invalid argument count.");
+		return false;
+	}
+
+	// V: This could be better but it'll do for now
+
+	std::string buff = { arguments[1].c_str() };
+	for (auto i = 2; i < arguments.size(); i++)
+	{
+		buff.append(arguments[i]);
+
+		if (i != arguments.size() - 1)
+			buff.append(" ");
+	}
+
+	GH3::CRCKey key = nylon::Hash(buff.c_str());
+	
+	auto entry = GH3::Script::Resolve(key);
+
+	if (entry == nullptr)
+	{
+		caller.PushHistory(std::format("Hashed '{0}' as 0x{1:08X} :: Entry returned null. (It didn't exist or wasn't found in the Symbol table)", buff, key));
+		return true;
+	}
+
+	float value = 0;
+
+	if (entry->Type == GH3::Script::CSymbolTableEntryType::FLOAT)
+		value = entry->FloatValue;
+	else if (entry->Type == GH3::Script::CSymbolTableEntryType::INTEGER)
+		value = (float)entry->UInt32Value;
+	else
+	{
+		caller.PushHistory(std::format("Hashed '{}' as 0x{:08X} :: Type cannot be casted to float: {}", buff, key, GH3::Script::GetTypeName(entry->Type)));
+		return true;
+	}
+
+	caller.PushHistory(std::format("Hashed '{}' as 0x{:08X} :: ({}) = {}", buff, key, GH3::Script::GetTypeName(entry->Type), value));
+
+	return true;
+}
 int TextInputCallback_CallbackHistory(nylon::CommandConsole* console, ImGuiInputTextCallbackData* data)
 {
 	return 0;
@@ -239,6 +288,7 @@ nylon::CommandConsole::CommandConsole()
 	RegisterCommand(ConsoleCommand(":3", ":3", ":3", command_ColonThree));
 	RegisterCommand(ConsoleCommand("monitorvar", "(not yet implemented)", "(not yet implemented)", nullptr));
 	RegisterCommand(ConsoleCommand("writemem", "Write a value at a given memory address", "writemem <address> <uint8|int8|uint16|int16|uint32|int32|float> <value>", command_WriteMemory));
+	RegisterCommand(ConsoleCommand("script_getfloat", "Calls Script::GetFloat", "script_getfloat <name>", command_string_getfloat));
 }
 
 bool nylon::CommandConsole::RegisterCommand(const ConsoleCommand& command)

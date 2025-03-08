@@ -14,11 +14,11 @@ namespace GH3
 
 		while (true)
 		{
-			if (entry->NameKey == key)
-				break;
-
 			if (entry == nullptr)
 				return entry;
+
+			if (entry->NameKey == key)
+				break;
 
 			entry = entry->Next;
 		}
