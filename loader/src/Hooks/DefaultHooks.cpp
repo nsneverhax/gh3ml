@@ -53,10 +53,37 @@ void detourDebugLog(char* fmt, va_list args)
 
 HWND WindowHandle = nullptr;
 
+void MoveWindow(int posx, int posy)
+{
+    RECT rectClient, rectWindow;
+    HWND hWnd = GetConsoleWindow();
+    GetClientRect(hWnd, &rectClient);
+    GetWindowRect(hWnd, &rectWindow);
+    MoveWindow(hWnd, posx, posy, rectClient.right - rectClient.left, rectClient.bottom - rectClient.top, TRUE);
+}
+void MoveCenter()
+{
+    RECT rectClient, rectWindow;
+    HWND hWnd = GetConsoleWindow();
+    GetClientRect(hWnd, &rectClient);
+    GetWindowRect(hWnd, &rectWindow);
+    int posx, posy;
+    posx = GetSystemMetrics(SM_CXSCREEN) / 2 - (rectWindow.right - rectWindow.left) / 2,
+    posy = GetSystemMetrics(SM_CYSCREEN) / 2 - (rectWindow.bottom - rectWindow.top) / 2,
+
+    MoveWindow(hWnd, posx, posy, rectClient.right - rectClient.left, rectClient.bottom - rectClient.top, TRUE);
+}
+
 HWND detourCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
 {
     uint32_t* debugFullScreen = reinterpret_cast<uint32_t*>(0x00c4cbdc);
-    uint32_t CreateWindowExAHookID = (uint32_t)nylon::Hash("1234");
+    // uint32_t CreateWindowExAHookID = (uint32_t)nylon::Hash("1234");
+
+    int windowWidth = nWidth;
+    int windowHeight = nHeight;
+    uint32_t* configVideoWidth = reinterpret_cast<uint32_t*>(0x00c4cbe4);
+    uint32_t* configVideoHeight = reinterpret_cast<uint32_t*>(0x00c4cbe0);
+
     uint32_t style = 0;
     switch (cfg::GameWindowStyle())
     {
@@ -70,16 +97,36 @@ HWND detourCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowN
     case cfg::WindowStyle::BorderlessWindowed:
         *debugFullScreen = 0;
         style = WS_POPUP;
+        windowWidth = *configVideoWidth;
+        windowHeight = *configVideoHeight;
         break;
     case cfg::WindowStyle::BorderlessFullscreen:
+        TODO(Need to set the fullscreen size!!!);
         *debugFullScreen = 0;
         style = WS_POPUP;
+        windowWidth = *configVideoWidth;
+        windowHeight = *configVideoHeight;
         break;
     default:
         break;
     }
-    WindowHandle = nylon::hook::Orig<1000, nylon::hook::cconv::STDCall, HWND>(dwExStyle, lpClassName, lpWindowName, style, 0, 0, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 
+
+    WindowHandle = nylon::hook::Orig<1000, nylon::hook::cconv::STDCall, HWND>(dwExStyle, lpClassName, lpWindowName, style, X, Y, windowWidth, windowHeight, hWndParent, hMenu, hInstance, lpParam);
+    
+    //MoveCenter();
+
+    //RECT rect;
+    //if (GetWindowRect(WindowHandle, &rect))
+    //{
+    //    int width = rect.right - rect.left;
+    //    int height = rect.bottom - rect.top;
+
+    //    int height2 = rect.bottom - rect.top;
+    //    
+    //    auto xSize = GetSystemMetrics(SM_CXSCREEN);
+    //    auto ySize = GetSystemMetrics(SM_CYSCREEN);
+    //}
 
     return WindowHandle;
 }
@@ -185,6 +232,9 @@ void detourVideo_InitializeDevice(void* engineParams)
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(WindowHandle);
     ImGui_ImplDX9_Init(*gh3::Direct3DDevice);
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\consola.ttf", 14);
 
     nylon::internal::Log.Info("Hooking DirectX 9...");
     nylon::internal::CreateDirectXHooks();

@@ -1,11 +1,16 @@
 #include <Nylon/VersionInfo.hpp>
 #include <format>
 
-nylon::VersionInfo _currentVersion = { 1, 4, 0, nylon::VersionType::Alpha };
+nylon::VersionInfo _currentVersion = { 1, 5, 0, nylon::VersionType::Alpha };
+bool _isPreRelease = true;
 
 const nylon::VersionInfo& nylon::Version()
 {
 	return _currentVersion;
+}
+bool nylon::IsPreRelease()
+{
+	return _isPreRelease;
 }
 std::string nylon::to_string(VersionType value, bool shortHand)
 {
@@ -25,5 +30,5 @@ std::string nylon::to_string(VersionType value, bool shortHand)
 }
 std::string nylon::to_string(const VersionInfo& value)
 {
-	return std::format("{}.{}.{}-{}", value.Major, value.Minor, value.Revision, to_string(value.Type));
+	return std::format("{}{}.{}.{}-{}", _isPreRelease ? "pre-" : "", to_string(value.Type), value.Major, value.Minor, value.Revision);
 }

@@ -1,7 +1,7 @@
 {
-  "openGH3Console": true,
+"openGH3Console": true,
   "allowQScriptPrintf": true,
-  "windowStyle": 1,
+  "windowStyle": 3,
   "pluginLogType": 1,
   "unlockfps": false,
   "windowWidth": 1920,

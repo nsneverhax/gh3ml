@@ -348,7 +348,7 @@ void nylon::CommandConsole::Draw()
 	static std::string consoleTitleString = "";
 	if (consoleTitleString.empty())
 	{
-		consoleTitleString = std::format("Nylon Console - v{}", to_string(nylon::Version()));
+		consoleTitleString = std::format("Nylon Console - {}", to_string(nylon::Version()));
 	}
 
 	if (!ImGui::Begin(consoleTitleString.c_str()))

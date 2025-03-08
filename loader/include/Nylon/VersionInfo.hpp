@@ -105,6 +105,8 @@ namespace nylon
 	/// <returns></returns>
 	const VersionInfo& Version();
 
+	bool IsPreRelease();
+
 	std::string to_string(VersionType value, bool shortHand = false);
 	std::string to_string(const VersionInfo& value);
 }
