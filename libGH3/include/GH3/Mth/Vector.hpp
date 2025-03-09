@@ -1,13 +1,24 @@
 #pragma once
 
+#include <GH3/Common.hpp>
+
 namespace GH3::Mth
 {
-	class Vector
+	struct Vector2f
 	{
-	public:
-		uint8_t gap0[1];
-		uint8_t byte1;
+		float X;
+		float Y;
+	};
 
+	struct Vector3f
+	{
+		float X;
+		float Y;
+		float Z;
+	};
+
+	struct Vector4f
+	{
 		float X;
 		float Y;
 		float Z;

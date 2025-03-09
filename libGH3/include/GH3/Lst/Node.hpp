@@ -11,7 +11,7 @@ namespace GH3::Lst
 	enum class NodePriority : uint16_t
 	{
 		vNORMAL_PRIROITY = 0,
-		VHEAD_NODE = UINT32_MAX
+		VHEAD_NODE = UINT16_MAX
 	};
 
 	enum class SystemTaskPriority

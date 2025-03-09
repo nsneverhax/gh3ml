@@ -30,5 +30,5 @@ namespace GH3::Script
 		QTypeMap = 0x36,
 	};
 
-	std::string to_string(CComponentType type);
+	std::string to_string(CComponentType type); // TODO MOVE THIS
 }

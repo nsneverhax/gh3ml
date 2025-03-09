@@ -8,6 +8,10 @@
 #include <chrono>
 #include <type_traits>
 
+#define _STR(x) #x
+#define STR(x) _STR(x)
+#define TODO(x) __pragma(message("TODO: " _STR(x) " :: " __FILE__ "@" STR(__LINE__)))
+
 namespace nylon
 {
 	/// <summary>
@@ -46,11 +50,6 @@ namespace nylon
 	/// </summary>
 	/// <returns></returns>
 	std::filesystem::path ResourcesDirectory();
-	/// <summary>
-	/// The current directory where Nylon will look for profiles
-	/// </summary>
-	/// <returns></returns>
-	std::filesystem::path ProfilesDirectory();
 
 	/// <summary>
 	/// Is Nylon in portable mode?

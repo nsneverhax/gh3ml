@@ -22,13 +22,9 @@ add_library(${PROJECT_NAME} SHARED
     "src/CFunc/DefaultCFuncs.cpp"
     "src/Logging/LogFile.cpp"
     "src/Logging/LogSource.cpp"
-    "src/Nylon/CommandConsole.cpp"
-    "src/Nylon/Hook.cpp"
-
 )
 
-add_subdirectory("src/Nylon/Internal/Hooks")
-add_subdirectory("src/Nylon/Internal/ImGUI")
+add_subdirectory("src/Nylon")
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "include/"

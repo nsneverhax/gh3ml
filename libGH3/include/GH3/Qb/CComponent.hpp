@@ -35,7 +35,7 @@ namespace GH3::Script
 			char* CStringValue;
 			wchar_t* WStringValue;
 			Script::CPair* PairValue;
-			Mth::Vector* VectorPair;
+			Mth::Vector4f* VectorValue;
 			// QTypeScript
 			// QTypeCFunc
 			// QTypeUnk9

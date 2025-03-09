@@ -61,11 +61,13 @@ void detour__GuitarFuncs_Create2DGem(GH3::Script::CStruct* playerStatus, int32_t
 }
 
 
+
 void nylon::internal::SetupGuitarFuncsHooks()
 {
 	Log.Info("Setting up GuitarFuncs Hooks...");
 
-	nylon::hook::CreateHook<GuitarFuncs_Create2DGem>(detour__GuitarFuncs_Create2DGem);
+
+	//nylon::hook::CreateHook<GuitarFuncs_Create2DGem>(detour__GuitarFuncs_Create2DGem);
 
 	Log.Info("Finished setting up GuitarFuncs hooks.");
 }

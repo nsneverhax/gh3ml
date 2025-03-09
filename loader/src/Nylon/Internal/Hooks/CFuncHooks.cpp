@@ -71,7 +71,7 @@ bool detour__CFunc_PrintStruct(GH3::QbStruct* params, GH3::Script::CScript* scri
             in::LogGH3.Info("\t{0}({1}, {2})", key, component->PairValue->X, component->PairValue->Y);
             break;
         case GH3::Script::CComponentType::QTypeVector:
-            in::LogGH3.Info("\t{0}({1}, {2}, {3}, {4})", key, component->VectorPair->X, component->VectorPair->Y, component->VectorPair->Z, component->VectorPair->W);
+            in::LogGH3.Info("\t{0}({1}, {2}, {3}, {4})", key, component->VectorValue->X, component->VectorValue->Y, component->VectorValue->Z, component->VectorValue->W);
             break;
         case GH3::Script::CComponentType::QTypeScript:
             in::LogGH3.Info("\t{}(not implemented, please report this to Vultu with your code!)", key);
@@ -209,15 +209,74 @@ bool detour__CFunc_LoadTexture(GH3::QbStruct* params, CScript* script)
     return binding::CFunc_LoadTexture::Orig(params, script);
 }
 
+#include <Nylon/Profile.hpp>
+
+nylon::Profile temp = { };
+
+bool detour__CFuncs_SetGemConstants(GH3::QbStruct* params, CScript* script)
+{
+    auto ret = binding::CFuncs_SetGemConstants::Orig(params, script);
+
+    GH3::CRCKey* DefaultMaterials = reinterpret_cast<GH3::CRCKey*>(0x00a178f4);
+    GH3::CRCKey* DefaultHOPOMaterials = reinterpret_cast<GH3::CRCKey*>(0x00a178e0);
+
+    GH3::CRCKey* StarPhraseMaterials = reinterpret_cast<GH3::CRCKey*>(0x00a178cc);
+    GH3::CRCKey* StarPhraseHOPOMaterials = reinterpret_cast<GH3::CRCKey*>(0x00a178b8);
+
+    GH3::CRCKey* BattlePhraseMaterials = reinterpret_cast<GH3::CRCKey*>(0x00a178a4);
+    GH3::CRCKey* BattlePhraseHOPOMaterials = reinterpret_cast<GH3::CRCKey*>(0x00a17890);
+
+    GH3::CRCKey* ActivePowerMaterials = reinterpret_cast<GH3::CRCKey*>(0x00a1787c);
+    GH3::CRCKey* ActivePowerHOPOMaterials = reinterpret_cast<GH3::CRCKey*>(0x00a17868);
+
+    GH3::CRCKey* WhammyMaterials = reinterpret_cast<GH3::CRCKey*>(0x00a1791c);
+
+    for (auto i = 0; i < 5; i++)
+    {
+        auto laneMaterial = temp.GetGuitarLaneMaterialInfo(static_cast<nylon::HighwayLane>(i));
+        DefaultMaterials[i] = laneMaterial.DefaultGems.Strum;
+        DefaultHOPOMaterials[i] = laneMaterial.DefaultGems.HOPO;
+
+        StarPhraseMaterials[i] = laneMaterial.StarPowerPhraseGems.Strum;
+        StarPhraseHOPOMaterials[i] = laneMaterial.StarPowerPhraseGems.HOPO;
+
+        BattlePhraseMaterials[i] = laneMaterial.BattlePowerPhraseGems.Strum;
+        BattlePhraseHOPOMaterials[i] = laneMaterial.BattlePowerPhraseGems.HOPO;
+
+        ActivePowerMaterials[i] = laneMaterial.StarPowerGems.Strum;
+        ActivePowerHOPOMaterials[i] = laneMaterial.StarPowerGems.HOPO;
+
+        WhammyMaterials[i] = laneMaterial.SustainMaterial;
+
+        // in::Log.Info("WhammyMaterials[{}] : {}", i, GH3::CRC::FindChecksumName(WhammyMaterials[i]));
+        // 
+        //in::Log.Info("DefaultMaterials[{}] : {:#8}", i, (DefaultMaterials[i]));
+        //in::Log.Info("DefaultHOPOMaterials[{}] : {:#8}", i, (DefaultHOPOMaterials[i]));
+
+        //in::Log.Info("StarPhraseMaterials[{}] : {:#8}", i, (StarPhraseMaterials[i]));
+        //in::Log.Info("StarPhraseHOPOMaterials[{}] : {:#8}", i, (StarPhraseHOPOMaterials[i]));
+
+        //in::Log.Info("BattlePhraseMaterials[{}] : {:#8}", i, (BattlePhraseMaterials[i]));
+        //in::Log.Info("BattlePhraseHOPOMaterials[{}] : {:#8}", i, (BattlePhraseHOPOMaterials[i]));
+
+        //in::Log.Info("ActivePowerMaterials[{}] : {:#8}", i, (ActivePowerMaterials[i]));
+        //in::Log.Info("ActivePowerHOPOMaterials[{}] : {:#8}", i, (ActivePowerHOPOMaterials[i]));
+    }
+
+    return ret;
+}
 
 void nylon::internal::CreateCFuncHooks()
 {
     PushLogTask("Creating CFunc hooks");
 
+    temp.SetDefaults();
+
 	hook::CreateHook<binding::CFunc_PrintStruct>(detour__CFunc_PrintStruct);
     hook::CreateHook<binding::CFunc_PrintF>(detour__CFunc_PrintF);
     hook::CreateHook<binding::CFunc_LoadPak>(detour__CFunc_LoadPak);
     hook::CreateHook<binding::CFunc_LoadTexture>(detour__CFunc_LoadTexture);
+    hook::CreateHook<binding::CFuncs_SetGemConstants>(detour__CFuncs_SetGemConstants);
 
     PopLogTask();
 }

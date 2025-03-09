@@ -79,10 +79,6 @@ std::filesystem::path nylon::ResourcesDirectory()
 {
 	return NylonDirectory() / "Resources";
 }
-std::filesystem::path nylon::ProfilesDirectory()
-{
-	return NylonDirectory() / "Profiles";
-}
 
 bool nylon::IsPortableMode()
 {

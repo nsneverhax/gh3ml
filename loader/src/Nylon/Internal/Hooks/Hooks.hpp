@@ -19,7 +19,9 @@ namespace nylon::internal
 
 		using CFunc_LoadTexture = nylon::hook::Binding<0x00541f40, nylon::hook::cconv::CDecl, bool, GH3::QbStruct*, GH3::Script::CScript*>;
 
-		using CFunc_MemCardSystemInitialize = nylon::hook::Binding<0x0043c1b0, nylon::hook::cconv::CDecl, bool, GH3::QbStruct*, GH3::Script::CScript*>;
+		// using CFunc_MemCardSystemInitialize = nylon::hook::Binding<0x0043c1b0, nylon::hook::cconv::CDecl, bool, GH3::QbStruct*, GH3::Script::CScript*>;
+
+		using CFuncs_SetGemConstants = nylon::hook::Binding<0x0041b930, nylon::hook::cconv::CDecl, bool, GH3::QbStruct*, GH3::Script::CScript*>;
 	}
 
 	void CreateCFuncHooks();

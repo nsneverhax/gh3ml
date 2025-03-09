@@ -159,18 +159,17 @@ bool command_WriteMemory(nylon::CommandConsole& caller, std::vector<std::string>
 	return true;
 }
 
-
-bool command_string_getfloat(nylon::CommandConsole& caller, std::vector<std::string> arguments)
+#pragma region string_get
+inline std::string command_string_getset__base(nylon::CommandConsole& caller, std::vector<std::string> arguments)
 {
 	if (arguments.size() != 2)
 	{
 		caller.PushHistory("Invalid argument count.");
-		return false;
+		return "";
 	}
 
-	// V: This could be better but it'll do for now
-
 	std::string buff = { arguments[1].c_str() };
+
 	for (auto i = 2; i < arguments.size(); i++)
 	{
 		buff.append(arguments[i]);
@@ -178,6 +177,16 @@ bool command_string_getfloat(nylon::CommandConsole& caller, std::vector<std::str
 		if (i != arguments.size() - 1)
 			buff.append(" ");
 	}
+
+	return buff;
+}
+
+bool command_string_getfloat(nylon::CommandConsole& caller, std::vector<std::string> arguments)
+{
+	std::string buff = command_string_getset__base(std::forward<nylon::CommandConsole&>(caller), std::forward<std::vector<std::string>>(arguments));
+
+	if (buff.size() == 0)
+		return false;
 
 	GH3::CRCKey key = nylon::Hash(buff.c_str());
 	
@@ -205,6 +214,43 @@ bool command_string_getfloat(nylon::CommandConsole& caller, std::vector<std::str
 
 	return true;
 }
+
+bool command_string_setfloat(nylon::CommandConsole& caller, std::vector<std::string> arguments)
+{
+	std::string buff = command_string_getset__base(std::forward<nylon::CommandConsole&>(caller), std::forward<std::vector<std::string>>(arguments));
+
+	if (buff.size() == 0)
+		return false;
+
+	GH3::CRCKey key = nylon::Hash(buff.c_str());
+
+	auto entry = GH3::Script::Resolve(key);
+
+	if (entry == nullptr)
+	{
+		caller.PushHistory(std::format("Hashed '{0}' as 0x{1:08X} :: Entry returned null. (It didn't exist or wasn't found in the Symbol table)", buff, key));
+		return true;
+	}
+
+	float value = 0;
+
+	if (entry->Type == GH3::Script::CSymbolTableEntryType::FLOAT)
+		value = entry->FloatValue;
+	else if (entry->Type == GH3::Script::CSymbolTableEntryType::INTEGER)
+		value = (float)entry->UInt32Value;
+	else
+	{
+		caller.PushHistory(std::format("Hashed '{}' as 0x{:08X} :: Type cannot be casted to float: {}", buff, key, GH3::Script::GetTypeName(entry->Type)));
+		return true;
+	}
+
+	caller.PushHistory(std::format("Hashed '{}' as 0x{:08X} :: ({}) = {}", buff, key, GH3::Script::GetTypeName(entry->Type), value));
+
+	return true;
+}
+
+#pragma endregion
+
 int TextInputCallback_CallbackHistory(nylon::CommandConsole* console, ImGuiInputTextCallbackData* data)
 {
 	return 0;

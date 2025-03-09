@@ -7,6 +7,5 @@ namespace GH3::Spt
 	class Class
 	{
 	public:
-
 	};
 }

@@ -1,7 +1,6 @@
 #pragma once
 
-#ifndef butts
-#define butts
+#include <Nylon/Core.hpp>
 
 namespace nylon
 {
@@ -86,6 +85,8 @@ namespace nylon
         return CRC32Table[(crc ^ FixChar(c)) & 0xFF] ^ ((crc >> 8) & 0x00FFFFFF);
     }
 
+    TODO(This shit dont work!)
+
     constexpr std::uint32_t Hash(const char* string, uint32_t previousKey = 0xffffffff)
     {
         if (string == nullptr)
@@ -106,4 +107,3 @@ namespace nylon
 
     }
 }
-#endif

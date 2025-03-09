@@ -525,5 +525,12 @@ void nylon::internal::SetupDefaultHooks()
 
     _CFuncManager.Register();
 
+    const char** fretNames = reinterpret_cast<const char**>(0x00957b2c);
+    fretNames[0] = "red";
+    fretNames[1] = "orange";
+    fretNames[2] = "yellow";
+    fretNames[3] = "green";
+    fretNames[4] = "blue";
+
     PopLogTask();
 }
