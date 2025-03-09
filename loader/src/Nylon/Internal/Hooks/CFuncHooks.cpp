@@ -1,4 +1,4 @@
-#include "CFuncHooks.hpp"
+#include <Nylon/Internal/Hooks/Hooks.hpp>
 
 #include <Nylon/Config.hpp>
 
@@ -209,11 +209,6 @@ bool detour__CFunc_LoadTexture(GH3::QbStruct* params, CScript* script)
     return binding::CFunc_LoadTexture::Orig(params, script);
 }
 
-bool detour__CFunc_MemCardSystemInitialize(GH3::QbStruct* params, CScript* script)
-{
-
-    return binding::CFunc_MemCardSystemInitialize::Orig(params, script);
-}
 
 void nylon::internal::CreateCFuncHooks()
 {
@@ -223,7 +218,6 @@ void nylon::internal::CreateCFuncHooks()
     hook::CreateHook<binding::CFunc_PrintF>(detour__CFunc_PrintF);
     hook::CreateHook<binding::CFunc_LoadPak>(detour__CFunc_LoadPak);
     hook::CreateHook<binding::CFunc_LoadTexture>(detour__CFunc_LoadTexture);
-    hook::CreateHook<binding::CFunc_MemCardSystemInitialize>(detour__CFunc_MemCardSystemInitialize);
 
     PopLogTask();
 }

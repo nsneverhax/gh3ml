@@ -10,20 +10,23 @@
 #include <Nylon/Config.hpp>
 #include <d3d9.h>
 
+
 #include <Nylon/Internal/Main.hpp>
 #include <Nylon/Internal/Logging/LogFile.hpp>
+#include <Nylon/Internal/Hooks/Hooks.hpp>
 
 
 #include <imgui.h>
 #include <imgui_impl_dx9.h>
 #include <imgui_impl_win32.h>
 
+
 #include <Nylon/CommandConsole.hpp>
 
 
 #include <GH3/Spt/Singleton.hpp>
 
-#include "Hooks/Hooks.hpp"
+
 #include <Nylon/Checksum.hpp>
 #include <stack>
 

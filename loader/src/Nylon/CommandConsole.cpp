@@ -6,7 +6,8 @@
 #include <GH3/Script/CSymbolTableEntry.hpp>
 
 #include <format>
-#include "Imgui/ImGui.hpp"
+#include <Nylon/Internal/Imgui/ImGui.hpp>
+
 
 extern nylon::CommandConsole nylon::Console = { };
 

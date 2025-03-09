@@ -1,5 +1,7 @@
 #include <Nylon/Internal/Main.hpp>
-#include "Hooks.hpp"
+#include <Nylon/Internal/Hooks/Hooks.hpp>
+#include <Nylon/Internal/Imgui/ImGui.hpp>
+
 #include <Nylon/Hook.hpp>
 #include <GH3/DirectX.hpp>
 #include <iostream>
@@ -11,7 +13,7 @@
 
 #include <D3dx9tex.h>
 
-#include "../Imgui/Imgui.hpp"
+
 
 constexpr int PresentHookID = 2;
 constexpr int ResetHookID = 3;

@@ -1,4 +1,5 @@
-#include "Imgui.hpp"
+#include <Nylon/Internal/Imgui/ImGui.hpp>
+
 #include <Nylon/CommandConsole.hpp>
 #include <Nylon/VersionInfo.hpp>
 

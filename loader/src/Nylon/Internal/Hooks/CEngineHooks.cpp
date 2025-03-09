@@ -1,4 +1,4 @@
-#include "hooks/Hooks.hpp"
+#include <Nylon/Internal/Hooks/Hooks.hpp>
 
 using Nx_CEngine_sInitializeStartupParams = nylon::hook::Binding<0x0058c4c0, nylon::hook::cconv::CDecl, void>;
 

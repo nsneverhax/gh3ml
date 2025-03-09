@@ -15,8 +15,6 @@ add_library(${PROJECT_NAME} SHARED
     "src/Core.cpp"
     "src/Logging/Log.cpp"
     "src/Config.cpp"
-    "src/Hooks/DefaultHooks.cpp"
-    "src/Hooks/Hook.cpp"
     "src/ModInfo.cpp"
     "src/VersionInfo.cpp"
 
@@ -25,13 +23,12 @@ add_library(${PROJECT_NAME} SHARED
     "src/Logging/LogFile.cpp"
     "src/Logging/LogSource.cpp"
     "src/Nylon/CommandConsole.cpp"
+    "src/Nylon/Hook.cpp"
 
-    "src/Hooks/CFuncHooks.cpp"
-
-    "src/Imgui/ImGui.cpp"
 )
 
-add_subdirectory(src/hooks)
+add_subdirectory("src/Nylon/Internal/Hooks")
+add_subdirectory("src/Nylon/Internal/ImGUI")
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "include/"

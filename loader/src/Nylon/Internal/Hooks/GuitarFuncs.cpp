@@ -1,4 +1,5 @@
-#include "hooks/Hooks.hpp"
+#include <Nylon/Internal/Hooks/Hooks.hpp>
+
 #include <Nylon/Checksum.hpp>
 
 #include <GH3/Qb/QbStruct.hpp>

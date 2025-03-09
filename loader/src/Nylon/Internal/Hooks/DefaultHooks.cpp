@@ -1,6 +1,6 @@
 #include <Nylon/Internal/Main.hpp>
-#include "../Imgui/Imgui.hpp"
-#include "CFuncHooks.hpp"
+#include <Nylon/Internal/Imgui/ImGui.hpp>
+#include <Nylon/Internal/Hooks/Hooks.hpp>
 
 #include <Nylon/Hook.hpp>
 #include <d3d9.h>
@@ -25,8 +25,6 @@
 
 #include <XInput.h>
 
-
-#include "Hooks.hpp"
 
 #include<Nylon/Checksum.hpp>
 
@@ -522,9 +520,6 @@ void nylon::internal::SetupDefaultHooks()
     // nylon::hook::CreateHook<Time_UpdateTime>(detourTimeUpdateTime);
 
     // nylon::hook::CreateHook<CFuncWait>(detourCFuncWait);
-
-
-    nylon::internal::SetupAspyrHooks();
 
     _CFuncManager = { };
 

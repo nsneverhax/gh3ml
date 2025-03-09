@@ -3,10 +3,10 @@
 #include <GH3/Common.hpp>
 #include <GH3/Mem/CPoolable.hpp>
 
+#include <GH3/Qb/QbStruct.hpp>
+
 namespace GH3::Script
 {
-	using CStruct = GH3::QbStruct;
-
 	class CScript
 	{
 		uint32_t NotSessionSpecific;

@@ -47,5 +47,5 @@ namespace GH3
 namespace GH3::Script
 {
 	// TEMP
-	typedef QbStruct CStruct;
+	using CStruct = QbStruct;
 }

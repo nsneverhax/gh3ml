@@ -1,10 +1,13 @@
 #pragma once
 
-#include <GH3/Qb.hpp>
-
 #include <Nylon/Hook.hpp>
 
-TODO(Migrate this to centralized header.);
+#include <GH3/Qb/CScript.hpp>
+#include <GH3/Qb/QbStruct.hpp>
+
+#include <cstdint>
+#include <windows.h>
+#include <d3d9.h>
 
 namespace nylon::internal
 {
@@ -20,4 +23,12 @@ namespace nylon::internal
 	}
 
 	void CreateCFuncHooks();
+
+	using D3D9DevicePresent = HRESULT(__stdcall*)(void* self, const RECT* pSourceRect, const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion);
+
+	void SetupDefaultHooks();
+	bool CreateDirectXHooks();
+
+	void SetupCEngineHooks();
+	void SetupGuitarFuncsHooks();
 }
