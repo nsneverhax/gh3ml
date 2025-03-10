@@ -144,6 +144,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
         in::CreateLogFile();
 
+        in::PushLogTask("Initializing Nylon");
+
         if (nylon::IsWine())
             nylon::internal::Log.Info("Wine {} detected.", nylon::WineVersion());
         else
@@ -167,7 +169,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
         in::LoadMods();
 
-        in::Log.Info("Finished Core Initialization!");
+        in::PopLogTask();
+
         break;
 
     case DLL_THREAD_ATTACH:

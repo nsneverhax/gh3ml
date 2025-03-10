@@ -91,12 +91,15 @@ void UnwrapValue(matjson::Value& value, std::string_view name, double* outValue,
 
 void in::ReadConfig()
 {
+	in::PushLogTask("Reading Config");
+
 	_configMalformed = false;
 
 	if (!fs::exists(cfg::ConfigFilepath()))
 	{
 		in::Log.Warn("Unable to find \"{}\" so it will be remade.", cfg::ConfigFilepath().string());
 		in::WriteConfig();
+		in::PopLogTask();
 		return;
 	}
 
@@ -111,6 +114,7 @@ void in::ReadConfig()
 	{
 		in::Log.Warn("Unable to parse \"{}\" so it will be remade.", cfg::ConfigFilepath().string());
 		in::WriteConfig();
+		in::PopLogTask();
 		return;
 	}
 
@@ -138,6 +142,8 @@ void in::ReadConfig()
 
 	UnwrapValue(object, "sustainTailSizeMultiplier", &_sustainTailSizeMultiplier, 1.0f);
 
+	in::PopLogTask();
+
 	if (_configMalformed)
 	{
 		in::Log.Warn("\"{}\" was malformed or the version didn't match, so it will be remade using known values.", cfg::ConfigFilepath().string());
@@ -149,6 +155,7 @@ void in::WriteConfig()
 {
 	try
 	{
+		in::PushLogTask("Writing Config");
 		auto obj = matjson::makeObject(
 			{
 				{ "openGH3Console", true },
@@ -173,10 +180,12 @@ void in::WriteConfig()
 
 		dumpFile << dumped.c_str();
 		dumpFile.close();
+		in::PopLogTask();
 	}
 	catch (...)
 	{
 		Log.Error("There was an unknown error writing the config file!");
+		in::PopLogTask();
 	}
 }
 

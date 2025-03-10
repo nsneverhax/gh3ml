@@ -9,38 +9,13 @@
 // We are going to manually specify WINAPI (__stdcall) calling convention and then manually parse the decorated names
 // into non-decorated ones. This is probably a bad idea, but it will work for now.
 
-struct XINPUT_STATE;
-struct XINPUT_CAPABILITIES;
-struct XINPUT_VIBRATION;
+constexpr static auto MAX_PATH_CHARS = 32768u;
 
+#pragma region IPHLPAPI Exposure
 struct IP_ADAPTER_INFO;
 typedef IP_ADAPTER_INFO* PIP_ADAPTER_INFO;
 
-constexpr static auto MAX_PATH_CHARS = 32768u;
-static HMODULE getXInput() 
-{
-    static auto xinput = []() -> HMODULE
-        {
-            std::wstring path(MAX_PATH_CHARS, L'\0');
 
-            // Vultu: Some people have special xinput1_3.dll for their guitars.. apparently
-            // We are already modding the game might as well give them support for it.
-            if (std::filesystem::exists("nylon\\xinput1_3.dll"))
-            {
-                return LoadLibraryW(L"nylon\\xinput1_3.dll");
-            }
-
-            auto size = GetSystemDirectoryW(path.data(), path.size());
-            if (size)
-            {
-                path.resize(size);
-                return LoadLibraryW((path + L"\\xinput1_3.dll").c_str());
-            }
-            return NULL;
-        }();
-
-    return xinput;
-}
 static HMODULE getIPHLPAPI()
 {
     static auto iphlpapi = []() -> HMODULE
@@ -66,13 +41,7 @@ static FARPROC getFPIPHLPAPI(const std::string& sym)
 
     return NULL;
 }
-static FARPROC getFPXInput(const std::string& sym)
-{
-    if (auto module = getXInput())
-        return GetProcAddress(module, sym.c_str());
 
-    return NULL;
-}
 
 #pragma comment(linker, "/export:GetAdaptersInfo@@YGKPAUIP_ADAPTER_INFO@@PAK@Z=GetAdaptersInfo")
 DWORD WINAPI GetAdaptersInfo(_Out_writes_bytes_opt_(*SizePointer) PIP_ADAPTER_INFO AdapterInfo, _Inout_ PULONG SizePointer)
@@ -84,10 +53,46 @@ DWORD WINAPI GetAdaptersInfo(_Out_writes_bytes_opt_(*SizePointer) PIP_ADAPTER_IN
         return reinterpret_cast<FPType>(fp)(AdapterInfo, SizePointer);
     }
 
-    return ERROR_DEVICE_NOT_CONNECTED;
+    return 0;
+}
+#pragma endregion
+
+#pragma region XInput Exposure
+struct XINPUT_STATE;
+struct XINPUT_CAPABILITIES;
+struct XINPUT_VIBRATION;
+static HMODULE getXInput()
+{
+    static auto xinput = []() -> HMODULE
+        {
+            std::wstring path(MAX_PATH_CHARS, L'\0');
+
+            // Vultu: Some people have special xinput1_3.dll for their guitars.. apparently
+            // We are already modding the game might as well give them support for it.
+            if (std::filesystem::exists("nylon\\xinput1_3.dll"))
+            {
+                return LoadLibraryW(L"nylon\\xinput1_3.dll");
+            }
+
+            auto size = GetSystemDirectoryW(path.data(), path.size());
+            if (size)
+            {
+                path.resize(size);
+                return LoadLibraryW((path + L"\\xinput1_3.dll").c_str());
+            }
+            return NULL;
+        }();
+
+    return xinput;
 }
 
-// extern "C" __declspec(dllexport) GetAdaptersInfo()
+static FARPROC getFPXInput(const std::string& sym)
+{
+    if (auto module = getXInput())
+        return GetProcAddress(module, sym.c_str());
+
+    return NULL;
+}
 
 #pragma comment(linker, "/export:XInputGetState@@YGKKPAUXINPUT_STATE@@@Z=XInputGetState,@2")
 DWORD WINAPI XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
@@ -128,6 +133,7 @@ DWORD WINAPI XInputGetCapabilities(DWORD dwUserIndex, DWORD dwFlags, XINPUT_CAPA
     return ERROR_DEVICE_NOT_CONNECTED;
 }
 
+
 #pragma comment(linker, "/export:XInputEnable@@YGXH@Z=XInputEnable,@5")
 void WINAPI XInputEnable(BOOL enable)
 {
@@ -141,6 +147,7 @@ void WINAPI XInputEnable(BOOL enable)
     return;
 }
 
+#pragma endregion
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
@@ -148,6 +155,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
     if (fdwReason == DLL_PROCESS_ATTACH)
     {
+
         DisableThreadLibraryCalls(hinstDLL);
         
         std::wstring path = (std::filesystem::current_path() / L"nylon.dll").wstring();
@@ -158,7 +166,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
             return FALSE;
         }
 
-        // This is UB. -- Vultu: Too bad!
         if (LoadLibraryW(path.c_str()) == NULL)
         {
             DWORD errorMessageID = GetLastError();

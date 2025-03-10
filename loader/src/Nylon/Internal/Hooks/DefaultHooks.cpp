@@ -328,16 +328,16 @@ int deoutCreateHighwayDrawRect(double * array, float param_2, float param_3, flo
 
     return CreateHighwayDrawRect::Orig(
         array, 
-        param_2 * whammyMultipliers[1],
-        param_3 * whammyMultipliers[2], // Whammy Tail Lower ??
+        param_2,
+        param_3, // Whammy Tail Lower ??
         whammyTopWidth * whammySizeMultiplier, 
-        param_5 * whammyMultipliers[3] * whammySizeMultiplier,
+        param_5 * whammySizeMultiplier,
         whammyWidthOffset * whammySizeMultiplier,
         param_7 * whammySizeMultiplier, 
-        param_8 * whammyMultipliers[5],
-        param_9 * whammyMultipliers[6],
-        whammyTailEnd * whammyMultipliers[7], // Whammy Glow ??
-        whammyTailBegin * whammyMultipliers[8] // Whammy Tail Begin
+        param_8,
+        param_9 ,
+        whammyTailEnd, // Whammy Glow ??
+        whammyTailBegin // Whammy Tail Begin
     );
 }
 
@@ -459,8 +459,12 @@ void detour__WhammyRelatedFUN_0041b760(int param_1_00, int param_2_00, float par
     WhammyRelatedFUN_0041b760::Orig(param_1_00, param_2_00, param3, whammyShortenMultiplier);
 }
 
-
-
+// m_DOF_CoC
+// m_DOF_RadiusScale
+// m_DOF_PixelSizeLow
+// m_DOF_PixelSizeHigh
+// m_vDepthOfFieldParams
+using 
 void nylon::internal::SetupDefaultHooks()
 {
     PushLogTask("Setting up default hooks");
@@ -525,12 +529,12 @@ void nylon::internal::SetupDefaultHooks()
 
     _CFuncManager.Register();
 
-    const char** fretNames = reinterpret_cast<const char**>(0x00957b2c);
-    fretNames[0] = "red";
-    fretNames[1] = "orange";
-    fretNames[2] = "yellow";
-    fretNames[3] = "green";
-    fretNames[4] = "blue";
+    //const char** fretNames = reinterpret_cast<const char**>(0x00957b2c);
+    //fretNames[0] = "red";
+    //fretNames[1] = "orange";
+    //fretNames[2] = "yellow";
+    //fretNames[3] = "green";
+    //fretNames[4] = "blue";
 
     PopLogTask();
 }

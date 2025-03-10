@@ -213,6 +213,7 @@ bool detour__CFunc_LoadTexture(GH3::QbStruct* params, CScript* script)
 
 nylon::Profile temp = { };
 
+
 bool detour__CFuncs_SetGemConstants(GH3::QbStruct* params, CScript* script)
 {
     auto ret = binding::CFuncs_SetGemConstants::Orig(params, script);
@@ -230,6 +231,14 @@ bool detour__CFuncs_SetGemConstants(GH3::QbStruct* params, CScript* script)
     GH3::CRCKey* ActivePowerHOPOMaterials = reinterpret_cast<GH3::CRCKey*>(0x00a17868);
 
     GH3::CRCKey* WhammyMaterials = reinterpret_cast<GH3::CRCKey*>(0x00a1791c);
+
+    // GH3::CRCKey* GemColorKeys = reinterpret_cast<GH3::CRCKey*>(0x00957b90);
+
+    //GemColorKeys[0] = GH3::CRC::GenerateCRCFromString("Red");
+    //GemColorKeys[1] = GH3::CRC::GenerateCRCFromString("Orange");
+    //GemColorKeys[2] = GH3::CRC::GenerateCRCFromString("Yellow");
+    //GemColorKeys[3] = GH3::CRC::GenerateCRCFromString("Green");
+    //GemColorKeys[4] = GH3::CRC::GenerateCRCFromString("Blue");
 
     for (auto i = 0; i < 5; i++)
     {

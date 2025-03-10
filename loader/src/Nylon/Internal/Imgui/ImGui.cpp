@@ -5,6 +5,8 @@
 
 #include <GH3/DirectX.hpp>
 #include <GH3/Addresses.hpp>
+
+#include <iostream>
 #include <XInput.h>
 
 void nylon::imgui::BeginFrame()
@@ -25,13 +27,10 @@ void nylon::imgui::EndFrame()
 		(*gh3::Direct3DDevice)->EndScene();
 	}
 }
-float* whammyMultipliers = new float[9];
-
 bool _nylonMenuActive = false;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-#include <iostream>
 
 LRESULT nylon::imgui::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -110,14 +109,7 @@ bool showTextureViewer = false;
 
 void nylon::imgui::NylonMenu()
 {
-	static bool whammyMAde = false;
 
-	if (!whammyMAde)
-	{
-		for (auto i = 0; i < 9; i++)
-			whammyMultipliers[i] = 1.0f;
-		whammyMAde = true;
-	}
 
 	if (!GetNylonMenuActive())
 		return;
