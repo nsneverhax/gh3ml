@@ -11,6 +11,10 @@ namespace GH3::Gfx
 
 	class CDofFXPropsState : public CScreenFXPropsState
 	{
+	private:
+		void plat_draw();
+
+	public:
 		bool IsOn;
 		float BackDist;
 		float FocalDist;
@@ -29,7 +33,6 @@ namespace GH3::Gfx
 
 		void AllocateCopy();
 		void Draw();
-		void plat_draw();
 		void Resolve();
 		bool SetParams(CStruct* cstruct);
 		void GetParams(CStruct* cstruct);
