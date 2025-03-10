@@ -70,4 +70,16 @@ namespace GH3
 
 	using CFunction = bool(__stdcall*)(CStruct*, CScript*);
 
+
+	template<uint32 size>
+	struct UnknownStructure
+	{
+		uint8 memory[size];
+
+		template <class T>
+		T GetValue(uint32 address)
+		{
+
+		}
+	};
 }

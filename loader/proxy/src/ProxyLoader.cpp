@@ -13,6 +13,9 @@ struct XINPUT_STATE;
 struct XINPUT_CAPABILITIES;
 struct XINPUT_VIBRATION;
 
+struct IP_ADAPTER_INFO;
+typedef IP_ADAPTER_INFO* PIP_ADAPTER_INFO;
+
 constexpr static auto MAX_PATH_CHARS = 32768u;
 static HMODULE getXInput() 
 {
@@ -38,8 +41,32 @@ static HMODULE getXInput()
 
     return xinput;
 }
+static HMODULE getIPHLPAPI()
+{
+    static auto iphlpapi = []() -> HMODULE
+        {
+            std::wstring path(MAX_PATH_CHARS, L'\0');
 
-static FARPROC getFP(const std::string& sym) 
+            auto size = GetSystemDirectoryW(path.data(), path.size());
+            if (size)
+            {
+                path.resize(size);
+                return LoadLibraryW((path + L"\\IPHLPAPI.DLL").c_str());
+            }
+            return NULL;
+        }();
+
+    return iphlpapi;
+}
+
+static FARPROC getFPIPHLPAPI(const std::string& sym)
+{
+    if (auto module = getIPHLPAPI())
+        return GetProcAddress(module, sym.c_str());
+
+    return NULL;
+}
+static FARPROC getFPXInput(const std::string& sym)
 {
     if (auto module = getXInput())
         return GetProcAddress(module, sym.c_str());
@@ -47,10 +74,25 @@ static FARPROC getFP(const std::string& sym)
     return NULL;
 }
 
+#pragma comment(linker, "/export:GetAdaptersInfo@@YGKPAUIP_ADAPTER_INFO@@PAK@Z=GetAdaptersInfo")
+DWORD WINAPI GetAdaptersInfo(_Out_writes_bytes_opt_(*SizePointer) PIP_ADAPTER_INFO AdapterInfo, _Inout_ PULONG SizePointer)
+{
+    static auto fp = getFPIPHLPAPI("GetAdaptersInfo");
+    if (fp)
+    {
+        using FPType = decltype(&GetAdaptersInfo);
+        return reinterpret_cast<FPType>(fp)(AdapterInfo, SizePointer);
+    }
+
+    return ERROR_DEVICE_NOT_CONNECTED;
+}
+
+// extern "C" __declspec(dllexport) GetAdaptersInfo()
+
 #pragma comment(linker, "/export:XInputGetState@@YGKKPAUXINPUT_STATE@@@Z=XInputGetState,@2")
 DWORD WINAPI XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 {
-    static auto fp = getFP("XInputGetState");
+    static auto fp = getFPXInput("XInputGetState");
     if (fp)
     {
         using FPType = decltype(&XInputGetState);
@@ -63,7 +105,7 @@ DWORD WINAPI XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 #pragma comment(linker, "/export:XInputSetState@@YGKKPAUXINPUT_VIBRATION@@@Z=XInputSetState,@3")
 DWORD WINAPI XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
 {
-    static auto fp = getFP("XInputSetState");
+    static auto fp = getFPXInput("XInputSetState");
     if (fp)
     {
         using FPType = decltype(&XInputSetState);
@@ -76,7 +118,7 @@ DWORD WINAPI XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
 #pragma comment(linker, "/export:XInputGetCapabilities@@YGKKKPAUXINPUT_CAPABILITIES@@@Z=XInputGetCapabilities,@4")
 DWORD WINAPI XInputGetCapabilities(DWORD dwUserIndex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities)
 {
-    static auto fp = getFP("XInputGetCapabilities");
+    static auto fp = getFPXInput("XInputGetCapabilities");
     if (fp)
     {
         using FPType = decltype(&XInputGetCapabilities);
@@ -89,7 +131,7 @@ DWORD WINAPI XInputGetCapabilities(DWORD dwUserIndex, DWORD dwFlags, XINPUT_CAPA
 #pragma comment(linker, "/export:XInputEnable@@YGXH@Z=XInputEnable,@5")
 void WINAPI XInputEnable(BOOL enable)
 {
-    static auto fp = getFP("XInputEnable");
+    static auto fp = getFPXInput("XInputEnable");
     if (fp)
     {
         using FPType = decltype(&XInputEnable);

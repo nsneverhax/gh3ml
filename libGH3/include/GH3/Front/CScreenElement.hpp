@@ -16,6 +16,8 @@ namespace GH3::Front
 
 	struct ConcatProps
 	{
+		float Alpha;
+
 		Mth::Vector3f WorldPosition;
 		Mth::Vector2f ScreenPosition;
 		uint32_t ZPosition;
@@ -56,4 +58,6 @@ namespace GH3::Front
 
 		float ZPriority;
 	};
+
+	// SIZE_ASSERT(CScreenElement, 0x1F4);
 }
