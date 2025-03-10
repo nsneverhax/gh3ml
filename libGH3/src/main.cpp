@@ -32,6 +32,7 @@
 #include <GH3/Front/CScreenElement.hpp>
 #include <GH3/Front/CSpriteElement.hpp>
 
+#include <GH3/Gfx/CDofPFXPropsState.hpp>
 #include <GH3/Gfx/CDofPoissonFXPropsState.hpp>
 #include <GH3/Gfx/CScreenFXPropsState.hpp>
 

@@ -9,13 +9,23 @@ namespace GH3::Gfx
 	class QbStruct;
 	typedef QbStruct CStruct;
 
-	class CDofPoissonFXPropsState : public CScreenFXPropsState
+	class CDofFXPropsState : public CScreenFXPropsState
 	{
 		bool IsOn;
 		float BackDist;
 		float FocalDist;
 		float FrontDist;
 		float ClampBack;
+
+		uint32 BackColor[4];
+		uint32 FrontColor[4];
+
+		uint32 BlurResolution;
+		float BlurRadius;
+
+		uint32 UDivs;
+		uint32 VDivs;
+		uint32 Order;
 
 		void AllocateCopy();
 		void Draw();
@@ -26,6 +36,6 @@ namespace GH3::Gfx
 
 	};
 
-	SIZE_ASSERT(CDofPoissonFXPropsState, 0x2c);
+	SIZE_ASSERT(CDofFXPropsState, 0x60);
 
 }
