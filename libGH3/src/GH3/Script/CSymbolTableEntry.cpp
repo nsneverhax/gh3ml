@@ -78,6 +78,8 @@ namespace GH3
 			return entry->FloatValue;
 		else if (entry->Type == Script::CSymbolTableEntryType::INTEGER)
 			return (float)entry->UInt32Value;
+
+		return 0.0f;
 	}
 	char* Script::GetCString(CRCKey key)
 	{

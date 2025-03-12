@@ -187,7 +187,7 @@ bool detour__CFunc_LoadPak(GH3::Script::CStruct* params, CScript* script)
             nylon::internal::Log.Info("Found it! Loading...");
             GH3::Script::CStruct modPakStruct = GH3::Script::CStruct();
 
-            GH3::Script::Functions::InsertCStringItem(&modPakStruct, 0, expectedPakPath.data());
+            modPakStruct.AddNonLocalizedString(0, expectedPakPath.data());
 
             binding::CFunc_LoadPak::Orig(&modPakStruct, script);
             nylon::internal::Log.Info("Done!");

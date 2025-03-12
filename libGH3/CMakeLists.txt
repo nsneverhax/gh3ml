@@ -8,10 +8,11 @@ project(libGH3)
 
 add_library(${PROJECT_NAME} STATIC
     "src/main.cpp"
-    "src/GH3/Qb/QbStruct.cpp"
+    "src/GH3/Script/CStruct.cpp"
     "src/GH3/CFunc.cpp"
     "src/GH3/CRC.cpp"
     "src/GH3/Addresses.cpp"
- "src/GH3/Lst/Node.cpp" "src/GH3/Script/CComponentType.cpp" "src/GH3/Script/CSymbolTableEntry.cpp" "src/GH3/Script/CSymbolTableEntryType.cpp")
+ "src/GH3/Lst/Node.cpp" "src/GH3/Script/CComponentType.cpp" "src/GH3/Script/CSymbolTableEntry.cpp" "src/GH3/Script/CSymbolTableEntryType.cpp" 
+ "src/GH3/Mem/CCompactPool.cpp" "src/GH3/Mem/CPoolable.cpp")
 
 target_include_directories(${PROJECT_NAME} PUBLIC "include/")

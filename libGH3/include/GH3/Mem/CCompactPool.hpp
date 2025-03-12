@@ -27,16 +27,4 @@ namespace GH3::Mem
 	SIZE_ASSERT(CCompactPool, 0x6c);
 
 
-
-	void* CCompactPool::Allocate(uint32_t param_1)
-	{
-		if (FreeList == NULL)
-			return NULL;
-
-		CurrentUsedItems++;
-		if (MaxUsedItems < CurrentUsedItems)
-			MaxUsedItems = CurrentUsedItems;
-
-		return this->FreeList;
-	}
 }

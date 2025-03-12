@@ -24,17 +24,18 @@ namespace GH3::Script
 
 		bool GetChecksum(CRCKey key, CRCKey& outKey, int printContents = false);
 
-		bool GetFloat(CRCKey key, float& out, int printContents = false);
+		bool GetFloat(CRCKey key, float* out, int printContents = false);
 		bool GetArray(CRCKey key, void* out, int printContents = false);
 
 		bool GetInteger(CRCKey key, int32_t* out, int printContents = false);
 
+		void AddNonLocalizedString(CRCKey key, char* string);
 		bool GetNonLocalizedString(CRCKey key, char** out, int printContents = false);
 		//bool GetWString(uint32_t key, const& out, int printContents = 1);
 		//bool GetPair(uint32_t key, float& out, int printContents = 1);
 		//bool GetVector(uint32_t key, float& out, int printContents = 1);
 		bool GetStructure(CRCKey key, float& out, int printContents = false);
-		bool HasKey(CRCKey key);
+		bool ContainsFlag(CRCKey key);
 	};
 
 	//namespace Functions

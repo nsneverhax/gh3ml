@@ -40,9 +40,9 @@ extern bool cf::PrintStructReportType = true;
 
 bool cf::SetPrintStructReportType(GH3::Script::CStruct* params, CScript * script)
 {
-	if (params->HasKey(KEY_TRUE))
+	if (params->ContainsFlag(KEY_TRUE))
 		PrintStructReportType = true;
-	else if (params->HasKey(KEY_FALSE))
+	else if (params->ContainsFlag(KEY_FALSE))
 		PrintStructReportType = false;
 	return true;
 }
@@ -55,9 +55,9 @@ extern bool cf::PrintStructReportName = true;
 
 bool cf::SetPrintStructReportName(GH3::Script::CStruct* params, CScript* script)
 {
-	if (params->HasKey(KEY_TRUE))
+	if (params->ContainsFlag(KEY_TRUE))
 		PrintStructReportType = true;
-	else if (params->HasKey(KEY_FALSE))
+	else if (params->ContainsFlag(KEY_FALSE))
 		PrintStructReportType = false;
 	return true;
 }

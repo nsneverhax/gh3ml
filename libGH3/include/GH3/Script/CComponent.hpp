@@ -22,7 +22,7 @@ namespace GH3::Script
 	constexpr uint32 CComponentListAddress = 0x00c4ee4c;
 	constexpr uint32 CComponentListIndexAddress = 0x00c4ee58;
 
-	class CComponent : Mem::CPoolable<CComponent, CComponentListAddress, CComponentListIndexAddress>
+	class CComponent /* :  Mem::CPoolable<CComponent> */
 	{
 	public:
 

@@ -379,7 +379,7 @@ bool detourCFuncWait(GH3::Script::CStruct* params, void* script)
     } deltaBuffer;
 
     float waitTime = 0;
-    params->GetFloat(0, waitTime);
+    params->GetFloat(0, &waitTime);
 
 
     deltaBuffer.value = (*DeltaTime) * 1000.0f; // convert to ms
