@@ -8,6 +8,7 @@
 
 #include <GH3/CRC.hpp>
 #include <Nylon/DefaultCFuncs.hpp>
+#include <GH3/Script/CStruct.hpp>
 
 namespace binding = nylon::internal::binding;
 
@@ -15,7 +16,7 @@ namespace in = nylon::internal;
 
 using namespace GH3::Script;
 
-bool detour__CFunc_PrintStruct(GH3::QbStruct* params, GH3::Script::CScript* script)
+bool detour__CFunc_PrintStruct(GH3::Script::CStruct* params, GH3::Script::CScript* script)
 {
     if (params->ComponentList == nullptr)
         nylon::internal::LogGH3.Warn("Struct had a null component list!!");
@@ -126,7 +127,7 @@ bool detour__CFunc_PrintStruct(GH3::QbStruct* params, GH3::Script::CScript* scri
 	return true;
 }
 
-bool detour__CFunc_PrintF(GH3::QbStruct* params, CScript* script)
+bool detour__CFunc_PrintF(GH3::Script::CStruct* params, CScript* script)
 {
     if (!nylon::config::AllowQScriptPrintf())
         return true;
@@ -152,7 +153,7 @@ bool detour__CFunc_PrintF(GH3::QbStruct* params, CScript* script)
     return true;
 }
 
-bool detour__CFunc_LoadPak(GH3::QbStruct* params, CScript* script)
+bool detour__CFunc_LoadPak(GH3::Script::CStruct* params, CScript* script)
 {
     static bool _doPakCheck = true;
 
@@ -163,7 +164,7 @@ bool detour__CFunc_LoadPak(GH3::QbStruct* params, CScript* script)
 
     char* pakNameBuffer;
 
-    params->GetString(0, &pakNameBuffer, 0);
+    params->GetNonLocalizedString(0, &pakNameBuffer, 0);
 
     in::Log.Info("Loading Pak: \"{}\"", pakNameBuffer);
 
@@ -184,9 +185,9 @@ bool detour__CFunc_LoadPak(GH3::QbStruct* params, CScript* script)
             expectedPakPath.insert(0, "..\\nylon\\Mods\\");
 
             nylon::internal::Log.Info("Found it! Loading...");
-            GH3::QbStruct modPakStruct = GH3::QbStruct();
+            GH3::Script::CStruct modPakStruct = GH3::Script::CStruct();
 
-            GH3::Functions::InsertCStringItem(&modPakStruct, 0, expectedPakPath.data());
+            GH3::Script::Functions::InsertCStringItem(&modPakStruct, 0, expectedPakPath.data());
 
             binding::CFunc_LoadPak::Orig(&modPakStruct, script);
             nylon::internal::Log.Info("Done!");
@@ -198,11 +199,11 @@ bool detour__CFunc_LoadPak(GH3::QbStruct* params, CScript* script)
     return ret;
 }
 
-bool detour__CFunc_LoadTexture(GH3::QbStruct* params, CScript* script)
+bool detour__CFunc_LoadTexture(GH3::Script::CStruct* params, CScript* script)
 {
     char* nameBuffer;
 
-    params->GetString(0, &nameBuffer, 0);
+    params->GetNonLocalizedString(0, &nameBuffer, 0);
 
     in::Log.Info("Loading Texture: \"{}\"", nameBuffer);
 
@@ -214,7 +215,7 @@ bool detour__CFunc_LoadTexture(GH3::QbStruct* params, CScript* script)
 nylon::Profile temp = { };
 
 
-bool detour__CFuncs_SetGemConstants(GH3::QbStruct* params, CScript* script)
+bool detour__CFuncs_SetGemConstants(GH3::Script::CStruct* params, CScript* script)
 {
     auto ret = binding::CFuncs_SetGemConstants::Orig(params, script);
 

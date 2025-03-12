@@ -2,8 +2,7 @@
 
 #include <GH3/Common.hpp>
 #include <GH3/Mem/CPoolable.hpp>
-
-#include <GH3/Qb/QbValueType.hpp>
+#include <GH3/Script/SymbolType.hpp>
 #include <GH3//Script/CSymbolTableEntryType.hpp>
 
 namespace GH3::Script

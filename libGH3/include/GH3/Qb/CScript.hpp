@@ -3,7 +3,7 @@
 #include <GH3/Common.hpp>
 #include <GH3/Mem/CPoolable.hpp>
 
-#include <GH3/Qb/QbStruct.hpp>
+#include <GH3/Script/CStruct.hpp>
 
 namespace GH3::Script
 {

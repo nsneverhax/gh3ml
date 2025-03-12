@@ -298,12 +298,12 @@ LRESULT __stdcall WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 #pragma endregion
 
 
-using func_SetNewWhammyValue = nylon::hook::Binding<0x0041de60, nylon::hook::cconv::CDecl, bool, GH3::QbStruct*>;
-bool detourSetNewWhammyValue(GH3::QbStruct* self)
-{
-    return SetNewWhammyValue(self);
-    //return func_SetNewWhammyValue::Orig(self);
-}
+//using func_SetNewWhammyValue = nylon::hook::Binding<0x0041de60, nylon::hook::cconv::CDecl, bool, GH3::QbStruct*>;
+//bool detourSetNewWhammyValue(GH3::QbStruct* self)
+//{
+//    return SetNewWhammyValue(self);
+//    //return func_SetNewWhammyValue::Orig(self);
+//}
 
 
 using CreateHighwayDrawRect = nylon::hook::Binding<0x00601d30, nylon::hook::cconv::CDecl, int, double*, float, float, float, float, float, float, float, float, float, float>;
@@ -366,9 +366,9 @@ void detourNodeArray_SetCFuncInfo(void* startAddress, uint32_t count)
     // Vultu: Don't do anything becuase CFunc Manager will handle it all
 }
 
-using CFuncWait = nylon::hook::Binding<0x0052eaf0, nylon::hook::cconv::CDecl, bool, GH3::QbStruct*, void*>;
+using CFuncWait = nylon::hook::Binding<0x0052eaf0, nylon::hook::cconv::CDecl, bool, GH3::Script::CStruct*, void*>;
 
-bool detourCFuncWait(GH3::QbStruct* params, void* script)
+bool detourCFuncWait(GH3::Script::CStruct* params, void* script)
 {
     // Vultu: Write out deltatime to the memory before we get there, honestly it might be better to rewrite this function later.
 
@@ -464,7 +464,7 @@ void detour__WhammyRelatedFUN_0041b760(int param_1_00, int param_2_00, float par
 // m_DOF_PixelSizeLow
 // m_DOF_PixelSizeHigh
 // m_vDepthOfFieldParams
-using 
+//using 
 void nylon::internal::SetupDefaultHooks()
 {
     PushLogTask("Setting up default hooks");

@@ -2,7 +2,7 @@
 
 #include <Nylon/Checksum.hpp>
 
-#include <GH3/Qb/QbStruct.hpp>
+#include <GH3/Script/CStruct.hpp>
 
 #include <GH3/Script/CSymbolTableEntry.hpp>
 

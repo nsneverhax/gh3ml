@@ -29,7 +29,9 @@
 #define SIZE_ASSERT_FUZZYX(x, s, a) static_assert((sizeof(x) / a * a) + (((x % a) != 0) * a) == s)
 #endif // NO_SIZE_ASSERT
 
+#define GH3Func(name, address, cconv, ret) using name = ret(cconv*)
 
+#define FAST_GH3_API
 
 #define GH3_API __declspec(dllexport)
 
@@ -38,6 +40,10 @@
 
 #include <cstdint>
 #include <string>
+
+#define _STR(x) #x
+#define STR(x) _STR(x)
+#define TODO(x) __pragma(message("TODO: " _STR(x) " :: " __FILE__ "@" STR(__LINE__)))
 
 namespace GH3
 {

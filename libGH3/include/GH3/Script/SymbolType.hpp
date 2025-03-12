@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-namespace GH3
+namespace GH3::Script
 {
-	enum class QbValueType : uint8_t
+	enum QType : uint8
 	{
 		QTypeNull = 0,
 		QTypeInt = 1,
@@ -14,8 +14,8 @@ namespace GH3
 		QTypePair = 5,
 		QTypeVector = 6,
 		QTypeScript = 7,
-		QTypeCFunc = 8,
-		QTypeUnk0x9 = 9,
+		QTypeCFunction = 8,
+		QTypeMemberFunction = 9,
 		QTypeQbStruct = 10,
 		QTypeUnk0xB = 11,
 		QTypeQbArray = 12,

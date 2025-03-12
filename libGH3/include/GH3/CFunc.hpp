@@ -15,6 +15,6 @@ namespace GH3
 	extern uint32_t CFuncArrayCount;
 	extern CFuncDescriptor* CFuncArray;
 
-	bool SetNewWhammyValue(QbStruct* qbStruct);
+	bool SetNewWhammyValue(Script::CStruct* qbStruct);
 }
 

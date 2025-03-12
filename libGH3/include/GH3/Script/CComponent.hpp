@@ -7,22 +7,26 @@
 #include <GH3/Keys.hpp>
 
 #include <GH3/Script/CComponentType.hpp>
-
-#include <GH3/Qb/QbValueType.hpp>
-
+#include <GH3/Script/SymbolType.hpp>
 #include <GH3/Script/CPair.hpp>
 #include <GH3/Script/CArray.hpp>
+
 #include <GH3/Mth/Vector.hpp>
 
-namespace GH3
-{
-	class QbStruct;
-}
+#include <GH3/Mem/CPoolable.hpp>
+
 namespace GH3::Script
 {
-	class CComponent
+	class CStruct;
+
+	constexpr uint32 CComponentListAddress = 0x00c4ee4c;
+	constexpr uint32 CComponentListIndexAddress = 0x00c4ee58;
+
+	class CComponent : Mem::CPoolable<CComponent, CComponentListAddress, CComponentListIndexAddress>
 	{
 	public:
+
+
 		uint8_t unkFlag0;
 		CComponentType Flags;
 		std::uint16_t ScriptSize;
@@ -39,7 +43,7 @@ namespace GH3::Script
 			// QTypeScript
 			// QTypeCFunc
 			// QTypeUnk9
-			QbStruct* StructValue;
+			Script::CStruct* StructValue;
 			Script::CArray* ArrayValue;
 			CRCKey KeyValue;
 			// QTypeQbKeyRef

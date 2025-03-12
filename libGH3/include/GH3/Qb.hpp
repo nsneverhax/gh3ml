@@ -3,7 +3,7 @@
 #include <cstdint>
 
 #include "Keys.hpp"
-#include "Qb/QbStruct.hpp"
+#include <GH3/Script/CStruct.hpp>
 #include "Qb/CScript.hpp"
 
 

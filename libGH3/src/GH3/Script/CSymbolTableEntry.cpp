@@ -88,6 +88,7 @@ namespace GH3
 
 		return entry->CStringValue;
 	}
+
 	CRCKey Script::GetChecksum(CRCKey key)
 	{
 		CSymbolTableEntry* entry = Resolve(key);

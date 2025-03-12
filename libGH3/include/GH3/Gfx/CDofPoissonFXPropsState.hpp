@@ -6,9 +6,6 @@
 
 namespace GH3::Gfx
 {
-	class QbStruct;
-	typedef QbStruct CStruct;
-
 	class CDofPoissonFXPropsState : public CScreenFXPropsState
 	{
 		bool IsOn;
