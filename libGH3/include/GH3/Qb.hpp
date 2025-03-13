@@ -4,7 +4,7 @@
 
 #include "Keys.hpp"
 #include <GH3/Script/CStruct.hpp>
-#include "Qb/CScript.hpp"
+#include <GH3/Script/CScript.hpp>
 
 
 /*

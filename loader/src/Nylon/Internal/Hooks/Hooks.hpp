@@ -2,7 +2,7 @@
 
 #include <Nylon/Hook.hpp>
 
-#include <GH3/Qb/CScript.hpp>
+#include <GH3/Script/CScript.hpp>
 #include <GH3/Script/CStruct.hpp>
 
 #include <cstdint>

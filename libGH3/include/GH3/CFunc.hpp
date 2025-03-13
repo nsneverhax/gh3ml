@@ -2,6 +2,9 @@
 
 #include "Qb.hpp"
 
+#include <GH3/Script/CStruct.hpp>
+#include <GH3/Script/CScript.hpp>
+
 namespace GH3
 {
 	struct CFuncDescriptor
@@ -14,6 +17,9 @@ namespace GH3
 
 	extern uint32_t CFuncArrayCount;
 	extern CFuncDescriptor* CFuncArray;
+
+
+
 
 	bool SetNewWhammyValue(Script::CStruct* qbStruct);
 }
