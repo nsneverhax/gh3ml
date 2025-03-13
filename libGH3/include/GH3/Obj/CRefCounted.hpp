@@ -5,13 +5,17 @@
 namespace GH3::Obj
 {
 	template<class T>
-	class CSmartPointer;
+	class CSmtPtr;
 
 
 	class CRefCounted : public Spt::Class
 	{
 	public:
 		void** vftable;
-		CSmartPointer<CRefCounted>* PointerList;
+		CSmtPtr<CRefCounted>* PointerList;
+
+		void AddSmartPointer(CSmtPtr<CRefCounted>* smtPtr);
+		void RemoveSmartPointer(CSmtPtr<CRefCounted>* smtPtr);
+		void NotifySmartPointers();
 	};
 }

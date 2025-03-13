@@ -13,6 +13,6 @@ add_library(${PROJECT_NAME} STATIC
     "src/GH3/CRC.cpp"
     "src/GH3/Addresses.cpp"
  "src/GH3/Lst/Node.cpp" "src/GH3/Script/CComponentType.cpp" "src/GH3/Script/CSymbolTableEntry.cpp" "src/GH3/Script/CSymbolTableEntryType.cpp" 
- "src/GH3/Mem/CCompactPool.cpp" "src/GH3/Mem/CPoolable.cpp" )
+ "src/GH3/Mem/CCompactPool.cpp" "src/GH3/Mem/CPoolable.cpp"  "src/GH3/Obj/CRefCounted.cpp")
 
 target_include_directories(${PROJECT_NAME} PUBLIC "include/")
