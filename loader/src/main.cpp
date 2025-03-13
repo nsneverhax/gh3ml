@@ -166,6 +166,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         in::SetupDefaultHooks();
         in::SetupCEngineHooks();
         in::SetupGuitarFuncsHooks();
+        in::SetupGfxCScreenFXManagerHooks();
 
         in::LoadMods();
 

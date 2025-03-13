@@ -33,4 +33,6 @@ namespace nylon::internal
 
 	void SetupCEngineHooks();
 	void SetupGuitarFuncsHooks();
+
+	void SetupGfxCScreenFXManagerHooks();
 }

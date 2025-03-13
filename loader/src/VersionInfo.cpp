@@ -1,8 +1,8 @@
 #include <Nylon/VersionInfo.hpp>
 #include <format>
 
-nylon::VersionInfo _currentVersion = { 1, 5, 0, nylon::VersionType::Alpha };
-bool _isPreRelease = true;
+nylon::VersionInfo _currentVersion = { 2, 0, 0, nylon::VersionType::Alpha };
+bool _isPreRelease = false;
 
 const nylon::VersionInfo& nylon::Version()
 {

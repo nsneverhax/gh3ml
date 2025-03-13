@@ -71,39 +71,18 @@ namespace nylon
         0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
     };
 
-    constexpr char FixChar(char c)
-    {
-        if (c >= 'A' && c <= 'Z')
-            return c + 32;
-        if (c == '/')
-            return '\\';
-
-        return c;
-    }
-    constexpr std::uint32_t HashChar(char c, std::uint32_t crc)
-    {
-        return CRC32Table[(crc ^ FixChar(c)) & 0xFF] ^ ((crc >> 8) & 0x00FFFFFF);
-    }
-
-    TODO(This shit dont work!)
-
     constexpr std::uint32_t Hash(const char* string, uint32_t previousKey = 0xffffffff)
     {
         if (string == nullptr)
             return 0;
-        std::uint32_t key = 0xffffffff;
-        const char* ch = string;
-
-        while (true)
+        uint32_t key = previousKey;
+        for (int i = 0; string[i] != '\0'; i++)
         {
-            char c = *ch++;
-
-            if (c == '\0')
-                break;
-
+            char c = std::tolower(string[i]);
+            if (c == '/')
+                c = '\\';
             key = CRC32Table[(key ^ c) & 0xFF] ^ ((key >> 8) & 0x00FFFFFF);
         }
         return key;
-
     }
 }
