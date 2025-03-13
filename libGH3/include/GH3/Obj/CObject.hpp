@@ -62,8 +62,9 @@ namespace GH3::Obj
 		CRCKey field19;
 		undefined4 field20;
 		CAliveRefCounted _base_CAliveRefCounted;
-
+		undefined4 field22;
 	};
+
 	SIZE_ASSERT(CObject::CAliveRefCounted, 0x8);
 	SIZE_ASSERT(CObject, 0x64);
 

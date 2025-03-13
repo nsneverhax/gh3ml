@@ -31,3 +31,5 @@ namespace GH3::CRC
 	CRCKey GenerateCRCFromString(const char* string);
 
 }
+
+#define HASH(x) GH3::CRC::GenerateCRCFromString(x)

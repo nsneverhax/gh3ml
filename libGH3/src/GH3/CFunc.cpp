@@ -7,8 +7,39 @@
 
 #include <algorithm>
 
+#include <GH3/CRC.hpp>
+
+#include <GH3/Script/ScriptCommon.hpp>
+#include <GH3/Script/CArray.hpp>
+
 uint32_t GH3::CFuncArrayCount = 0x492;
 GH3::CFuncDescriptor* GH3::CFuncArray = reinterpret_cast<GH3::CFuncDescriptor*>(0x009551B8);
+
+
+bool GH3::ScriptSetNewWhammyValue(Script::CStruct* params, Script::CScript* script)
+{
+	CRCKey playerStatusChecksum = 0;
+
+	params->GetChecksum(HASH("player_status"), &playerStatusChecksum, 1);
+	Script::CStruct* playerStatus = Script::GetStructure(playerStatusChecksum);
+
+	float value = 0.0;
+	if (params->GetFloat(HASH("value"), &value, 1))
+		return false;
+	
+	int32 player = 0;
+
+	params->GetInteger(HASH("player"), &player, 1);
+
+	CRCKey whammyWibbleKey = player == 1 ? HASH("whammywibble0") : HASH("whammywibble1");
+
+	Script::CArray* whammyWibbleArray = Script::GetArray(whammyWibbleKey);
+
+
+
+	return true;
+
+}
 
 //bool GH3::SetNewWhammyValue(QbStruct* qbStruct)
 //{

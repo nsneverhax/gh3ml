@@ -458,6 +458,14 @@ void detour__WhammyRelatedFUN_0041b760(int param_1_00, int param_2_00, float par
     //*WhammyShorten = 0.5f;
     WhammyRelatedFUN_0041b760::Orig(param_1_00, param_2_00, param3, whammyShortenMultiplier);
 }
+using Nx_CTexture_LoadTexture = nylon::hook::Binding<0x00596280, nylon::hook::cconv::ThisCall, void, void*, char*, char>;
+
+void detour__Nx_CTexture_LoadTexture(void* self, char* filename, char param_2)
+{
+    nylon::internal::Log.Info("Loading Texutre \"{}\"", filename);
+    Nx_CTexture_LoadTexture::Orig(self, filename, param_2);
+}
+
 
 // m_DOF_CoC
 // m_DOF_RadiusScale
@@ -518,6 +526,7 @@ void nylon::internal::SetupDefaultHooks()
 
     nylon::hook::CreateHook<ControllerUpdate>(detour__ControllerUpdate);
     nylon::hook::CreateHook<CRC_FindChecksumeName>(detour__CRC_FindChecksumeName);
+    nylon::hook::CreateHook<Nx_CTexture_LoadTexture>(detour__Nx_CTexture_LoadTexture);
 
     // nylon::hook::CreateHook<WhammyRelatedFUN_0041b760>(detour__WhammyRelatedFUN_0041b760);
 

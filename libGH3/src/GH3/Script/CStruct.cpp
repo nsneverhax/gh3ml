@@ -8,10 +8,10 @@ namespace GH3::Script
 		return reinterpret_cast<bool(__thiscall*)(CStruct*, CRCKey, QType, void*)>(0x004786a0)(this, key, valueType, value);
 	}
 
-	bool CStruct::GetChecksum(CRCKey key, CRCKey& outKey, int printContents)
+	bool CStruct::GetChecksum(CRCKey key, CRCKey* outKey, int printContents)
 	{
 		NEEDS_IMPLEMENTATION();
-		return reinterpret_cast<bool(__thiscall*)(CStruct*, CRCKey, uint32_t*, int)>(0x00478e50)(this, key, &outKey, printContents);
+		return reinterpret_cast<bool(__thiscall*)(CStruct*, CRCKey, CRCKey*, int)>(0x00478e50)(this, key, outKey, printContents);
 	}
 	
 	bool CStruct::GetFloat(CRCKey key, float* out, int printContents)

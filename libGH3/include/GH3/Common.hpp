@@ -41,11 +41,17 @@
 #include <cstdint>
 #include <string>
 
+#include <iostream>
+
 #define _STR(x) #x
 #define STR(x) _STR(x)
 #define TODO(x) __pragma(message("TODO: " _STR(x) " :: " __FILE__ "@" STR(__LINE__)))
 
-#define NEEDS_IMPLEMENTATION() __pragma(__FUNCTION__  in __FILE__ "@" STR(__LINE__))
+#define NEEDS_IMPLEMENTATION() std::cout << __FUNCTION__ << " in " << __FILE__  << " @ " << STR(__LINE__) << " NEEDS IMPLEMENTATION." << std::endl; \
+	__pragma(message("**** IMPLEMENTATION NEEDED **** " __FUNCTION__  " in " __FILE__ "\" @ " STR(__LINE__)))
+
+#define NEEDS_TESTING() std::cout << __FUNCTION__ << " in " << __FILE__  << " @ " << STR(__LINE__) << " NEEDS TO BE TESTED. Please report if it is working!" << std::endl; \
+	__pragma(message("**** TESTING NEEDED **** " __FUNCTION__  " in \"" __FILE__ "\" @ " STR(__LINE__)))
 
 namespace GH3
 {

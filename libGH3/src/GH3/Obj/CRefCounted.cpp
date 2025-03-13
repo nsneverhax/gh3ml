@@ -3,19 +3,23 @@
 
 namespace GH3::Obj
 {
+	CRefCounted::~CRefCounted()
+	{
+		NotifySmartPointers();
+	}
 
 	void CRefCounted::AddSmartPointer(CSmtPtr<CRefCounted>* smtPtr)
 	{
-		smtPtr->Next = this->PointerList;
-		if (this->PointerList != NULL) {
-			this->PointerList->Previous = smtPtr;
+		smtPtr->Next = this->mp_pointerList;
+		if (this->mp_pointerList != NULL) {
+			this->mp_pointerList->Previous = smtPtr;
 		}
-		this->PointerList = smtPtr;
+		this->mp_pointerList = smtPtr;
 	}
 	void CRefCounted::RemoveSmartPointer(CSmtPtr<CRefCounted>* smtPtr)
 	{
 		if (smtPtr->Previous == NULL) {
-			this->PointerList = smtPtr->Next;
+			this->mp_pointerList = smtPtr->Next;
 		}
 		else {
 			smtPtr->Previous->Next = smtPtr->Next;
@@ -32,12 +36,12 @@ namespace GH3::Obj
 		CRefCounted* piVar2;
 		CSmtPtr<CRefCounted>* piVar1;
 
-		pCVar1 = this->PointerList;
+		pCVar1 = this->mp_pointerList;
 		while (pCVar1 != NULL) {
 			piVar1 = pCVar1->Next;
 			if (pCVar1->Data != NULL) {
 				if (pCVar1->Previous == NULL) {
-					pCVar1->Data->PointerList = piVar1;
+					pCVar1->Data->mp_pointerList = piVar1;
 				}
 				else {
 					pCVar1->Previous->Next = piVar1;

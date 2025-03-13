@@ -10,9 +10,11 @@ namespace GH3::Obj
 
 	class CRefCounted : public Spt::Class
 	{
+	protected:
+		CSmtPtr<CRefCounted>* mp_pointerList;
 	public:
-		void** vftable;
-		CSmtPtr<CRefCounted>* PointerList;
+
+		virtual ~CRefCounted();
 
 		void AddSmartPointer(CSmtPtr<CRefCounted>* smtPtr);
 		void RemoveSmartPointer(CSmtPtr<CRefCounted>* smtPtr);

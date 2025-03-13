@@ -22,7 +22,7 @@ namespace GH3::Script
 
 		void AddComponent(CComponent* component, int param_2);
 
-		bool GetChecksum(CRCKey key, CRCKey& outKey, int printContents = false);
+		bool GetChecksum(CRCKey key, CRCKey* outKey, int printContents = false);
 
 		bool GetFloat(CRCKey key, float* out, int printContents = false);
 		bool GetArray(CRCKey key, void* out, int printContents = false);

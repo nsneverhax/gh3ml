@@ -90,7 +90,7 @@ bool detour__CFunc_PrintStruct(GH3::Script::CStruct* params, GH3::Script::CScrip
             in::LogGH3.SetIndentLevel(in::LogGH3.GetIndentLevel() - 1);
             break;
         case GH3::Script::CComponentType::QTypeQbArray:
-            in::LogGH3.Info("\t{0}Type:\"{1}\" Size:{2}", key, GH3::Script::to_string(component->GetType()), component->ArrayValue->size);
+            in::LogGH3.Info("\t{0}Type:\"{1}\" Size:{2}", key, GH3::Script::to_string(component->GetType()), component->ArrayValue->Size);
             break;
         case GH3::Script::CComponentType::QTypeQbKey:
             in::LogGH3.Info("\t{}", GH3::CRC::FindChecksumName(component->KeyValue));

@@ -38,8 +38,8 @@ namespace GH3::Lst
 		void SetPrevious(Node<T>* node);
 
 		Priority GetPriority() const;
-		Node<T> GetNext() const;
-		Node<T> GetPrevious() const;
+		Node<T>* GetNext() const;
+		Node<T>* GetPrevious() const;
 		T* GetData() const;
 
 		Node<T>* IterateNext() const;
@@ -83,12 +83,12 @@ namespace GH3::Lst
 		return m_priority;
 	}
 	template<class T>
-	Node<T> Node<T>::GetNext() const
+	Node<T>* Node<T>::GetNext() const
 	{
 		return m_next->IsHead() ? nullptr : m_next;
 	}
 	template<class T>
-	Node<T> Node<T>::GetPrevious() const
+	Node<T>* Node<T>::GetPrevious() const
 	{
 		return m_previous->IsHead() ? nullptr : m_previous;
 	}
