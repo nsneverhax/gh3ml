@@ -27,7 +27,6 @@
 #include <GH3/Ass/CAssMan.hpp>
 
 #include <GH3/Obj/CTracker.hpp>
-#include <GH3/Qb/CArray.hpp>
 
 #include <GH3/Front/CScreenElement.hpp>
 #include <GH3/Front/CSpriteElement.hpp>
@@ -35,5 +34,10 @@
 #include <GH3/Gfx/CDofPFXPropsState.hpp>
 #include <GH3/Gfx/CDofPoissonFXPropsState.hpp>
 #include <GH3/Gfx/CScreenFXPropsState.hpp>
+#include <GH3/Gfx/CScreenFXManager.hpp>
+
+#include <GH3/Nx/CViewport.hpp>
+
+#include <GH3/NxXenon/sSprite.hpp>
 
 GH3::Spt::SingletonPtr<GH3::Obj::CTracker> GH3::Obj_CTracker = { reinterpret_cast<GH3::Obj::CTracker*>(0x00b4f360) };

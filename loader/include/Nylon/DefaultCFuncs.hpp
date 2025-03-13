@@ -21,12 +21,6 @@ namespace nylon::CFuncs
 	bool HasConVar(GH3::Script::CStruct* params, GH3::Script::CScript* script);
 	bool RegisterConVar(GH3::Script::CStruct* params, GH3::Script::CScript* script);
 
-	//bool SetPrintStructReportType(GH3::Script::CStruct* params, GH3::Script::CScript* script);
-	//bool GetPrintStructReportType(GH3::Script::CStruct* params, GH3::Script::CScript* script);
-
-	//bool SetPrintStructReportName(GH3::Script::CStruct* params, GH3::Script::CScript* script);
-	//bool GetPrintStructReportName(GH3::Script::CStruct* params, GH3::Script::CScript* script);
-
 	bool SetNylonFlag(GH3::Script::CStruct* params, GH3::Script::CScript* script);
 	bool GetNylonFlag(GH3::Script::CStruct* params, GH3::Script::CScript* script);
 

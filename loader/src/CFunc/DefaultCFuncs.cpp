@@ -36,32 +36,28 @@ bool cf::RegisterConVar(GH3::Script::CStruct* params, CScript* script)
 {
 	return true;
 }
-extern bool cf::PrintStructReportType = true;
 
-bool cf::SetPrintStructReportType(GH3::Script::CStruct* params, CScript * script)
+
+
+bool cf::SetNylonFlag(GH3::Script::CStruct* params, GH3::Script::CScript* script)
 {
-	if (params->ContainsFlag(KEY_TRUE))
-		PrintStructReportType = true;
-	else if (params->ContainsFlag(KEY_FALSE))
-		PrintStructReportType = false;
+
 	return true;
 }
-bool cf::GetPrintStructReportType(GH3::Script::CStruct* params, CScript* script)
+bool cf::GetNylonFlag(GH3::Script::CStruct* params, GH3::Script::CScript* script)
 {
-	return PrintStructReportType;
+
 }
 
-extern bool cf::PrintStructReportName = true;
+bool cf::IsBandAerosmith(GH3::Script::CStruct* params, GH3::Script::CScript* script)
+{
 
-bool cf::SetPrintStructReportName(GH3::Script::CStruct* params, CScript* script)
-{
-	if (params->ContainsFlag(KEY_TRUE))
-		PrintStructReportType = true;
-	else if (params->ContainsFlag(KEY_FALSE))
-		PrintStructReportType = false;
-	return true;
 }
-bool cf::GetPrintStructReportName(GH3::Script::CStruct* params, CScript* script)
+bool cf::IsSongAerosmith(GH3::Script::CStruct* params, GH3::Script::CScript* script)
 {
-	return PrintStructReportType;
+
+}
+bool cf::IsFiveBandSong(GH3::Script::CStruct* params, GH3::Script::CScript* script)
+{
+
 }
