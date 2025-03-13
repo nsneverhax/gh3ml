@@ -7,11 +7,11 @@ namespace GH3::Obj
 	class CRefCounted;
 
 	template <class T>
-	class CSmartPointer
+	class CSmtPtr
 	{
 	public:
 		T* Data;
-		CSmartPointer<CRefCounted>* Previous;
-		CSmartPointer<CRefCounted>* Next;
+		CSmtPtr<CRefCounted>* Previous;
+		CSmtPtr<CRefCounted>* Next;
 	};
 }

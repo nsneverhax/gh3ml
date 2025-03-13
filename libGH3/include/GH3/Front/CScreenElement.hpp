@@ -36,11 +36,11 @@ namespace GH3::Front
 	class CScreenElement : public Obj::CObject
 	{
 	public:
-		Obj::CSmartPointer<CScreenElement> Parent;
-		Obj::CSmartPointer<CScreenElement> ChildList;
+		Obj::CSmtPtr<CScreenElement> Parent;
+		Obj::CSmtPtr<CScreenElement> ChildList;
 
-		Obj::CSmartPointer<CScreenElement> Next;
-		Obj::CSmartPointer<CScreenElement> Previous;
+		Obj::CSmtPtr<CScreenElement> Next;
+		Obj::CSmtPtr<CScreenElement> Previous;
 
 		ConcatProps LocalProperties;
 		ConcatProps TargetProperties;

@@ -7,9 +7,6 @@
 
 namespace nylon::CFuncs
 {
-	extern bool PrintStructReportType;
-	extern bool PrintStructReportName;
-
 	using CFunction = bool(*)(GH3::Script::CStruct*, GH3::Script::CScript);
 
 	// typedef CFunction = (bool)(*)(GH3::QbStruct*, GH3::QbScript*);

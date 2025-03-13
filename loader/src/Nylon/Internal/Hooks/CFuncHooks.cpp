@@ -33,8 +33,8 @@ bool detour__CFunc_PrintStruct(GH3::Script::CStruct* params, GH3::Script::CScrip
 
         std::string key = "";
 
-        bool reportName = nylon::CFuncs::PrintStructReportName;
-        bool reportType = nylon::CFuncs::PrintStructReportType;
+        bool reportName = true;
+        bool reportType = true;
 
         if (!reportName && !reportType)
             key = "";

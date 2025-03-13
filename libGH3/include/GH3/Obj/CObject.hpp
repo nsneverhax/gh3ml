@@ -18,6 +18,29 @@ namespace GH3::Obj
 
 		};
 
+		virtual ~CObject()
+		{
+
+		}
+
+		virtual void FUN_00d98e8a(void* param_1)
+		{
+			NEEDS_IMPLEMENTATION();
+			reinterpret_cast<void(__thiscall*)(CObject*, void*)>(0x004e5460)(this, param_1);
+		}
+		virtual void SetProperties(void* param_1)
+		{
+			NEEDS_IMPLEMENTATION();
+			reinterpret_cast<void(__thiscall*)(CObject*, void*)>(0x004e53b0)(this, param_1);
+		}
+
+		void RemoveTagsFromScript(uint32 param_1)
+		{
+			NEEDS_IMPLEMENTATION();
+			reinterpret_cast<void(__thiscall*)(CObject*, int)>(0x00d98a1f)(this, param_1);
+		}
+
+
 		uint32 Flags;
 		void* Manager;
 		CScript* Script;
@@ -39,7 +62,7 @@ namespace GH3::Obj
 		CRCKey field19;
 		undefined4 field20;
 		CAliveRefCounted _base_CAliveRefCounted;
-		undefined1* This; // this???
+
 	};
 	SIZE_ASSERT(CObject::CAliveRefCounted, 0x8);
 	SIZE_ASSERT(CObject, 0x64);

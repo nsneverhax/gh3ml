@@ -41,23 +41,22 @@ bool cf::RegisterConVar(GH3::Script::CStruct* params, CScript* script)
 
 bool cf::SetNylonFlag(GH3::Script::CStruct* params, GH3::Script::CScript* script)
 {
-
-	return true;
+	return false;
 }
 bool cf::GetNylonFlag(GH3::Script::CStruct* params, GH3::Script::CScript* script)
 {
-
+	return false;
 }
 
 bool cf::IsBandAerosmith(GH3::Script::CStruct* params, GH3::Script::CScript* script)
 {
-
+	return false;
 }
 bool cf::IsSongAerosmith(GH3::Script::CStruct* params, GH3::Script::CScript* script)
 {
-
+	return false;
 }
 bool cf::IsFiveBandSong(GH3::Script::CStruct* params, GH3::Script::CScript* script)
 {
-
+	return false;
 }

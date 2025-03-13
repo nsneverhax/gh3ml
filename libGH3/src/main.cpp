@@ -35,8 +35,10 @@
 #include <GH3/Gfx/CDofPoissonFXPropsState.hpp>
 #include <GH3/Gfx/CScreenFXPropsState.hpp>
 #include <GH3/Gfx/CScreenFXManager.hpp>
+#include <GH3/Gfx/Camera.hpp>
 
 #include <GH3/Nx/CViewport.hpp>
+#include <GH3/Nx/CXenonViewport.hpp>
 
 #include <GH3/NxXenon/sSprite.hpp>
 

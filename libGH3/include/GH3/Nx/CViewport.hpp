@@ -2,8 +2,15 @@
 
 #include <GH3/Common.hpp>
 
+#include <GH3/Obj/CSmartPointer.hpp>
+#include <GH3/Gfx/Camera.hpp>
+
 namespace GH3::Nx
 {
+	//
+	//
+	// vftable[2] -> CreateRenderTarget
+	//
 	class CViewport
 	{
 	public:
@@ -24,12 +31,12 @@ namespace GH3::Nx
 		undefined4 field14;
 		undefined4 field15;
 		undefined4 field16;
-		undefined4 field17;
-		undefined4 field18;
-		undefined4 field19;
+		Obj::CSmtPtr<Gfx::Camera> Camera;
 		undefined4 field20;
 		undefined4 field21;
 		undefined4 field22;
+
+		void CreateRenderTarget();
 	};
 
 	SIZE_ASSERT(CViewport, 0x5C);
